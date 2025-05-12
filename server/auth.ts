@@ -29,7 +29,9 @@ export function setupAuth(app: Express) {
     store: sessionStore,
     cookie: {
       httpOnly: true,
-      maxAge: 24 * 60 * 60 * 1000 // 24 hours
+      maxAge: 24 * 60 * 60 * 1000, // 24 hours
+      secure: process.env.NODE_ENV === 'production', // Only use HTTPS in production
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax' // Allow cross-site in production (for Replit deployment)
     }
   };
 
