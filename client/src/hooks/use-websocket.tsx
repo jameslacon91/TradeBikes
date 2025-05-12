@@ -16,14 +16,20 @@ const WebSocketContext = createContext<WebSocketContextType>({
   registerAuthenticatedUser: () => console.warn('WebSocket not initialized')
 });
 
+// Check if we're running in the browser
+const isBrowser = typeof window !== 'undefined';
+
 // Export the provider component that will wrap our app
 export function WebSocketProvider({ children }: { children: ReactNode }) {
+  // Only create state if in browser
   const [socket, setSocket] = useState<WebSocket | null>(null);
   const [connected, setConnected] = useState(false);
   const [userId, setUserId] = useState<number | null>(null);
 
-  // Setup WebSocket connection
+  // Setup WebSocket connection - only in browser
   useEffect(() => {
+    if (!isBrowser) return; // Return early if not in browser
+    
     let ws: WebSocket | null = null;
     
     try {
@@ -82,6 +88,8 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
 
   // Register user ID when it changes
   useEffect(() => {
+    if (!isBrowser) return; // Return early if not in browser
+    
     if (socket && connected && userId) {
       socket.send(JSON.stringify({
         type: 'register',
@@ -93,11 +101,14 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
 
   // Function to register authenticated user
   const registerAuthenticatedUser = (newUserId: number) => {
+    if (!isBrowser) return; // Return early if not in browser
     setUserId(newUserId);
   };
 
   // Handle incoming WebSocket messages
   const handleWebSocketMessage = (message: WSMessage) => {
+    if (!isBrowser) return; // Return early if not in browser
+    
     console.log('Received WebSocket message:', message);
     
     // Handle based on message type
@@ -120,6 +131,8 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
 
   // Send a message through the WebSocket
   const sendMessage = (message: WSMessage) => {
+    if (!isBrowser) return; // Return early if not in browser
+    
     if (socket && connected) {
       socket.send(JSON.stringify(message));
     } else {

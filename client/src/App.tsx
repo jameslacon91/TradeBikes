@@ -34,7 +34,8 @@ function Router() {
       {/* Protected routes */}
       <ProtectedRoute path="/dashboard" component={() => {
         const { user } = useAuth();
-        return user?.role === 'dealer' ? <DealerDashboard /> : <TraderDashboard />;
+        if (!user) return null; // Handle case when user might be null
+        return user.role === 'dealer' ? <DealerDashboard /> : <TraderDashboard />;
       }} />
       
       <ProtectedRoute path="/subscription" component={SubscriptionPage} />
@@ -48,7 +49,8 @@ function Router() {
       {/* Account related routes */}
       <ProtectedRoute path="/account" component={() => {
         const { user } = useAuth();
-        return user?.role === 'dealer' ? <DealerDashboard /> : <TraderDashboard />;
+        if (!user) return null; // Handle case when user might be null
+        return user.role === 'dealer' ? <DealerDashboard /> : <TraderDashboard />;
       }} />
       
       {/* Map and search routes */}
