@@ -29,29 +29,33 @@ export default function SubscriptionPage() {
   const subscriptionPlans: SubscriptionPlan[] = [
     {
       id: 'basic',
-      name: 'Basic Trader',
-      price: billingInterval === 'month' ? 149 : 1490,
+      name: 'Basic Subscription',
+      price: billingInterval === 'month' ? 125 : 1350, // £125/month, yearly with 10% discount
       interval: billingInterval,
       features: [
-        'Unlimited purchases & sales',
-        'Real-time auction notifications',
-        'Direct messaging with dealers',
-        'Access to complete vehicle history',
-        'Downloadable transaction records'
+        'Unlimited listings',
+        'Real-time bidding system',
+        'Full notification system',
+        'In-app messaging',
+        'Basic reporting',
+        'Email support',
+        'High-quality image uploads'
       ]
     },
     {
-      id: 'premium',
-      name: 'Premium Trader',
-      price: billingInterval === 'month' ? 249 : 2490,
+      id: 'pro',
+      name: 'Pro Subscription',
+      price: billingInterval === 'month' ? 250 : 2700, // £250/month (estimated), yearly with 10% discount
       interval: billingInterval,
       features: [
-        'All Basic Trader features',
-        'HPI check lookup integration',
-        'CAP guide integration',
-        'Automated vehicle valuation',
-        'Premium customer support',
-        'Early access to new features'
+        'All Basic features',
+        'Integrated HPI checks',
+        'ANPR integration',
+        'API data exports',
+        'Advanced analytics',
+        'Priority support',
+        'Custom branding options',
+        'Coming soon'
       ]
     }
   ];
@@ -87,10 +91,15 @@ export default function SubscriptionPage() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
           {subscriptionPlans.map((plan) => (
-            <Card key={plan.id} className={plan.id === 'premium' ? 'border-primary shadow-lg' : ''}>
-              {plan.id === 'premium' && (
+            <Card key={plan.id} className={plan.id === 'basic' ? 'border-primary shadow-lg' : ''}>
+              {plan.id === 'basic' && (
                 <div className="absolute top-0 right-0 bg-primary text-white px-3 py-1 text-sm font-medium rounded-bl-lg rounded-tr-lg">
                   POPULAR
+                </div>
+              )}
+              {plan.id === 'pro' && (
+                <div className="absolute top-0 right-0 bg-amber-500 text-white px-3 py-1 text-sm font-medium rounded-bl-lg rounded-tr-lg">
+                  COMING SOON
                 </div>
               )}
               <CardHeader>
@@ -115,10 +124,11 @@ export default function SubscriptionPage() {
               <CardFooter>
                 <Button 
                   className="w-full" 
-                  variant={plan.id === 'premium' ? 'default' : 'outline'} 
+                  variant={plan.id === 'basic' ? 'default' : 'outline'} 
                   onClick={() => handleSubscribe(plan.id)}
+                  disabled={plan.id === 'pro'}
                 >
-                  Select {plan.name}
+                  {plan.id === 'pro' ? 'Coming Soon' : `Select ${plan.name}`}
                 </Button>
               </CardFooter>
             </Card>

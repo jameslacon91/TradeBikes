@@ -83,6 +83,195 @@ export default function AboutPage() {
           </div>
         </div>
 
+        {/* Key Features */}
+        <div className="mb-16">
+          <h2 className="text-3xl font-bold mb-8 text-center">Key Features</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="bg-white p-6 rounded-lg border border-gray-200 flex flex-col">
+              <h3 className="font-semibold mb-2">Role-Based Access</h3>
+              <p className="text-sm text-muted-foreground flex-grow">
+                Separate dashboards and features for Dealers, Traders, and Administrators, each with tailored functionality
+              </p>
+            </div>
+            <div className="bg-white p-6 rounded-lg border border-gray-200 flex flex-col">
+              <h3 className="font-semibold mb-2">Comprehensive Listings</h3>
+              <p className="text-sm text-muted-foreground flex-grow">
+                Create detailed motorcycle listings with registration details, full specifications, and up to 20 high-quality photos
+              </p>
+            </div>
+            <div className="bg-white p-6 rounded-lg border border-gray-200 flex flex-col">
+              <h3 className="font-semibold mb-2">Real-Time Bidding</h3>
+              <p className="text-sm text-muted-foreground flex-grow">
+                Live auction system with built-in messaging between dealers and traders to facilitate negotiation
+              </p>
+            </div>
+            <div className="bg-white p-6 rounded-lg border border-gray-200 flex flex-col">
+              <h3 className="font-semibold mb-2">Post-Sale Tracking</h3>
+              <p className="text-sm text-muted-foreground flex-grow">
+                Complete auction history and transaction management for both buyers and sellers
+              </p>
+            </div>
+            <div className="bg-white p-6 rounded-lg border border-gray-200 flex flex-col">
+              <h3 className="font-semibold mb-2">Smart Notification System</h3>
+              <p className="text-sm text-muted-foreground flex-grow">
+                Customizable alerts for new listings, bids, messages, and auction completions to keep you informed
+              </p>
+            </div>
+            <div className="bg-white p-6 rounded-lg border border-gray-200 flex flex-col">
+              <h3 className="font-semibold mb-2">Private Listings</h3>
+              <p className="text-sm text-muted-foreground flex-grow">
+                Option to create invitation-only auctions for select traders, perfect for special or high-value motorcycles
+              </p>
+            </div>
+          </div>
+        </div>
+        
+        {/* Pricing */}
+        <div className="mb-16">
+          <h2 className="text-3xl font-bold mb-8 text-center">Subscription Plans</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-5xl mx-auto">
+            <div className="col-span-1 lg:col-span-1">
+              {/* Free Trial */}
+              <div className="bg-white rounded-lg border-2 border-gray-200 p-8 h-full flex flex-col">
+                <h3 className="text-xl font-bold mb-2">Free Trial</h3>
+                <div className="mb-4">
+                  <span className="text-3xl font-bold">£0</span>
+                  <span className="text-gray-500 ml-1">/ 14 days</span>
+                </div>
+                <p className="text-sm text-muted-foreground mb-6">
+                  Experience all platform features with no commitment
+                </p>
+                <ul className="space-y-3 mb-8 flex-grow">
+                  <li className="flex items-start">
+                    <svg className="h-5 w-5 text-green-500 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                    <span className="text-sm">Full platform access</span>
+                  </li>
+                  <li className="flex items-start">
+                    <svg className="h-5 w-5 text-green-500 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                    <span className="text-sm">Card-on-file required</span>
+                  </li>
+                  <li className="flex items-start">
+                    <svg className="h-5 w-5 text-green-500 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                    <span className="text-sm">No obligation</span>
+                  </li>
+                </ul>
+                <Button variant="outline" className="w-full" asChild>
+                  <Link href="/register">Start Free Trial</Link>
+                </Button>
+              </div>
+            </div>
+            
+            <div className="col-span-1 lg:col-span-1">
+              {/* Basic Subscription */}
+              <div className="bg-white rounded-lg border-2 border-primary p-8 h-full flex flex-col relative">
+                <div className="absolute top-0 right-0 bg-primary text-white text-xs px-3 py-1 rounded-bl-lg rounded-tr-lg">
+                  POPULAR
+                </div>
+                <h3 className="text-xl font-bold mb-2">Basic Subscription</h3>
+                <div className="mb-4">
+                  <span className="text-3xl font-bold">£125</span>
+                  <span className="text-gray-500 ml-1">/ month + VAT</span>
+                </div>
+                <p className="text-sm text-muted-foreground mb-6">
+                  Perfect for most dealers and traders
+                </p>
+                <ul className="space-y-3 mb-8 flex-grow">
+                  <li className="flex items-start">
+                    <svg className="h-5 w-5 text-green-500 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                    <span className="text-sm">Unlimited listings</span>
+                  </li>
+                  <li className="flex items-start">
+                    <svg className="h-5 w-5 text-green-500 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                    <span className="text-sm">Real-time bidding</span>
+                  </li>
+                  <li className="flex items-start">
+                    <svg className="h-5 w-5 text-green-500 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                    <span className="text-sm">Full notification system</span>
+                  </li>
+                  <li className="flex items-start">
+                    <svg className="h-5 w-5 text-green-500 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                    <span className="text-sm">Basic reporting</span>
+                  </li>
+                  <li className="flex items-start">
+                    <svg className="h-5 w-5 text-green-500 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                    <span className="text-sm">Email support</span>
+                  </li>
+                </ul>
+                <Button className="w-full" asChild>
+                  <Link href="/register">Subscribe Now</Link>
+                </Button>
+              </div>
+            </div>
+            
+            <div className="col-span-1 lg:col-span-1">
+              {/* Pro Tier (Coming soon) */}
+              <div className="bg-white rounded-lg border-2 border-gray-200 p-8 h-full flex flex-col relative opacity-75">
+                <div className="absolute top-0 right-0 bg-amber-500 text-white text-xs px-3 py-1 rounded-bl-lg rounded-tr-lg">
+                  COMING SOON
+                </div>
+                <h3 className="text-xl font-bold mb-2">Pro Subscription</h3>
+                <div className="mb-4">
+                  <span className="text-3xl font-bold">Contact Sales</span>
+                </div>
+                <p className="text-sm text-muted-foreground mb-6">
+                  Advanced features for power users
+                </p>
+                <ul className="space-y-3 mb-8 flex-grow">
+                  <li className="flex items-start">
+                    <svg className="h-5 w-5 text-green-500 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                    <span className="text-sm">All Basic features</span>
+                  </li>
+                  <li className="flex items-start">
+                    <svg className="h-5 w-5 text-green-500 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                    <span className="text-sm">Integrated HPI checks</span>
+                  </li>
+                  <li className="flex items-start">
+                    <svg className="h-5 w-5 text-green-500 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                    <span className="text-sm">ANPR integration</span>
+                  </li>
+                  <li className="flex items-start">
+                    <svg className="h-5 w-5 text-green-500 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                    <span className="text-sm">API data exports</span>
+                  </li>
+                  <li className="flex items-start">
+                    <svg className="h-5 w-5 text-green-500 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                    <span className="text-sm">Priority support</span>
+                  </li>
+                </ul>
+                <Button variant="outline" className="w-full" disabled>
+                  Coming Soon
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+        
         {/* Benefits */}
         <div className="mb-16">
           <h2 className="text-3xl font-bold mb-8 text-center">Platform Benefits</h2>
