@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
-import Layout from "@/components/layout/Layout";
+import NotificationTest from "@/components/notifications/NotificationTest";
 import { Button } from "@/components/ui/button";
 import { TradeBikesLogo } from "@/components/logo";
 
@@ -17,10 +17,15 @@ export default function HomePage() {
   }, [user, navigate]);
 
   return (
-    <Layout>
+    <div className="container mx-auto px-4 py-8">
+      <div className="max-w-4xl mx-auto mb-12">
+        <h2 className="text-2xl font-bold mb-4">Notifications Test Panel</h2>
+        <NotificationTest />
+      </div>
+    
       <div className="relative">
         {/* Hero Section */}
-        <div className="bg-primary-light py-12 md:py-24">
+        <div className="bg-primary-light py-12 md:py-24 rounded-lg">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="md:flex md:items-center md:justify-between">
               <div className="md:w-1/2 text-white">
@@ -232,6 +237,6 @@ export default function HomePage() {
           </div>
         </div>
       </div>
-    </Layout>
+    </div>
   );
 }
