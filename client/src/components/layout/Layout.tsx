@@ -144,20 +144,20 @@ export default function Layout({ children }: LayoutProps) {
             <div>
               <h4 className="font-semibold mb-4">Quick Links</h4>
               <ul className="space-y-2">
-                <li><Link href="/"><a className="text-gray-600 hover:text-primary text-sm">Home</a></Link></li>
-                <li><Link href="/about"><a className="text-gray-600 hover:text-primary text-sm">About Us</a></Link></li>
-                <li><Link href="/stock"><a className="text-gray-600 hover:text-primary text-sm">View Stock</a></Link></li>
-                <li><Link href="/register"><a className="text-gray-600 hover:text-primary text-sm">Register</a></Link></li>
+                <li><Link href="/" className="text-gray-600 hover:text-primary text-sm">Home</Link></li>
+                <li><Link href="/about" className="text-gray-600 hover:text-primary text-sm">About Us</Link></li>
+                <li><Link href="/stock" className="text-gray-600 hover:text-primary text-sm">View Stock</Link></li>
+                <li><Link href="/register" className="text-gray-600 hover:text-primary text-sm">Register</Link></li>
               </ul>
             </div>
             
             <div>
               <h4 className="font-semibold mb-4">Support</h4>
               <ul className="space-y-2">
-                <li><Link href="/contact"><a className="text-gray-600 hover:text-primary text-sm">Contact Us</a></Link></li>
-                <li><Link href="/faq"><a className="text-gray-600 hover:text-primary text-sm">FAQ</a></Link></li>
-                <li><Link href="/privacy"><a className="text-gray-600 hover:text-primary text-sm">Privacy Policy</a></Link></li>
-                <li><Link href="/terms"><a className="text-gray-600 hover:text-primary text-sm">Terms of Service</a></Link></li>
+                <li><Link href="/contact" className="text-gray-600 hover:text-primary text-sm">Contact Us</Link></li>
+                <li><Link href="/faq" className="text-gray-600 hover:text-primary text-sm">FAQ</Link></li>
+                <li><Link href="/privacy" className="text-gray-600 hover:text-primary text-sm">Privacy Policy</Link></li>
+                <li><Link href="/terms" className="text-gray-600 hover:text-primary text-sm">Terms of Service</Link></li>
               </ul>
             </div>
             
