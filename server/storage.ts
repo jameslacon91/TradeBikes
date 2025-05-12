@@ -618,8 +618,6 @@ export class MemStorage implements IStorage {
       id: this.auctionId++,
       motorcycleId: motorcycle1.id,
       dealerId: dealer.id,
-      startingPrice: 5000,
-      reservePrice: 5500,
       startTime: new Date(Date.now() - 3600000), // 1 hour ago
       endTime: oneHourFromNow,
       status: 'active',
@@ -633,8 +631,6 @@ export class MemStorage implements IStorage {
       id: this.auctionId++,
       motorcycleId: motorcycle2.id,
       dealerId: dealer.id,
-      startingPrice: 14000,
-      reservePrice: 15000,
       startTime: new Date(Date.now() - 7200000), // 2 hours ago
       endTime: fourHoursFromNow,
       status: 'active',

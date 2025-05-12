@@ -187,7 +187,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ message: "Authentication required" });
       }
       
-      const { motorcycleId, startingPrice, reservePrice, startTime, endTime } = validationResult.data;
+      const { motorcycleId, startTime, endTime } = validationResult.data;
       
       // Verify motorcycle exists and belongs to dealer
       const motorcycle = await storage.getMotorcycle(motorcycleId);
@@ -207,8 +207,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const auction = await storage.createAuction({
         motorcycleId,
         dealerId: req.user.id,
-        startingPrice,
-        reservePrice,
         startTime: startTimeDate,
         endTime: endTimeDate
       });
