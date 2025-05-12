@@ -15,45 +15,71 @@ export default function HomePage() {
   return (
     <Layout>
       {/* Hero Section */}
-      <div className="bg-gradient-to-r from-primary to-primary-dark">
-        <div className="container mx-auto px-4 py-16 md:py-24">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+      <div className="relative overflow-hidden bg-gradient-to-r from-primary to-primary-dark">
+        {/* Background pattern */}
+        <div className="absolute inset-0 z-0 opacity-10">
+          <svg className="h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+            <defs>
+              <pattern id="motorcycle-pattern" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
+                <path d="M10,0 L20,10 L10,20 L0,10 Z" fill="currentColor" />
+              </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#motorcycle-pattern)" />
+          </svg>
+        </div>
+        
+        <div className="container relative z-10 mx-auto px-4 py-20 md:py-28">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
             <div>
-              <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">
-                Revolutionizing Motorcycle Trading
+              <div className="inline-block mb-4 bg-white/20 backdrop-blur-sm px-4 py-1 rounded-full">
+                <p className="text-white text-sm font-medium">B2B Motorcycle Trading Platform</p>
+              </div>
+              <h1 className="text-4xl md:text-5xl font-bold text-white mb-6 leading-tight">
+                Revolutionizing <span className="text-amber-200">Motorcycle Trading</span>
               </h1>
-              <p className="text-xl text-white/90 mb-8">
-                TradeBikes is a B2B platform that modernizes the way used motorcycles are traded between dealerships and traders.
+              <p className="text-xl text-white/90 mb-8 leading-relaxed">
+                TradeBikes is the modern way to trade used motorcycles between dealerships and traders with real-time auctions.
               </p>
               <div className="flex flex-wrap gap-4">
                 <Link href="/register">
-                  <Button size="lg" className="bg-white text-primary hover:bg-gray-100">
+                  <Button size="lg" className="bg-white text-primary hover:bg-gray-100 shadow-lg hover:shadow-xl transition-all duration-300">
                     Register Now
                   </Button>
                 </Link>
-                <Link href="/stock">
-                  <Button size="lg" variant="outline" className="text-white border-white hover:bg-white/10">
-                    View Current Stock
+                <Link href="/auctions">
+                  <Button size="lg" variant="outline" className="text-white border-white hover:bg-white/10 transition-all duration-300">
+                    Browse Auctions
                   </Button>
                 </Link>
               </div>
+              <p className="mt-6 text-white/70 text-sm">
+                Free 14-day trial • £125/month + VAT thereafter • No credit card required
+              </p>
             </div>
             <div className="hidden md:block">
-              <div className="bg-white p-6 rounded-lg shadow-lg">
-                <div className="aspect-video bg-gray-100 rounded-md mb-4 flex items-center justify-center">
-                  <Bike className="h-24 w-24 text-gray-400"/>
+              <div className="bg-white/10 backdrop-blur-md p-6 rounded-2xl shadow-xl border border-white/20">
+                <div className="aspect-video bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl mb-4 flex items-center justify-center overflow-hidden relative">
+                  <div className="absolute inset-0 bg-black/20"></div>
+                  <img 
+                    src="https://images.unsplash.com/photo-1571646750134-f19967f97042"
+                    alt="Motorcycle auction preview"
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-1 rounded-md">
+                    LIVE
+                  </div>
                 </div>
                 <div className="flex justify-between mb-4">
                   <div>
-                    <p className="text-sm text-gray-500">Current Bid</p>
-                    <p className="text-lg font-bold">£5,850</p>
+                    <p className="text-sm text-white/70">Current Bid</p>
+                    <p className="text-xl font-bold text-white">£5,850</p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-500">Time Left</p>
-                    <p className="text-lg font-bold text-red-500">01:23:45</p>
+                    <p className="text-sm text-white/70">Time Left</p>
+                    <p className="text-xl font-bold text-amber-300">01:23:45</p>
                   </div>
                 </div>
-                <Button className="w-full" size="lg">
+                <Button className="w-full bg-amber-500 hover:bg-amber-600 text-white" size="lg">
                   Join Auction
                 </Button>
               </div>
@@ -63,134 +89,314 @@ export default function HomePage() {
       </div>
 
       {/* Key Features */}
-      <div className="py-16 bg-gray-50">
+      <div className="py-24 bg-gray-50">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-12">Why Choose TradeBikes?</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow">
-              <div className="bg-primary/10 p-3 rounded-full w-12 h-12 flex items-center justify-center mb-4">
-                <Clock className="h-6 w-6 text-primary" />
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold mb-6">Why Choose TradeBikes?</h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Our platform offers a streamlined approach to motorcycle trading with powerful features designed for dealers and traders.
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+            <div className="group relative bg-white p-8 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 overflow-hidden">
+              <div className="absolute top-0 right-0 w-24 h-24 bg-primary/5 -mr-8 -mt-8 rounded-full group-hover:scale-150 transition-transform duration-500 ease-out"></div>
+              <div className="relative">
+                <div className="bg-gradient-to-br from-primary to-primary-dark p-4 rounded-2xl w-16 h-16 flex items-center justify-center mb-6 shadow-md group-hover:-translate-y-1 transition-transform duration-300">
+                  <Clock className="h-8 w-8 text-white" />
+                </div>
+                <h3 className="text-xl font-bold mb-4 group-hover:text-primary transition-colors duration-300">Real-time Auctions</h3>
+                <p className="text-gray-600 mb-4">
+                  Bid in real-time on available motorcycles with live updates and instant notifications when you're outbid.
+                </p>
+                <Link href="/auctions" className="text-primary font-medium inline-flex items-center group-hover:translate-x-2 transition-transform duration-300">
+                  Learn more
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />
+                  </svg>
+                </Link>
               </div>
-              <h3 className="text-xl font-semibold mb-2">Real-time Auctions</h3>
-              <p className="text-gray-600">
-                Bid in real-time on available motorcycles with live updates and instant notifications.
-              </p>
             </div>
-            <div className="bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow">
-              <div className="bg-primary/10 p-3 rounded-full w-12 h-12 flex items-center justify-center mb-4">
-                <MapPin className="h-6 w-6 text-primary" />
+            
+            <div className="group relative bg-white p-8 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 overflow-hidden">
+              <div className="absolute top-0 right-0 w-24 h-24 bg-primary/5 -mr-8 -mt-8 rounded-full group-hover:scale-150 transition-transform duration-500 ease-out"></div>
+              <div className="relative">
+                <div className="bg-gradient-to-br from-primary to-primary-dark p-4 rounded-2xl w-16 h-16 flex items-center justify-center mb-6 shadow-md group-hover:-translate-y-1 transition-transform duration-300">
+                  <MapPin className="h-8 w-8 text-white" />
+                </div>
+                <h3 className="text-xl font-bold mb-4 group-hover:text-primary transition-colors duration-300">Map Search</h3>
+                <p className="text-gray-600 mb-4">
+                  Find available motorcycles based on your location and preferred radius for convenient trading and logistics.
+                </p>
+                <Link href="/map" className="text-primary font-medium inline-flex items-center group-hover:translate-x-2 transition-transform duration-300">
+                  Learn more
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />
+                  </svg>
+                </Link>
               </div>
-              <h3 className="text-xl font-semibold mb-2">Map Search</h3>
-              <p className="text-gray-600">
-                Find available motorcycles based on your location and preferred radius for convenient trading.
-              </p>
             </div>
-            <div className="bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow">
-              <div className="bg-primary/10 p-3 rounded-full w-12 h-12 flex items-center justify-center mb-4">
-                <Shield className="h-6 w-6 text-primary" />
+            
+            <div className="group relative bg-white p-8 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 overflow-hidden">
+              <div className="absolute top-0 right-0 w-24 h-24 bg-primary/5 -mr-8 -mt-8 rounded-full group-hover:scale-150 transition-transform duration-500 ease-out"></div>
+              <div className="relative">
+                <div className="bg-gradient-to-br from-primary to-primary-dark p-4 rounded-2xl w-16 h-16 flex items-center justify-center mb-6 shadow-md group-hover:-translate-y-1 transition-transform duration-300">
+                  <Shield className="h-8 w-8 text-white" />
+                </div>
+                <h3 className="text-xl font-bold mb-4 group-hover:text-primary transition-colors duration-300">Verified Listings</h3>
+                <p className="text-gray-600 mb-4">
+                  All motorcycles undergo verification checks to ensure quality and accurate information for confident bidding.
+                </p>
+                <Link href="/about" className="text-primary font-medium inline-flex items-center group-hover:translate-x-2 transition-transform duration-300">
+                  Learn more
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />
+                  </svg>
+                </Link>
               </div>
-              <h3 className="text-xl font-semibold mb-2">Verified Listings</h3>
-              <p className="text-gray-600">
-                All motorcycles undergo verification checks to ensure quality and accurate information.
-              </p>
             </div>
           </div>
         </div>
       </div>
 
       {/* How It Works */}
-      <div className="py-16">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-12">How It Works</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="text-center">
-              <div className="w-16 h-16 bg-primary text-white rounded-full flex items-center justify-center mx-auto mb-4 text-xl font-bold">1</div>
-              <h3 className="text-xl font-semibold mb-2">Register Your Company</h3>
-              <p className="text-gray-600">
-                Sign up as a dealer or trader with your business details.
-              </p>
+      <div className="py-24 relative overflow-hidden">
+        {/* Background elements */}
+        <div className="absolute inset-0 z-0">
+          <div className="absolute left-0 top-0 w-64 h-64 bg-primary/5 rounded-full -ml-32 -mt-32"></div>
+          <div className="absolute right-0 bottom-0 w-96 h-96 bg-primary/5 rounded-full -mr-48 -mb-48"></div>
+        </div>
+      
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold mb-6">How It Works</h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Getting started with TradeBikes is simple. Follow these steps to begin trading motorcycles efficiently.
+            </p>
+          </div>
+          
+          <div className="flex flex-col md:flex-row max-w-5xl mx-auto">
+            <div className="flex-1 relative mb-16 md:mb-0">
+              {/* Step 1 */}
+              <div className="relative flex items-start mb-12">
+                <div className="min-w-[80px] mr-6">
+                  <div className="relative">
+                    <div className="w-20 h-20 bg-gradient-to-br from-primary to-primary-dark text-white rounded-2xl shadow-lg flex items-center justify-center text-2xl font-bold">1</div>
+                    {/* Connector line */}
+                    <div className="absolute top-full left-1/2 w-1 bg-gray-200 h-16 -translate-x-1/2 mt-4 hidden md:block"></div>
+                  </div>
+                </div>
+                <div className="pt-2">
+                  <h3 className="text-xl font-bold mb-3">Register Your Company</h3>
+                  <p className="text-gray-600">
+                    Create your account and specify your role as a dealer or trader. We'll verify your business details to ensure platform security.
+                  </p>
+                </div>
+              </div>
+              
+              {/* Step 2 */}
+              <div className="relative flex items-start mb-12">
+                <div className="min-w-[80px] mr-6">
+                  <div className="relative">
+                    <div className="w-20 h-20 bg-gradient-to-br from-primary to-primary-dark text-white rounded-2xl shadow-lg flex items-center justify-center text-2xl font-bold">2</div>
+                    {/* Connector line */}
+                    <div className="absolute top-full left-1/2 w-1 bg-gray-200 h-16 -translate-x-1/2 mt-4 hidden md:block"></div>
+                  </div>
+                </div>
+                <div className="pt-2">
+                  <h3 className="text-xl font-bold mb-3">List or Bid on Motorcycles</h3>
+                  <p className="text-gray-600">
+                    Dealers can list motorcycles with detailed information and up to 20 high-quality photos. Traders can browse auctions and place bids in real-time.
+                  </p>
+                </div>
+              </div>
+              
+              {/* Step 3 */}
+              <div className="relative flex items-start">
+                <div className="min-w-[80px] mr-6">
+                  <div className="w-20 h-20 bg-gradient-to-br from-primary to-primary-dark text-white rounded-2xl shadow-lg flex items-center justify-center text-2xl font-bold">3</div>
+                </div>
+                <div className="pt-2">
+                  <h3 className="text-xl font-bold mb-3">Complete Transactions</h3>
+                  <p className="text-gray-600">
+                    Once an auction ends, both parties are notified and can securely exchange payment and arrange delivery through our platform's messaging system.
+                  </p>
+                </div>
+              </div>
             </div>
-            <div className="text-center">
-              <div className="w-16 h-16 bg-primary text-white rounded-full flex items-center justify-center mx-auto mb-4 text-xl font-bold">2</div>
-              <h3 className="text-xl font-semibold mb-2">List or Bid on Motorcycles</h3>
-              <p className="text-gray-600">
-                Dealers list motorcycles, traders place bids in real-time.
-              </p>
-            </div>
-            <div className="text-center">
-              <div className="w-16 h-16 bg-primary text-white rounded-full flex items-center justify-center mx-auto mb-4 text-xl font-bold">3</div>
-              <h3 className="text-xl font-semibold mb-2">Complete Transactions</h3>
-              <p className="text-gray-600">
-                Connect with buyer/seller and finalize the transaction securely.
-              </p>
+            
+            <div className="md:flex-1">
+              <div className="bg-white rounded-2xl shadow-xl overflow-hidden relative h-[500px]">
+                <div className="absolute inset-0 bg-gradient-to-br from-gray-800 to-gray-900 z-0"></div>
+                <img 
+                  src="https://images.unsplash.com/photo-1558979159-2b18a4070a87" 
+                  alt="Motorcycle auction process" 
+                  className="absolute inset-0 w-full h-full object-cover z-0 opacity-80"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent z-10"></div>
+                <div className="absolute bottom-0 left-0 right-0 p-8 z-20">
+                  <p className="text-sm text-amber-300 font-medium mb-2">READY TO GET STARTED?</p>
+                  <h3 className="text-2xl font-bold text-white mb-4">Join hundreds of dealers and traders on TradeBikes</h3>
+                  <Link href="/register">
+                    <Button className="bg-white text-primary hover:bg-gray-100">
+                      Register Now
+                    </Button>
+                  </Link>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
       {/* User Types */}
-      <div className="py-16 bg-gray-50">
+      <div className="py-24 bg-gradient-to-b from-gray-50 to-white">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-12">Built For Both Dealers & Traders</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="bg-white p-8 rounded-lg shadow-sm">
-              <h3 className="text-2xl font-bold mb-4 text-primary">For Dealers</h3>
-              <ul className="space-y-3">
-                <li className="flex items-start">
-                  <span className="mr-2 mt-1 text-green-500">✓</span>
-                  <span>Easy motorcycle listing with full details and images</span>
-                </li>
-                <li className="flex items-start">
-                  <span className="mr-2 mt-1 text-green-500">✓</span>
-                  <span>Set auction duration from 15 minutes to 24 hours</span>
-                </li>
-                <li className="flex items-start">
-                  <span className="mr-2 mt-1 text-green-500">✓</span>
-                  <span>Instant notifications for new bids and auction results</span>
-                </li>
-                <li className="flex items-start">
-                  <span className="mr-2 mt-1 text-green-500">✓</span>
-                  <span>Comprehensive dashboard to manage all listings</span>
-                </li>
-                <li className="flex items-start">
-                  <span className="mr-2 mt-1 text-green-500">✓</span>
-                  <span>Trader ratings to ensure quality transactions</span>
-                </li>
-              </ul>
-              <div className="mt-6">
-                <Link href="/register">
-                  <Button>Register as Dealer</Button>
-                </Link>
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold mb-6">Built For Both Dealers & Traders</h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Our platform offers tailored features for both sides of the motorcycle trading ecosystem.
+            </p>
+          </div>
+          
+          <div className="max-w-6xl mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+              {/* For Dealers */}
+              <div className="bg-white p-10 rounded-3xl shadow-xl border border-gray-100 relative overflow-hidden group hover:shadow-2xl transition-all duration-300">
+                {/* Background accent */}
+                <div className="absolute top-0 right-0 w-40 h-40 bg-primary/5 -mr-20 -mt-20 rounded-full group-hover:scale-150 transition-transform duration-500 ease-out"></div>
+                <div className="absolute bottom-0 left-0 w-24 h-24 bg-primary/5 -ml-12 -mb-12 rounded-full group-hover:scale-150 transition-transform duration-500 ease-out"></div>
+                
+                <div className="relative">
+                  <div className="inline-flex items-center px-4 py-2 bg-primary/10 rounded-full mb-6">
+                    <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center mr-3">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-white" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M8 9a3 3 0 100-6 3 3 0 000 6zM8 11a6 6 0 016 6H2a6 6 0 016-6zM16 7a1 1 0 10-2 0v1h-1a1 1 0 100 2h1v1a1 1 0 102 0v-1h1a1 1 0 100-2h-1V7z" />
+                      </svg>
+                    </div>
+                    <span className="font-medium text-primary">For Dealers</span>
+                  </div>
+                  
+                  <h3 className="text-2xl font-bold mb-6">Sell Your Motorcycles Faster</h3>
+                  
+                  <ul className="space-y-4 mb-8">
+                    <li className="flex items-start">
+                      <div className="flex-shrink-0 w-6 h-6 bg-green-100 rounded-full flex items-center justify-center mr-3 mt-0.5">
+                        <svg className="h-4 w-4 text-green-600" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                        </svg>
+                      </div>
+                      <span className="text-gray-700">Easy motorcycle listing with up to 20 images per listing</span>
+                    </li>
+                    <li className="flex items-start">
+                      <div className="flex-shrink-0 w-6 h-6 bg-green-100 rounded-full flex items-center justify-center mr-3 mt-0.5">
+                        <svg className="h-4 w-4 text-green-600" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                        </svg>
+                      </div>
+                      <span className="text-gray-700">Set flexible auction durations from 15 minutes to 24 hours</span>
+                    </li>
+                    <li className="flex items-start">
+                      <div className="flex-shrink-0 w-6 h-6 bg-green-100 rounded-full flex items-center justify-center mr-3 mt-0.5">
+                        <svg className="h-4 w-4 text-green-600" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                        </svg>
+                      </div>
+                      <span className="text-gray-700">Instant notifications for new bids and auction results</span>
+                    </li>
+                    <li className="flex items-start">
+                      <div className="flex-shrink-0 w-6 h-6 bg-green-100 rounded-full flex items-center justify-center mr-3 mt-0.5">
+                        <svg className="h-4 w-4 text-green-600" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                        </svg>
+                      </div>
+                      <span className="text-gray-700">Comprehensive dashboard to manage all listings</span>
+                    </li>
+                    <li className="flex items-start">
+                      <div className="flex-shrink-0 w-6 h-6 bg-green-100 rounded-full flex items-center justify-center mr-3 mt-0.5">
+                        <svg className="h-4 w-4 text-green-600" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                        </svg>
+                      </div>
+                      <span className="text-gray-700">Trader ratings to ensure quality transactions</span>
+                    </li>
+                  </ul>
+                  
+                  <Link href="/register">
+                    <Button className="bg-primary hover:bg-primary-dark text-white w-full md:w-auto transition-all duration-300 shadow-md hover:shadow-lg">
+                      Register as Dealer
+                    </Button>
+                  </Link>
+                </div>
               </div>
-            </div>
-            <div className="bg-white p-8 rounded-lg shadow-sm">
-              <h3 className="text-2xl font-bold mb-4 text-primary">For Traders</h3>
-              <ul className="space-y-3">
-                <li className="flex items-start">
-                  <span className="mr-2 mt-1 text-green-500">✓</span>
-                  <span>Browse all available motorcycles with advanced filters</span>
-                </li>
-                <li className="flex items-start">
-                  <span className="mr-2 mt-1 text-green-500">✓</span>
-                  <span>Real-time bidding with countdown timers</span>
-                </li>
-                <li className="flex items-start">
-                  <span className="mr-2 mt-1 text-green-500">✓</span>
-                  <span>Location-based search to find motorcycles nearby</span>
-                </li>
-                <li className="flex items-start">
-                  <span className="mr-2 mt-1 text-green-500">✓</span>
-                  <span>Save searches and get alerts for new listings</span>
-                </li>
-                <li className="flex items-start">
-                  <span className="mr-2 mt-1 text-green-500">✓</span>
-                  <span>Rate dealers after completed transactions</span>
-                </li>
-              </ul>
-              <div className="mt-6">
-                <Link href="/register">
-                  <Button>Register as Trader</Button>
-                </Link>
+              
+              {/* For Traders */}
+              <div className="bg-white p-10 rounded-3xl shadow-xl border border-gray-100 relative overflow-hidden group hover:shadow-2xl transition-all duration-300">
+                {/* Background accent */}
+                <div className="absolute top-0 right-0 w-40 h-40 bg-amber-500/5 -mr-20 -mt-20 rounded-full group-hover:scale-150 transition-transform duration-500 ease-out"></div>
+                <div className="absolute bottom-0 left-0 w-24 h-24 bg-amber-500/5 -ml-12 -mb-12 rounded-full group-hover:scale-150 transition-transform duration-500 ease-out"></div>
+                
+                <div className="relative">
+                  <div className="inline-flex items-center px-4 py-2 bg-amber-500/10 rounded-full mb-6">
+                    <div className="w-8 h-8 bg-amber-500 rounded-full flex items-center justify-center mr-3">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-white" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M10 2a4 4 0 00-4 4v1H5a1 1 0 00-.994.89l-1 9A1 1 0 004 18h12a1 1 0 00.994-1.11l-1-9A1 1 0 0015 7h-1V6a4 4 0 00-4-4zm2 5V6a2 2 0 10-4 0v1h4zm-6 3a1 1 0 112 0 1 1 0 01-2 0zm7-1a1 1 0 100 2 1 1 0 000-2z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                    <span className="font-medium text-amber-600">For Traders</span>
+                  </div>
+                  
+                  <h3 className="text-2xl font-bold mb-6">Find the Best Motorcycles</h3>
+                  
+                  <ul className="space-y-4 mb-8">
+                    <li className="flex items-start">
+                      <div className="flex-shrink-0 w-6 h-6 bg-amber-100 rounded-full flex items-center justify-center mr-3 mt-0.5">
+                        <svg className="h-4 w-4 text-amber-600" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                        </svg>
+                      </div>
+                      <span className="text-gray-700">Browse all available motorcycles with advanced filters</span>
+                    </li>
+                    <li className="flex items-start">
+                      <div className="flex-shrink-0 w-6 h-6 bg-amber-100 rounded-full flex items-center justify-center mr-3 mt-0.5">
+                        <svg className="h-4 w-4 text-amber-600" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                        </svg>
+                      </div>
+                      <span className="text-gray-700">Real-time bidding with countdown timers</span>
+                    </li>
+                    <li className="flex items-start">
+                      <div className="flex-shrink-0 w-6 h-6 bg-amber-100 rounded-full flex items-center justify-center mr-3 mt-0.5">
+                        <svg className="h-4 w-4 text-amber-600" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                        </svg>
+                      </div>
+                      <span className="text-gray-700">Location-based search to find motorcycles nearby</span>
+                    </li>
+                    <li className="flex items-start">
+                      <div className="flex-shrink-0 w-6 h-6 bg-amber-100 rounded-full flex items-center justify-center mr-3 mt-0.5">
+                        <svg className="h-4 w-4 text-amber-600" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                        </svg>
+                      </div>
+                      <span className="text-gray-700">Save searches and get alerts for new listings</span>
+                    </li>
+                    <li className="flex items-start">
+                      <div className="flex-shrink-0 w-6 h-6 bg-amber-100 rounded-full flex items-center justify-center mr-3 mt-0.5">
+                        <svg className="h-4 w-4 text-amber-600" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                        </svg>
+                      </div>
+                      <span className="text-gray-700">Rate dealers after completed transactions</span>
+                    </li>
+                  </ul>
+                  
+                  <Link href="/register">
+                    <Button className="bg-amber-500 hover:bg-amber-600 text-white w-full md:w-auto transition-all duration-300 shadow-md hover:shadow-lg">
+                      Register as Trader
+                    </Button>
+                  </Link>
+                </div>
               </div>
             </div>
           </div>
@@ -198,27 +404,82 @@ export default function HomePage() {
       </div>
 
       {/* CTA Section */}
-      <div className="bg-primary py-16">
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold text-white mb-6">Ready to Transform Your Motorcycle Trading?</h2>
-          <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
-            Join TradeBikes today and experience a faster, more efficient way to buy and sell used motorcycles.
-          </p>
-          <div className="flex flex-wrap justify-center gap-4">
-            <Link href="/register">
-              <Button size="lg" className="bg-white text-primary hover:bg-gray-100">
-                Register Now
-              </Button>
-            </Link>
-            <Link href="/about">
-              <Button size="lg" variant="outline" className="text-white border-white hover:bg-white/10">
-                Learn More
-              </Button>
-            </Link>
+      <div className="relative overflow-hidden bg-gradient-to-br from-primary via-primary-dark to-[#1a3469] py-24">
+        {/* Abstract background shapes */}
+        <div className="absolute inset-0 z-0">
+          <svg 
+            className="absolute right-0 top-0 w-full h-full opacity-10"
+            viewBox="0 0 678 600" 
+            fill="none" 
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <circle cx="75" cy="75" r="100" fill="white" />
+            <circle cx="540" cy="400" r="200" fill="white" />
+            <path d="M320,50 Q400,350 200,450 T450,550" stroke="white" strokeWidth="10" fill="none" />
+          </svg>
+        </div>
+        
+        <div className="container relative z-10 mx-auto px-4 max-w-5xl">
+          <div className="text-center mb-12">
+            <div className="inline-block mb-4 bg-white/10 backdrop-blur-sm px-4 py-1 rounded-full">
+              <p className="text-white text-sm font-medium tracking-wide">LIMITED TIME OFFER</p>
+            </div>
+            <h2 className="text-4xl font-bold text-white mb-6">Ready to Transform Your Motorcycle Trading?</h2>
+            <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
+              Join TradeBikes today and experience a faster, more efficient way to buy and sell used motorcycles.
+            </p>
           </div>
-          <p className="text-white/80 mt-6">
-            £149 monthly subscription for unlimited purchases and sales
-          </p>
+          
+          <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-3xl p-8 md:p-10 shadow-2xl">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+              <div>
+                <h3 className="font-bold text-2xl text-white mb-2">Basic Subscription</h3>
+                <div className="flex items-end mb-4">
+                  <span className="text-4xl font-bold text-white">£125</span>
+                  <span className="ml-1 text-white/70">/month + VAT</span>
+                </div>
+                <ul className="space-y-3 mb-6">
+                  <li className="flex items-start">
+                    <svg className="h-5 w-5 text-amber-300 mr-2 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                    <span className="text-white">Unlimited listings</span>
+                  </li>
+                  <li className="flex items-start">
+                    <svg className="h-5 w-5 text-amber-300 mr-2 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                    <span className="text-white">Real-time bidding</span>
+                  </li>
+                  <li className="flex items-start">
+                    <svg className="h-5 w-5 text-amber-300 mr-2 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                    <span className="text-white">14-day free trial</span>
+                  </li>
+                </ul>
+              </div>
+              <div className="flex flex-col">
+                <div className="flex items-center justify-between md:justify-end space-x-4 mb-8">
+                  <p className="text-white text-sm">No setup fees</p>
+                  <div className="h-4 border-l border-white/20"></div>
+                  <p className="text-white text-sm">Cancel anytime</p>
+                </div>
+                <div className="flex flex-col space-y-4">
+                  <Link href="/register" className="w-full">
+                    <Button size="lg" className="w-full bg-white text-primary hover:bg-gray-100 shadow-lg hover:shadow-xl transition-all duration-300">
+                      Start Free Trial
+                    </Button>
+                  </Link>
+                  <Link href="/about" className="w-full">
+                    <Button size="lg" variant="outline" className="w-full text-white border-white hover:bg-white/10 transition-all duration-300">
+                      Learn More
+                    </Button>
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </Layout>
