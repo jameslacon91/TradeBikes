@@ -80,9 +80,11 @@ export default function AuctionDetail() {
   const { motorcycle } = auction;
   
   // Define role and ownership variables
-  const isTrader = user?.role === 'trader';
-  const isDealer = user?.role === 'dealer';
-  const dealerOwnsAuction = isDealer && auction.dealerId === user?.id;
+  // Since all users are dealers now, we define seller/buyer relationships based on the auction
+  const isDealer = true; // All users are dealers in the unified model
+  const isSeller = user?.id === auction.dealerId; // This dealer created the auction
+  const isBuyer = user?.id !== auction.dealerId; // This dealer is viewing another's auction
+  const dealerOwnsAuction = isSeller; // Simplified for clarity
   
   // Check if auction is active
   const isActive = auction.status === 'active' && timeLeft !== 'Ended';
@@ -208,7 +210,7 @@ export default function AuctionDetail() {
                 </div>
                 
                 {/* Show bid form for traders on active auctions */}
-                {isTrader && isActive && (
+                {isBuyer && isActive && (
                   <div className="border-t border-gray-200 pt-4">
                     <BidForm
                       auctionId={auction.id}
@@ -218,7 +220,7 @@ export default function AuctionDetail() {
                 )}
                 
                 {/* Blind auction notice for traders */}
-                {isTrader && (
+                {isBuyer && (
                   <div className="mt-4 bg-blue-50 text-blue-800 p-4 rounded-md">
                     <h4 className="font-medium">Blind Auction Information</h4>
                     <p className="text-sm mt-1">
@@ -236,34 +238,34 @@ export default function AuctionDetail() {
                 )}
                 
                 {/* Bid confirmation widget - show for ended auctions */}
-                {timeLeft === 'Ended' && (dealerOwnsAuction || (isTrader && user?.id === auction.winningTraderId)) && auction.currentBid && (
+                {timeLeft === 'Ended' && (dealerOwnsAuction || (isBuyer && user?.id === auction.winningBidderId)) && auction.currentBid && (
                   <div className="space-y-4">
                     <BidConfirmation
                       auctionId={auction.id}
                       bid={{
                         id: auction.winningBidId || 0,
                         auctionId: auction.id,
-                        traderId: auction.winningTraderId || 0,
+                        dealerId: auction.winningBidderId || 0,
                         amount: auction.currentBid,
                         createdAt: new Date()
                       }}
                       isAccepted={auction.bidAccepted || false}
-                      isDealer={isDealer}
-                      isTrader={isTrader}
-                      traderId={auction.winningTraderId || 0}
+                      isDealer={isSeller}
+                      isBuyer={isBuyer}
+                      bidderId={auction.winningBidderId || 0}
                       dealConfirmed={auction.dealConfirmed || false}
                       collectionConfirmed={auction.collectionConfirmed || false}
                       onSuccess={() => {/* Refresh auction data */}}
                     />
                     
                     {/* Show collection confirmation for accepted bids */}
-                    {auction.bidAccepted && isTrader && user?.id === auction.winningTraderId && (
+                    {auction.bidAccepted && isBuyer && user?.id === auction.winningBidderId && (
                       <BidCollectionConfirmation
                         auctionId={auction.id}
                         bid={{
                           id: auction.winningBidId || 0,
                           auctionId: auction.id,
-                          traderId: auction.winningTraderId || 0,
+                          dealerId: auction.winningBidderId || 0,
                           amount: auction.currentBid,
                           createdAt: new Date()
                         }}
