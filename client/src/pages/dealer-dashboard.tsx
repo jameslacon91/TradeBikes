@@ -75,41 +75,53 @@ export default function DealerDashboard() {
             {/* Stats for Selling */}
             <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
               {/* Active Listings */}
-              <StatCard 
-                title="Active Listings" 
-                value={statsLoading ? "Loading..." : stats?.activeListings || 0}
-                icon={<Clipboard className="h-6 w-6 text-white" />}
-                bgColor="bg-primary-light"
-                trend={stats?.trendUp ? { up: true, value: stats.trendValue || 0 } : undefined}
-              />
+              <Link href="/auctions/dealer">
+                <StatCard 
+                  title="Active Listings" 
+                  value={statsLoading ? "Loading..." : stats?.activeListings || 0}
+                  icon={<Clipboard className="h-6 w-6 text-white" />}
+                  bgColor="bg-primary-light"
+                  trend={stats?.trendUp ? { up: true, value: stats.trendValue || 0 } : undefined}
+                  className="cursor-pointer transition-transform hover:translate-y-[-5px]"
+                />
+              </Link>
 
               {/* Total Bids */}
-              <StatCard 
-                title="Total Bids Received" 
-                value={statsLoading ? "Loading..." : stats?.totalBids || 0}
-                icon={<Clock className="h-6 w-6 text-white" />}
-                bgColor="bg-accent"
-                trend={stats?.trendUp ? { up: true, value: stats.trendValue || 0 } : undefined}
-              />
+              <Link href="/auctions/dealer">
+                <StatCard 
+                  title="Total Bids Received" 
+                  value={statsLoading ? "Loading..." : stats?.totalBids || 0}
+                  icon={<Clock className="h-6 w-6 text-white" />}
+                  bgColor="bg-accent"
+                  trend={stats?.trendUp ? { up: true, value: stats.trendValue || 0 } : undefined}
+                  className="cursor-pointer transition-transform hover:translate-y-[-5px]"
+                />
+              </Link>
 
               {/* Pending Completion */}
-              <StatCard 
-                title="Pending Completion" 
-                value={statsLoading ? "Loading..." : stats?.pendingCompletion || 0}
-                icon={<AlertCircle className="h-6 w-6 text-white" />}
-                bgColor="bg-yellow-500"
-              />
+              <Link href="/auctions/dealer?filter=pending">
+                <StatCard 
+                  title="Pending Completion" 
+                  value={statsLoading ? "Loading..." : stats?.pendingCompletion || 0}
+                  icon={<AlertCircle className="h-6 w-6 text-white" />}
+                  bgColor="bg-yellow-500"
+                  className="cursor-pointer transition-transform hover:translate-y-[-5px]"
+                />
+              </Link>
 
               {/* Total Revenue */}
-              <StatCard 
-                title="Revenue (MTD)" 
-                value={statsLoading ? "Loading..." : `£${stats?.revenue?.toLocaleString() || 0}`}
-                icon={<DollarSign className="h-6 w-6 text-white" />}
-                bgColor="bg-green-500"
-              />
+              <Link href="/auctions/dealer?filter=completed">
+                <StatCard 
+                  title="Revenue (MTD)" 
+                  value={statsLoading ? "Loading..." : `£${stats?.revenue?.toLocaleString() || 0}`}
+                  icon={<DollarSign className="h-6 w-6 text-white" />}
+                  bgColor="bg-green-500"
+                  className="cursor-pointer transition-transform hover:translate-y-[-5px]"
+                />
+              </Link>
             </div>
 
-            {/* My Active Auctions Section */}
+            {/* My Active Underwrites Section */}
             <div className="mt-8">
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-xl font-semibold text-gray-900">My Active Listings</h2>
@@ -142,7 +154,7 @@ export default function DealerDashboard() {
                 <div className="text-center py-10">
                   <p className="text-gray-500">You don't have any active listings.</p>
                   <Button className="mt-4" asChild>
-                    <Link href="/create-auction">Create Your First Auction</Link>
+                    <Link href="/create-auction">List Your First Bike</Link>
                   </Button>
                 </div>
               ) : (
@@ -163,7 +175,7 @@ export default function DealerDashboard() {
 
               <div className="mt-4 text-right">
                 <Button variant="ghost" className="text-primary" asChild>
-                  <Link href="/auctions/dealer">
+                  <Link href="/auctions?filter=dealer">
                     View all your listings
                     <svg className="ml-1 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                       <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
@@ -179,42 +191,54 @@ export default function DealerDashboard() {
             {/* Stats for Buying */}
             <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
               {/* Active Bids */}
-              <StatCard 
-                title="Active Bids" 
-                value={statsLoading ? "Loading..." : stats?.activeBids || 0}
-                icon={<TrendingUp className="h-6 w-6 text-white" />}
-                bgColor="bg-primary-light"
-              />
+              <Link href="/auctions?filter=active-bids">
+                <StatCard 
+                  title="Active Bids" 
+                  value={statsLoading ? "Loading..." : stats?.activeBids || 0}
+                  icon={<TrendingUp className="h-6 w-6 text-white" />}
+                  bgColor="bg-primary-light"
+                  className="cursor-pointer transition-transform hover:translate-y-[-5px]"
+                />
+              </Link>
 
-              {/* Won Auctions */}
-              <StatCard 
-                title="Won Auctions" 
-                value={statsLoading ? "Loading..." : stats?.wonAuctions || 0}
-                icon={<Archive className="h-6 w-6 text-white" />}
-                bgColor="bg-accent"
-              />
+              {/* Won Underwrites */}
+              <Link href="/auctions?filter=won">
+                <StatCard 
+                  title="Won Underwrites" 
+                  value={statsLoading ? "Loading..." : stats?.wonAuctions || 0}
+                  icon={<Archive className="h-6 w-6 text-white" />}
+                  bgColor="bg-accent"
+                  className="cursor-pointer transition-transform hover:translate-y-[-5px]"
+                />
+              </Link>
 
               {/* Pending Collection */}
-              <StatCard 
-                title="Pending Collection" 
-                value={statsLoading ? "Loading..." : stats?.pendingCollection || 0}
-                icon={<Truck className="h-6 w-6 text-white" />}
-                bgColor="bg-yellow-500"
-              />
+              <Link href="/auctions?filter=pending-collection">
+                <StatCard 
+                  title="Pending Collection" 
+                  value={statsLoading ? "Loading..." : stats?.pendingCollection || 0}
+                  icon={<Truck className="h-6 w-6 text-white" />}
+                  bgColor="bg-yellow-500"
+                  className="cursor-pointer transition-transform hover:translate-y-[-5px]"
+                />
+              </Link>
 
               {/* Total Spent */}
-              <StatCard 
-                title="Total Spent" 
-                value={statsLoading ? "Loading..." : `£${stats?.amountSpent || 0}`}
-                icon={<DollarSign className="h-6 w-6 text-white" />}
-                bgColor="bg-green-500"
-              />
+              <Link href="/auctions?filter=completed">
+                <StatCard 
+                  title="Total Spent" 
+                  value={statsLoading ? "Loading..." : `£${stats?.amountSpent || 0}`}
+                  icon={<DollarSign className="h-6 w-6 text-white" />}
+                  bgColor="bg-green-500"
+                  className="cursor-pointer transition-transform hover:translate-y-[-5px]"
+                />
+              </Link>
             </div>
 
-            {/* Available Auctions Section */}
+            {/* Available Underwrites Section */}
             <div className="mt-8">
               <div className="flex justify-between items-center mb-6">
-                <h2 className="text-xl font-semibold text-gray-900">Available Auctions</h2>
+                <h2 className="text-xl font-semibold text-gray-900">Available Underwrites</h2>
                 <div className="flex items-center">
                   <Button variant="outline" size="sm" className="mr-3">
                     <Filter className="mr-2 h-4 w-4" />
@@ -238,11 +262,11 @@ export default function DealerDashboard() {
 
               {allAuctionsLoading ? (
                 <div className="text-center py-10">
-                  <p className="text-gray-500">Loading available auctions...</p>
+                  <p className="text-gray-500">Loading available underwrites...</p>
                 </div>
               ) : displayedBuyingAuctions.length === 0 ? (
                 <div className="text-center py-10">
-                  <p className="text-gray-500">No active auctions found.</p>
+                  <p className="text-gray-500">No active underwrites found.</p>
                 </div>
               ) : (
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -263,7 +287,7 @@ export default function DealerDashboard() {
               <div className="mt-4 text-right">
                 <Button variant="ghost" className="text-primary" asChild>
                   <Link href="/auctions">
-                    View all available auctions
+                    View all available underwrites
                     <svg className="ml-1 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                       <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
                     </svg>

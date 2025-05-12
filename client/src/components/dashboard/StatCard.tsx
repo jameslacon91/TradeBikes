@@ -1,6 +1,6 @@
 import { ReactNode } from 'react';
 
-interface StatCardProps {
+export interface StatCardProps {
   title: string;
   value: string | number;
   icon: ReactNode;
@@ -9,11 +9,12 @@ interface StatCardProps {
     up: boolean;
     value: number;
   };
+  className?: string;
 }
 
-export default function StatCard({ title, value, icon, bgColor, trend }: StatCardProps) {
+export default function StatCard({ title, value, icon, bgColor, trend, className = '' }: StatCardProps) {
   return (
-    <div className="bg-white overflow-hidden shadow rounded-lg">
+    <div className={`bg-white overflow-hidden shadow rounded-lg ${className}`}>
       <div className="px-4 py-5 sm:p-6">
         <div className="flex items-center">
           <div className={`flex-shrink-0 ${bgColor} rounded-md p-3`}>
