@@ -20,6 +20,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "./lib/queryClient";
 import { AuthProvider } from "./hooks/use-auth";
 import { WebSocketProvider } from "./hooks/use-websocket";
+import { NotificationsProvider } from "./hooks/use-notifications";
 
 // The main router component
 function Router() {
@@ -70,10 +71,12 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <WebSocketProvider>
         <AuthProvider>
-          <TooltipProvider>
-            <Toaster />
-            <Router />
-          </TooltipProvider>
+          <NotificationsProvider>
+            <TooltipProvider>
+              <Toaster />
+              <Router />
+            </TooltipProvider>
+          </NotificationsProvider>
         </AuthProvider>
       </WebSocketProvider>
     </QueryClientProvider>

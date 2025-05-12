@@ -7,13 +7,15 @@ interface WebSocketContextType {
   connected: boolean;
   sendMessage: (message: WSMessage) => void;
   registerAuthenticatedUser: (userId: number) => void;
+  handleWebSocketMessage: ((message: WSMessage) => void) | null;
 }
 
 // Create the context with a default value
 const WebSocketContext = createContext<WebSocketContextType>({
   connected: false,
   sendMessage: () => console.warn('WebSocket not initialized'),
-  registerAuthenticatedUser: () => console.warn('WebSocket not initialized')
+  registerAuthenticatedUser: () => console.warn('WebSocket not initialized'),
+  handleWebSocketMessage: null
 });
 
 // Check if we're running in the browser
@@ -25,6 +27,7 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
   const [socket, setSocket] = useState<WebSocket | null>(null);
   const [connected, setConnected] = useState(false);
   const [userId, setUserId] = useState<number | null>(null);
+  const [messageHandler, setMessageHandler] = useState<((message: WSMessage) => void) | null>(null);
 
   // Setup WebSocket connection - only in browser
   useEffect(() => {
@@ -62,7 +65,7 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
       ws.addEventListener('message', (event) => {
         try {
           const message = JSON.parse(event.data) as WSMessage;
-          handleWebSocketMessage(message);
+          processWebSocketMessage(message);
         } catch (error) {
           console.error('Error parsing WebSocket message:', error);
         }
@@ -125,11 +128,16 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
     setUserId(newUserId);
   };
 
-  // Handle incoming WebSocket messages
-  const handleWebSocketMessage = (message: WSMessage) => {
+  // Process incoming WebSocket messages
+  const processWebSocketMessage = (message: WSMessage) => {
     if (!isBrowser) return; // Return early if not in browser
     
     console.log('Received WebSocket message:', message);
+    
+    // Custom handler takes precedence if defined
+    if (messageHandler) {
+      messageHandler(message);
+    }
     
     // Handle based on message type
     switch (message.type) {
@@ -166,7 +174,8 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
       value={{ 
         connected, 
         sendMessage, 
-        registerAuthenticatedUser 
+        registerAuthenticatedUser,
+        handleWebSocketMessage: messageHandler
       }}
     >
       {children}

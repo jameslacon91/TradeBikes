@@ -103,18 +103,16 @@ export function NotificationsProvider({ children }: { children: ReactNode }) {
       }
     };
 
-    // Register a callback for WebSocket messages
-    const originalHandler = webSocket.handleWebSocketMessage;
-    webSocket.handleWebSocketMessage = (message: WSMessage) => {
-      // Call the original handler first
-      if (originalHandler) originalHandler(message);
-      
-      // Then handle notifications
+    // Just listen for WebSocket messages, they'll be passed to our handler
+    const handleNotifications = (message: WSMessage) => {
       handleWebSocketMessage(message);
     };
+    
+    // Update the reference to our handler
+    webSocket.handleWebSocketMessage = handleNotifications;
 
     // No cleanup needed as we're just hooking into the existing WebSocket
-  }, [webSocket.connected]);
+  }, [webSocket.connected, webSocket]);
 
   // Function to add a new notification
   const addNotification = (notification: Omit<Notification, 'id' | 'timestamp' | 'isRead'>) => {
