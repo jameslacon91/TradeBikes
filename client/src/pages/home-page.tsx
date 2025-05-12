@@ -23,9 +23,12 @@ export default function HomePage() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="md:flex md:items-center md:justify-between">
               <div className="md:w-1/2 text-white">
-                <h1 className="text-4xl font-bold mb-6">
-                  Modernizing Used Motorcycle Trading
-                </h1>
+                <div className="flex items-center mb-6">
+                  <img src="/src/assets/logo.jpeg" alt="TradeBikes Logo" className="h-12 w-auto mr-4" />
+                  <h1 className="text-4xl font-bold">
+                    Modernizing Used Motorcycle Trading
+                  </h1>
+                </div>
                 <p className="text-xl mb-8">
                   TradeBikes is a B2B platform that replaces outdated methods with a
                   real-time, user-friendly solution for dealerships and traders.

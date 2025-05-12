@@ -50,9 +50,7 @@ export default function Header() {
             <div className="flex-shrink-0 flex items-center">
               <Link href="/">
                 <div className="flex items-center cursor-pointer">
-                  <svg className="h-8 w-8 text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-                  </svg>
+                  <img src="/src/assets/logo.jpeg" alt="TradeBikes Logo" className="h-8 w-auto" />
                   <span className="ml-2 text-xl font-bold text-gray-900">TradeBikes</span>
                 </div>
               </Link>

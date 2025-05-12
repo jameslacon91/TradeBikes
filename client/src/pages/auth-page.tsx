@@ -95,7 +95,7 @@ export default function AuthPage() {
         <div className="mx-auto w-full max-w-md">
           <div className="flex justify-center mb-6">
             <div className="flex items-center">
-              <Bike className="h-10 w-10 text-primary" />
+              <img src="/src/assets/logo.jpeg" alt="TradeBikes Logo" className="h-10 w-auto" />
               <span className="ml-2 text-2xl font-bold text-gray-900">TradeBikes</span>
             </div>
           </div>
