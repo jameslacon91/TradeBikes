@@ -3,8 +3,36 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+    <title>TradeBikes - Motorcycle Trading Platform</title>
+    <meta name="description" content="A B2B digital platform facilitating real-time trading of used motorcycles between dealerships and traders" />
+    <!-- Error handling script -->
+    <script>
+      window.addEventListener('error', function(e) {
+        console.error('Global error caught:', e.error);
+        document.getElementById('error-info').innerHTML = 
+          '<strong>Error:</strong> ' + e.message + '<br/><pre>' + (e.error && e.error.stack || 'No stack trace') + '</pre>';
+        document.getElementById('error-info').style.display = 'block';
+      });
+    </script>
+    <style>
+      #error-info {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        background: #fff0f0;
+        color: #ff0000;
+        padding: 10px;
+        border-bottom: 1px solid #ff0000;
+        z-index: 9999;
+        overflow: auto;
+        max-height: 50vh;
+      }
+    </style>
   </head>
   <body>
+    <div id="error-info"></div>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
     <!-- This is a replit script which adds a banner on the top of the page when opened in development mode outside the replit environment -->
