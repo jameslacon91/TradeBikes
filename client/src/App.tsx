@@ -21,7 +21,7 @@ import { queryClient } from "./lib/queryClient";
 import { AuthProvider } from "./hooks/use-auth";
 import { WebSocketProvider } from "./hooks/use-websocket";
 import { NotificationsProvider } from "./hooks/use-notifications";
-import Header from "./components/layout/Header";
+import SimpleHeader from "./components/SimpleHeader";
 
 // The main router component
 function Router() {
@@ -75,8 +75,11 @@ function App() {
           <NotificationsProvider>
             <TooltipProvider>
               <Toaster />
-              <div className="min-h-screen">
-                <Router />
+              <div className="min-h-screen flex flex-col">
+                <SimpleHeader />
+                <main className="flex-grow">
+                  <Router />
+                </main>
               </div>
             </TooltipProvider>
           </NotificationsProvider>
