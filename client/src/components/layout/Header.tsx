@@ -51,33 +51,33 @@ export default function Header() {
             
             {/* Main Navigation - Visible for all users */}
             <nav className="hidden md:ml-6 md:flex md:space-x-8">
-              <Link href="/about">
-                <a className={`${location === '/about' ? 'border-primary-light text-gray-900' : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'} inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium`}>
-                  About Us
-                </a>
-              </Link>
+              <div className={`${location === '/about' ? 'border-primary-light text-gray-900' : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'} inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium`}>
+                <Link href="/about">About Us</Link>
+              </div>
               
-              <Link href="/stock">
-                <a className={`${location === '/stock' ? 'border-primary-light text-gray-900' : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'} inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium`}>
-                  View Current Stock
-                </a>
-              </Link>
+              <div className={`${location === '/stock' ? 'border-primary-light text-gray-900' : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'} inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium`}>
+                <Link href="/stock">View Current Stock</Link>
+              </div>
               
               {user && (
                 <>
-                  <Link href="/search-map">
-                    <a className={`${location === '/search-map' ? 'border-primary-light text-gray-900' : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'} inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium`}>
-                      <MapPin className="w-4 h-4 mr-1" />
-                      Map View
-                    </a>
-                  </Link>
+                  <div className={`${location === '/search-map' ? 'border-primary-light text-gray-900' : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'} inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium`}>
+                    <Link href="/search-map">
+                      <span className="flex items-center">
+                        <MapPin className="w-4 h-4 mr-1" />
+                        Map View
+                      </span>
+                    </Link>
+                  </div>
                   
-                  <Link href="/search-list">
-                    <a className={`${location === '/search-list' ? 'border-primary-light text-gray-900' : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'} inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium`}>
-                      <Search className="w-4 h-4 mr-1" />
-                      Search
-                    </a>
-                  </Link>
+                  <div className={`${location === '/search-list' ? 'border-primary-light text-gray-900' : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'} inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium`}>
+                    <Link href="/search-list">
+                      <span className="flex items-center">
+                        <Search className="w-4 h-4 mr-1" />
+                        Search
+                      </span>
+                    </Link>
+                  </div>
                 </>
               )}
             </nav>
@@ -220,43 +220,31 @@ export default function Header() {
       {isMobileMenuOpen && (
         <div className="md:hidden">
           <div className="pt-2 pb-3 space-y-1">
-            <Link href="/">
-              <a className={`${location === '/' ? 'bg-primary-light text-white' : 'text-gray-600 hover:bg-gray-100'} block pl-3 pr-4 py-2 border-l-4 ${location === '/' ? 'border-primary' : 'border-transparent'} text-base font-medium`}>
-                Home
-              </a>
-            </Link>
+            <div className={`${location === '/' ? 'bg-primary-light text-white' : 'text-gray-600 hover:bg-gray-100'} block pl-3 pr-4 py-2 border-l-4 ${location === '/' ? 'border-primary' : 'border-transparent'} text-base font-medium`}>
+              <Link href="/">Home</Link>
+            </div>
             
-            <Link href="/about">
-              <a className={`${location === '/about' ? 'bg-primary-light text-white' : 'text-gray-600 hover:bg-gray-100'} block pl-3 pr-4 py-2 border-l-4 ${location === '/about' ? 'border-primary' : 'border-transparent'} text-base font-medium`}>
-                About Us
-              </a>
-            </Link>
+            <div className={`${location === '/about' ? 'bg-primary-light text-white' : 'text-gray-600 hover:bg-gray-100'} block pl-3 pr-4 py-2 border-l-4 ${location === '/about' ? 'border-primary' : 'border-transparent'} text-base font-medium`}>
+              <Link href="/about">About Us</Link>
+            </div>
             
-            <Link href="/stock">
-              <a className={`${location === '/stock' ? 'bg-primary-light text-white' : 'text-gray-600 hover:bg-gray-100'} block pl-3 pr-4 py-2 border-l-4 ${location === '/stock' ? 'border-primary' : 'border-transparent'} text-base font-medium`}>
-                View Current Stock
-              </a>
-            </Link>
+            <div className={`${location === '/stock' ? 'bg-primary-light text-white' : 'text-gray-600 hover:bg-gray-100'} block pl-3 pr-4 py-2 border-l-4 ${location === '/stock' ? 'border-primary' : 'border-transparent'} text-base font-medium`}>
+              <Link href="/stock">View Current Stock</Link>
+            </div>
             
             {user ? (
               <>
-                <Link href="/search-map">
-                  <a className={`${location === '/search-map' ? 'bg-primary-light text-white' : 'text-gray-600 hover:bg-gray-100'} block pl-3 pr-4 py-2 border-l-4 ${location === '/search-map' ? 'border-primary' : 'border-transparent'} text-base font-medium`}>
-                    Map View
-                  </a>
-                </Link>
+                <div className={`${location === '/search-map' ? 'bg-primary-light text-white' : 'text-gray-600 hover:bg-gray-100'} block pl-3 pr-4 py-2 border-l-4 ${location === '/search-map' ? 'border-primary' : 'border-transparent'} text-base font-medium`}>
+                  <Link href="/search-map">Map View</Link>
+                </div>
                 
-                <Link href="/search-list">
-                  <a className={`${location === '/search-list' ? 'bg-primary-light text-white' : 'text-gray-600 hover:bg-gray-100'} block pl-3 pr-4 py-2 border-l-4 ${location === '/search-list' ? 'border-primary' : 'border-transparent'} text-base font-medium`}>
-                    Search
-                  </a>
-                </Link>
+                <div className={`${location === '/search-list' ? 'bg-primary-light text-white' : 'text-gray-600 hover:bg-gray-100'} block pl-3 pr-4 py-2 border-l-4 ${location === '/search-list' ? 'border-primary' : 'border-transparent'} text-base font-medium`}>
+                  <Link href="/search-list">Search</Link>
+                </div>
                 
-                <Link href="/account">
-                  <a className={`${location === '/account' ? 'bg-primary-light text-white' : 'text-gray-600 hover:bg-gray-100'} block pl-3 pr-4 py-2 border-l-4 ${location === '/account' ? 'border-primary' : 'border-transparent'} text-base font-medium`}>
-                    My Account
-                  </a>
-                </Link>
+                <div className={`${location === '/account' ? 'bg-primary-light text-white' : 'text-gray-600 hover:bg-gray-100'} block pl-3 pr-4 py-2 border-l-4 ${location === '/account' ? 'border-primary' : 'border-transparent'} text-base font-medium`}>
+                  <Link href="/account">My Account</Link>
+                </div>
                 
                 <button
                   onClick={handleLogout}
