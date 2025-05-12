@@ -19,8 +19,9 @@ import { useToast } from '@/hooks/use-toast';
 export default function AuctionDetail() {
   const [auctionsMatch, auctionsParams] = useRoute<{ id: string }>('/auctions/:id');
   const [stockMatch, stockParams] = useRoute<{ id: string }>('/stock/:id');
+  const [underwritesMatch, underwritesParams] = useRoute<{ id: string }>('/underwrites/:id');
   
-  const params = auctionsParams || stockParams;
+  const params = auctionsParams || stockParams || underwritesParams;
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [timeLeft, setTimeLeft] = useState<string>('');
   const [endingSoon, setEndingSoon] = useState(false);
@@ -107,7 +108,7 @@ export default function AuctionDetail() {
         <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
           <div className="px-4 py-6 sm:px-0">
             <div className="text-center py-10">
-              <p className="text-gray-500">Loading auction details...</p>
+              <p className="text-gray-500">Loading underwrite details...</p>
             </div>
           </div>
         </div>
@@ -121,7 +122,7 @@ export default function AuctionDetail() {
         <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
           <div className="px-4 py-6 sm:px-0">
             <div className="text-center py-10">
-              <p className="text-red-500">Error loading auction. Please try again.</p>
+              <p className="text-red-500">Error loading underwrite. Please try again.</p>
             </div>
           </div>
         </div>

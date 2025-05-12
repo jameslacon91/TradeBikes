@@ -8,7 +8,7 @@ export default function CreateAuction() {
   const { user } = useAuth();
   const [_, navigate] = useLocation();
 
-  // Only dealers can create auctions
+  // Only dealers can create underwrites
   useEffect(() => {
     if (user && user.role !== 'dealer') {
       navigate('/dashboard');
