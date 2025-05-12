@@ -189,7 +189,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ message: "Authentication required" });
       }
       
-      const { motorcycleId, startTime, endTime } = validationResult.data;
+      const { motorcycleId, startTime, endTime, visibilityType, visibilityRadius } = validationResult.data;
       
       // Verify motorcycle exists and belongs to dealer
       const motorcycle = await storage.getMotorcycle(motorcycleId);
@@ -205,12 +205,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const startTimeDate = startTime ? new Date(startTime) : new Date();
       const endTimeDate = new Date(endTime);
       
-      // Create auction
+      // Create auction with visibility options
       const auction = await storage.createAuction({
         motorcycleId,
         dealerId: req.user.id,
         startTime: startTimeDate,
-        endTime: endTimeDate
+        endTime: endTimeDate,
+        visibilityType: visibilityType || 'all', // Default to showing all dealers
+        visibilityRadius: visibilityType === 'radius' ? visibilityRadius : null
       });
       
       res.status(201).json(auction);

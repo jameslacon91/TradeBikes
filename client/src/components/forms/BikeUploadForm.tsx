@@ -223,6 +223,8 @@ export default function BikeUploadForm() {
           motorcycleId: motorcycle.id,
           startTime: startTime.toISOString(),
           endTime: endTime.toISOString(),
+          visibilityType: data.visibilityType,
+          visibilityRadius: data.visibilityType === 'radius' ? data.visibilityRadius : null,
         });
         
         return await auctionRes.json();
@@ -673,7 +675,7 @@ export default function BikeUploadForm() {
         {/* Auction Details Section */}
         <div>
           <h2 className="text-lg font-semibold text-gray-900 mb-4">Auction Details</h2>
-          <div className="mt-4">
+          <div className="mt-4 space-y-6">
             <FormField
               control={form.control}
               name="auctionDuration"
@@ -701,6 +703,69 @@ export default function BikeUploadForm() {
                 </FormItem>
               )}
             />
+            
+            {/* Visibility Options */}
+            <div>
+              <h3 className="text-md font-semibold text-gray-800 mb-2">Listing Visibility</h3>
+              <FormField
+                control={form.control}
+                name="visibilityType"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <RadioGroup
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                        className="space-y-3"
+                      >
+                        {visibilityOptions.map((option) => (
+                          <div key={option.value} className="flex items-start space-x-2 p-2 rounded-md border border-transparent hover:border-gray-200 hover:bg-gray-50">
+                            <RadioGroupItem value={option.value} id={`visibility-${option.value}`} className="mt-1" />
+                            <div>
+                              <Label htmlFor={`visibility-${option.value}`} className="font-medium">{option.label}</Label>
+                              <p className="text-sm text-gray-500">{option.description}</p>
+                            </div>
+                          </div>
+                        ))}
+                      </RadioGroup>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              {/* Radius input - only show when radius option is selected */}
+              {form.watch('visibilityType') === 'radius' && (
+                <FormField
+                  control={form.control}
+                  name="visibilityRadius"
+                  render={({ field }) => (
+                    <FormItem className="mt-4 ml-6">
+                      <FormLabel>Radius (miles)</FormLabel>
+                      <FormControl>
+                        <Input 
+                          type="number" 
+                          {...field} 
+                          onChange={(e) => {
+                            const value = e.target.value === '' ? null : parseInt(e.target.value, 10);
+                            field.onChange(value);
+                          }}
+                          min={1}
+                          max={500}
+                          placeholder="e.g. 50" 
+                          className="w-32"
+                          value={field.value === null ? '' : field.value}
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        Only dealers within this distance will see your listing
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
+            </div>
           </div>
         </div>
         
