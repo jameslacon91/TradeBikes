@@ -22,6 +22,7 @@ import { queryClient } from "./lib/queryClient";
 import { AuthProvider } from "./hooks/use-auth";
 import { WebSocketProvider } from "./hooks/use-websocket";
 import { LogOut, UserCircle, Plus, TrendingUp } from "lucide-react";
+import InstallPrompt from "./components/mobile/InstallPrompt";
 
 // Main router component
 function Router() {
@@ -173,6 +174,7 @@ function App() {
           <TooltipProvider>
             <Toaster />
             <Router />
+            <InstallPrompt />
           </TooltipProvider>
         </AuthProvider>
       </WebSocketProvider>
