@@ -1,6 +1,7 @@
-import { Switch, Route } from "wouter";
+import { Switch, Route, Link, useLocation } from "wouter";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { Button } from "@/components/ui/button";
 import NotFound from "@/pages/not-found";
 import HomePage from "@/pages/home-page";
 import AboutPage from "@/pages/about-page";
@@ -14,13 +15,13 @@ import AuctionsPage from "@/pages/auctions-page";
 import AuctionDetail from "@/pages/auction-detail";
 import CreateAuction from "@/pages/create-auction";
 import MapSearchPage from "@/pages/map-search-page";
-import { Link } from "wouter";
 import { ProtectedRoute } from "./lib/protected-route";
 import { useAuth } from "./hooks/use-auth";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "./lib/queryClient";
 import { AuthProvider } from "./hooks/use-auth";
 import { WebSocketProvider } from "./hooks/use-websocket";
+import { LogOut, UserCircle, Plus, TrendingUp } from "lucide-react";
 
 // Main router component
 function Router() {
@@ -59,6 +60,100 @@ function Router() {
   );
 }
 
+// Navigation component with authentication awareness
+function MainNavigation() {
+  const { user, logoutMutation } = useAuth();
+  const [location, navigate] = useLocation();
+
+  const handleLogout = () => {
+    logoutMutation.mutate();
+    navigate('/');
+  };
+
+  return (
+    <header className="border-b bg-white shadow-sm">
+      <div className="container mx-auto px-4 py-4 flex justify-between items-center">
+        <Link href="/">
+          <div className="text-2xl font-bold text-primary cursor-pointer">TradeBikes</div>
+        </Link>
+        <nav>
+          <ul className="flex space-x-4 items-center">
+            <li>
+              <Link href="/" className="text-gray-600 hover:text-primary">Home</Link>
+            </li>
+            <li>
+              <Link href="/about" className="text-gray-600 hover:text-primary">About</Link>
+            </li>
+            <li>
+              <Link href="/stock" className="text-gray-600 hover:text-primary">View Stock</Link>
+            </li>
+            
+            {user ? (
+              // Navigation for logged in users
+              <>
+                <li>
+                  <Link href="/dashboard" className="text-gray-600 hover:text-primary flex items-center">
+                    <UserCircle className="w-4 h-4 mr-1" />
+                    Dashboard
+                  </Link>
+                </li>
+                
+                {user.role === 'dealer' && (
+                  <li>
+                    <Link 
+                      href="/create-auction" 
+                      className="text-white bg-primary hover:bg-primary-dark rounded-md px-3 py-2 flex items-center"
+                    >
+                      <Plus className="w-4 h-4 mr-1" />
+                      List Motorcycle
+                    </Link>
+                  </li>
+                )}
+                
+                {user.role === 'trader' && (
+                  <li>
+                    <Link 
+                      href="/auctions" 
+                      className="text-white bg-primary hover:bg-primary-dark rounded-md px-3 py-2 flex items-center"
+                    >
+                      <TrendingUp className="w-4 h-4 mr-1" />
+                      Bid On Auctions
+                    </Link>
+                  </li>
+                )}
+                
+                <li>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="text-gray-600 hover:text-primary flex items-center" 
+                    onClick={handleLogout}
+                  >
+                    <LogOut className="w-4 h-4 mr-1" />
+                    Logout
+                  </Button>
+                </li>
+              </>
+            ) : (
+              // Navigation for guests
+              <>
+                <li>
+                  <Link 
+                    href="/auth" 
+                    className="text-white bg-primary hover:bg-primary-dark rounded-md px-3 py-2"
+                  >
+                    Login
+                  </Link>
+                </li>
+              </>
+            )}
+          </ul>
+        </nav>
+      </div>
+    </header>
+  );
+}
+
 // App component with providers
 function App() {
   return (
@@ -68,42 +163,7 @@ function App() {
           <TooltipProvider>
             <Toaster />
             <div className="min-h-screen flex flex-col">
-              <header className="border-b bg-white shadow-sm">
-                <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-                  <Link href="/">
-                    <div className="text-2xl font-bold text-primary cursor-pointer">TradeBikes</div>
-                  </Link>
-                  <nav>
-                    <ul className="flex space-x-4">
-                      <li>
-                        <Link href="/">
-                          <a className="text-gray-600 hover:text-primary">Home</a>
-                        </Link>
-                      </li>
-                      <li>
-                        <Link href="/about">
-                          <a className="text-gray-600 hover:text-primary">About</a>
-                        </Link>
-                      </li>
-                      <li>
-                        <Link href="/stock">
-                          <a className="text-gray-600 hover:text-primary">View Stock</a>
-                        </Link>
-                      </li>
-                      <li>
-                        <Link href="/auth">
-                          <a className="text-gray-600 hover:text-primary">Login</a>
-                        </Link>
-                      </li>
-                      <li>
-                        <Link href="/register">
-                          <a className="text-gray-600 hover:text-primary">Register</a>
-                        </Link>
-                      </li>
-                    </ul>
-                  </nav>
-                </div>
-              </header>
+              <MainNavigation />
               <main className="flex-grow">
                 <Router />
               </main>
