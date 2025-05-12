@@ -65,8 +65,8 @@ const uploadSchema = insertMotorcycleSchema.extend({
     z.number().positive("Starting price must be positive").min(1, "Starting price is required")
   ),
   reservePrice: z.preprocess(
-    (a) => a === '' ? null : parseInt(z.string().parse(a), 10),
-    z.number().positive("Reserve price must be positive").nullable().optional()
+    (a) => a === '' ? undefined : parseInt(z.string().parse(a), 10),
+    z.number().positive("Reserve price must be positive").optional()
   ),
   auctionDuration: z.enum(['15min', '30min', '1hr', '2hr', '4hr', '8hr', '12hr', '24hr'], {
     required_error: "Please select an auction duration",
@@ -111,8 +111,9 @@ export default function BikeUploadForm() {
       power: '',
       description: '',
       startingPrice: 0,
-      reservePrice: null,
+      reservePrice: undefined,
       auctionDuration: '1hr',
+      images: []
     },
   });
 
@@ -362,7 +363,11 @@ export default function BikeUploadForm() {
                 <FormItem>
                   <FormLabel>Engine Size</FormLabel>
                   <FormControl>
-                    <Input {...field} placeholder="e.g. 675cc, 1200cc" />
+                    <Input 
+                      {...field} 
+                      value={field.value || ''}
+                      placeholder="e.g. 675cc, 1200cc" 
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -376,7 +381,11 @@ export default function BikeUploadForm() {
                 <FormItem>
                   <FormLabel>Power</FormLabel>
                   <FormControl>
-                    <Input {...field} placeholder="e.g. 95 HP, 70 kW" />
+                    <Input 
+                      {...field} 
+                      value={field.value || ''}
+                      placeholder="e.g. 95 HP, 70 kW" 
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -537,8 +546,8 @@ export default function BikeUploadForm() {
                     <Input 
                       type="number" 
                       {...field} 
-                      value={field.value === null ? '' : field.value}
-                      onChange={(e) => field.onChange(e.target.value === '' ? null : e.target.value)}
+                      value={field.value === undefined ? '' : field.value}
+                      onChange={(e) => field.onChange(e.target.value === '' ? undefined : e.target.value)}
                       placeholder="e.g. 4500" 
                     />
                   </FormControl>
