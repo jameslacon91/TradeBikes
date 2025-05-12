@@ -644,8 +644,6 @@ export class MemStorage implements IStorage {
       id: this.auctionId++,
       motorcycleId: motorcycle3.id,
       dealerId: dealer.id,
-      startingPrice: 12000,
-      reservePrice: 12500,
       startTime: new Date(Date.now() - 10800000), // 3 hours ago
       endTime: eightHoursFromNow,
       status: 'active',
@@ -660,8 +658,6 @@ export class MemStorage implements IStorage {
       id: this.auctionId++,
       motorcycleId: motorcycle4.id,
       dealerId: dealer2.id,
-      startingPrice: 8500,
-      reservePrice: 9000,
       startTime: new Date(Date.now() - 5400000), // 1.5 hours ago
       endTime: twelveHoursFromNow,
       status: 'active',
@@ -675,8 +671,6 @@ export class MemStorage implements IStorage {
       id: this.auctionId++,
       motorcycleId: motorcycle5.id,
       dealerId: dealer2.id,
-      startingPrice: 7200,
-      reservePrice: 7800,
       startTime: new Date(Date.now() - 14400000), // 4 hours ago
       endTime: twentyFourHoursFromNow,
       status: 'active',
@@ -690,8 +684,6 @@ export class MemStorage implements IStorage {
       id: this.auctionId++,
       motorcycleId: motorcycle6.id,
       dealerId: dealer.id,
-      startingPrice: 6800,
-      reservePrice: 7200,
       startTime: new Date(Date.now() - 18000000), // 5 hours ago
       endTime: fortyEightHoursFromNow,
       status: 'active',
@@ -705,8 +697,6 @@ export class MemStorage implements IStorage {
       id: this.auctionId++,
       motorcycleId: motorcycle7.id,
       dealerId: dealer2.id,
-      startingPrice: 15500,
-      reservePrice: 16000,
       startTime: new Date(Date.now() - 21600000), // 6 hours ago
       endTime: twentyFourHoursFromNow,
       status: 'active',
@@ -720,8 +710,6 @@ export class MemStorage implements IStorage {
       id: this.auctionId++,
       motorcycleId: motorcycle8.id,
       dealerId: dealer.id,
-      startingPrice: 13500,
-      reservePrice: 14000,
       startTime: new Date(Date.now() - 25200000), // 7 hours ago
       endTime: fortyEightHoursFromNow,
       status: 'active',
