@@ -1,8 +1,17 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
+import cors from "cors";
 
 const app = express();
+
+// Configure CORS for cross-site requests
+app.use(cors({
+  origin: true, // Reflect the request origin
+  credentials: true, // Allow cookies to be sent
+  exposedHeaders: ['set-cookie']
+}));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
