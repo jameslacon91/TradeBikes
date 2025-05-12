@@ -444,6 +444,9 @@ export class MemStorage implements IStorage {
       serviceHistory: 'Full BMW dealer service history, major service completed last month',
       tyreCondition: 'Excellent - approximately 90% remaining',
       description: 'BMW R1250GS Adventure in excellent condition. Full service history, with recent major service. Fitted with BMW panniers, crash bars, and GPS mount. Perfect for touring or commuting.',
+      dateAvailable: 'Next Week',
+      regNumber: 'MA22 BMW',
+      auctionDuration: '2weeks',
       images: [
         'https://pixabay.com/get/g36c0c8195618dc8b8b493fde8b7fa55befbe5d77d353ca2785647f9b1ea0dfe83f7a0e5f00d4322a2b83d6e24f9a753f873d7a297503dae896041edd74b0e639_1280.jpg'
       ],
@@ -480,8 +483,12 @@ export class MemStorage implements IStorage {
       color: 'Silver',
       condition: 'Excellent',
       engineSize: '765cc',
-      power: '121bhp',
+      serviceHistory: 'Full Triumph dealer service history, under warranty until 2025',
+      tyreCondition: 'Excellent - nearly new',
       description: 'Nearly new Triumph Street Triple RS with Arrow exhaust. Full service history and still under manufacturer warranty until 2025. Quickshifter and autoblipper fitted. Tail tidy and frame sliders included.',
+      dateAvailable: 'Immediate',
+      regNumber: 'LB22 TRP',
+      auctionDuration: '1week',
       images: [
         'https://images.unsplash.com/photo-1547549082-6bc09f2049ae'
       ],
