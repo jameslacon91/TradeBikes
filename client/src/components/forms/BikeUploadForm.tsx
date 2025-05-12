@@ -165,16 +165,16 @@ export default function BikeUploadForm() {
 
   // Convert auction duration to milliseconds
   const getDurationMs = (duration: string): number => {
-    const matches = duration.match(/^(\d+)(\w+)$/);
-    if (!matches) return 60 * 60 * 1000; // Default 1 hour
+    const DAY_IN_MS = 24 * 60 * 60 * 1000;
+    const WEEK_IN_MS = 7 * DAY_IN_MS;
+    const MONTH_IN_MS = 30 * DAY_IN_MS;
     
-    const [_, value, unit] = matches;
-    const amount = parseInt(value, 10);
-    
-    switch (unit) {
-      case 'min': return amount * 60 * 1000;
-      case 'hr': return amount * 60 * 60 * 1000;
-      default: return 60 * 60 * 1000;
+    switch (duration) {
+      case '1day': return DAY_IN_MS;
+      case '1week': return WEEK_IN_MS;
+      case '2weeks': return 2 * WEEK_IN_MS;
+      case '1month': return MONTH_IN_MS;
+      default: return DAY_IN_MS; // Default 1 day
     }
   };
 
@@ -201,8 +201,6 @@ export default function BikeUploadForm() {
         // Create the auction
         const auctionRes = await apiRequest("POST", "/api/auctions", {
           motorcycleId: motorcycle.id,
-          startingPrice: data.startingPrice,
-          reservePrice: data.reservePrice,
           startTime: startTime.toISOString(),
           endTime: endTime.toISOString(),
         });
@@ -379,23 +377,7 @@ export default function BikeUploadForm() {
               )}
             />
             
-            <FormField
-              control={form.control}
-              name="power"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Power</FormLabel>
-                  <FormControl>
-                    <Input 
-                      {...field} 
-                      value={field.value || ''}
-                      placeholder="e.g. 95 HP, 70 kW" 
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+
             
             <FormField
               control={form.control}
@@ -521,28 +503,7 @@ export default function BikeUploadForm() {
               )}
             />
             
-            <FormField
-              control={form.control}
-              name="driveType"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Drive Type</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select drive type" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="Chain">Chain</SelectItem>
-                      <SelectItem value="Belt">Belt</SelectItem>
-                      <SelectItem value="Shaft">Shaft</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+
             
             <FormField
               control={form.control}
@@ -695,40 +656,23 @@ export default function BikeUploadForm() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <FormField
               control={form.control}
-              name="startingPrice"
+              name="auctionDuration"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Starting Price (£)</FormLabel>
-                  <FormControl>
-                    <Input 
-                      type="number" 
-                      {...field} 
-                      onChange={(e) => field.onChange(e.target.value)}
-                      placeholder="e.g. 3500" 
-                    />
-                  </FormControl>
-                  <FormDescription>Minimum bid to start the auction</FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            
-            <FormField
-              control={form.control}
-              name="reservePrice"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Reserve Price (£) - Optional</FormLabel>
-                  <FormControl>
-                    <Input 
-                      type="number" 
-                      {...field} 
-                      value={field.value === undefined ? '' : field.value}
-                      onChange={(e) => field.onChange(e.target.value === '' ? undefined : e.target.value)}
-                      placeholder="e.g. 4500" 
-                    />
-                  </FormControl>
-                  <FormDescription>Minimum price you're willing to accept</FormDescription>
+                  <FormLabel>Auction Duration</FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select auction duration" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {durationOptions.map((option) => (
+                        <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormDescription>How long should your auction run for?</FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
