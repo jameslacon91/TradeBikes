@@ -111,7 +111,7 @@ export default function BidConfirmation({
     }
   });
 
-  // Confirm collection mutation (trader only)
+  // Confirm collection mutation (buyer only)
   const confirmCollectionMutation = useMutation({
     mutationFn: async () => {
       const response = await apiRequest('POST', `/api/auctions/${auctionId}/confirm-collection`, {});
@@ -120,7 +120,7 @@ export default function BidConfirmation({
     onSuccess: () => {
       toast({
         title: 'Collection confirmed',
-        description: 'The dealer has been notified.',
+        description: 'The seller has been notified.',
       });
       queryClient.invalidateQueries({ queryKey: [`/api/auctions/${auctionId}`] });
       if (onSuccess) onSuccess();
@@ -141,7 +141,7 @@ export default function BidConfirmation({
         <div className="mt-4 bg-yellow-50 text-yellow-800 p-4 rounded-md">
           <h4 className="font-medium">Winning Bid</h4>
           <p className="text-sm mt-1">
-            This auction has ended. The winning bid is £{bid.amount.toLocaleString()} from Trader ID: {bid.traderId}.
+            This auction has ended. The winning bid is £{bid.amount.toLocaleString()} from dealer ID: {bid.dealerId}.
           </p>
           <Button 
             className="mt-2" 
@@ -158,7 +158,7 @@ export default function BidConfirmation({
         <div className="mt-4 bg-blue-50 text-blue-800 p-4 rounded-md">
           <h4 className="font-medium">Deal Confirmed</h4>
           <p className="text-sm mt-1">
-            The trader has confirmed the deal. Please schedule a collection date.
+            The buyer has confirmed the deal. Please schedule a collection date.
           </p>
           <div className="flex mt-2 items-center gap-2">
             <Popover>
@@ -214,14 +214,14 @@ export default function BidConfirmation({
     );
   }
 
-  // UI for traders
-  if (isTrader) {
+  // UI for buyers
+  if (isBuyer) {
     if (isAccepted && !dealConfirmed) {
       return (
         <div className="mt-4 bg-yellow-50 text-yellow-800 p-4 rounded-md">
           <h4 className="font-medium">Your Bid Was Accepted!</h4>
           <p className="text-sm mt-1">
-            The dealer has accepted your bid of £{bid.amount.toLocaleString()}. Please confirm to proceed with the purchase.
+            The seller has accepted your bid of £{bid.amount.toLocaleString()}. Please confirm to proceed with the purchase.
           </p>
           <Button 
             className="mt-2" 
@@ -238,7 +238,7 @@ export default function BidConfirmation({
         <div className="mt-4 bg-blue-50 text-blue-800 p-4 rounded-md">
           <h4 className="font-medium">Deal Confirmed</h4>
           <p className="text-sm mt-1">
-            You have confirmed the deal. The dealer will schedule a collection date.
+            You have confirmed the deal. The seller will schedule a collection date.
           </p>
           {date && (
             <>
