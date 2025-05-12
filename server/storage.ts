@@ -116,9 +116,8 @@ export class MemStorage implements IStorage {
       checkPeriod: 86400000 // Prune expired entries every 24h
     });
     
-    // Don't seed sample data by default
-    // Uncomment the following line to seed sample data for development
-    // this.seedSampleData();
+    // Seed sample data for development
+    this.seedSampleData();
   }
 
   // Seed sample data for development
