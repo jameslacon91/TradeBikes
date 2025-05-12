@@ -65,6 +65,15 @@ const uploadSchema = insertMotorcycleSchema.extend({
   }),
   images: z.any().optional(),
   
+  // Visibility options
+  visibilityType: z.enum(['all', 'favorites', 'radius'], {
+    required_error: "Please select a visibility option",
+  }),
+  visibilityRadius: z.preprocess(
+    (val) => (val === '' ? null : Number(val)),
+    z.number().nullable().optional(),
+  ),
+  
   // Additional fields based on site plan
   serviceHistory: z.string().optional(),
   tyreCondition: z.string().optional(),
@@ -96,6 +105,13 @@ export default function BikeUploadForm() {
     { value: '2weeks', label: '2 weeks' },
     { value: '1month', label: '1 month' },
   ];
+  
+  // Define visibility options
+  const visibilityOptions = [
+    { value: 'all', label: 'All Dealers', description: 'Show to all registered dealers' },
+    { value: 'favorites', label: 'Favorite Dealers Only', description: 'Only show to dealers in your favorites list' },
+    { value: 'radius', label: 'Dealers in Radius', description: 'Only show to dealers within a specific radius' },
+  ];
 
   const form = useForm<UploadFormValues>({
     resolver: zodResolver(uploadSchema),
@@ -110,6 +126,10 @@ export default function BikeUploadForm() {
       description: '',
       auctionDuration: '1day',
       images: [],
+      
+      // Visibility options
+      visibilityType: 'all',
+      visibilityRadius: null,
       
       // Fields from the site plan
       regNumber: '',
