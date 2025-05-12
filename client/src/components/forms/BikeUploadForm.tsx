@@ -61,7 +61,7 @@ const yearOptions = Array.from({ length: 50 }, (_, i) => currentYear - i);
 // Extend the motorcycle schema for form validation
 const uploadSchema = insertMotorcycleSchema.extend({
   auctionDuration: z.enum(['1day', '1week', '2weeks', '1month'], {
-    required_error: "Please select an auction duration",
+    required_error: "Please select an underwrite duration",
   }),
   images: z.any().optional(),
   
@@ -98,7 +98,7 @@ export default function BikeUploadForm() {
   const [imageUrls, setImageUrls] = useState<string[]>([]);
   const [isUploading, setIsUploading] = useState(false);
 
-  // Define auction duration options
+  // Define underwrite duration options
   const durationOptions = [
     { value: '1day', label: '1 day' },
     { value: '1week', label: '1 week' },
