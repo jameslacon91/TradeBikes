@@ -392,8 +392,12 @@ export class MemStorage implements IStorage {
       color: 'Matt Black',
       condition: 'Excellent',
       engineSize: '649cc',
-      power: '94bhp',
+      serviceHistory: 'Full Honda dealer service history',
+      tyreCondition: 'Excellent - fitted 1,000 miles ago',
       description: 'Excellent condition CBR650R with full service history. Recent service completed at Honda dealership. New tires fitted 1,000 miles ago. Includes tail tidy, tank pad, and frame sliders. Minor scuff on right fairing. All keys and documents present.',
+      dateAvailable: 'Immediate',
+      regNumber: 'LP21 KFG',
+      auctionDuration: '1day',
       images: [
         'https://images.unsplash.com/photo-1568772585407-9361f9bf3a87',
         'https://images.unsplash.com/photo-1558981359-219d6364c9c8',
@@ -414,8 +418,12 @@ export class MemStorage implements IStorage {
       color: 'Red',
       condition: 'Excellent',
       engineSize: '1103cc',
-      power: '214bhp',
+      serviceHistory: 'Full Ducati dealer service history',
+      tyreCondition: 'Good - approximately 70% remaining',
       description: 'Stunning Ducati Panigale V4 in immaculate condition. One owner from new with full Ducati service history. Termignoni exhaust system and many carbon fiber upgrades. Must be seen!',
+      dateAvailable: 'Immediate',
+      regNumber: 'LD70 VXR',
+      auctionDuration: '1week',
       images: [
         'https://pixabay.com/get/g921a4328472c7e5e94708bfc521011586531e76fad4f1e17b3b2c842cadc7ae5a8c250ae07751e6ef489860fb2dc8399dc6d23e8dda15d66442febb8c9c2c9d6_1280.jpg'
       ],
@@ -433,7 +441,8 @@ export class MemStorage implements IStorage {
       color: 'Silver',
       condition: 'Excellent',
       engineSize: '1254cc',
-      power: '136bhp',
+      serviceHistory: 'Full BMW dealer service history, major service completed last month',
+      tyreCondition: 'Excellent - approximately 90% remaining',
       description: 'BMW R1250GS Adventure in excellent condition. Full service history, with recent major service. Fitted with BMW panniers, crash bars, and GPS mount. Perfect for touring or commuting.',
       images: [
         'https://pixabay.com/get/g36c0c8195618dc8b8b493fde8b7fa55befbe5d77d353ca2785647f9b1ea0dfe83f7a0e5f00d4322a2b83d6e24f9a753f873d7a297503dae896041edd74b0e639_1280.jpg'
@@ -723,8 +732,6 @@ export class MemStorage implements IStorage {
       id: this.auctionId++,
       motorcycleId: motorcycle9.id,
       dealerId: dealer2.id,
-      startingPrice: 11000,
-      reservePrice: 11500,
       startTime: new Date(Date.now() - 28800000), // 8 hours ago
       endTime: twentyFourHoursFromNow,
       status: 'active',
@@ -738,8 +745,6 @@ export class MemStorage implements IStorage {
       id: this.auctionId++,
       motorcycleId: motorcycle10.id,
       dealerId: dealer.id,
-      startingPrice: 18000,
-      reservePrice: 19000,
       startTime: new Date(Date.now() - 32400000), // 9 hours ago
       endTime: fortyEightHoursFromNow,
       status: 'active',
