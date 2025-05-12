@@ -188,11 +188,11 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur">
-      <div className="container flex h-16 items-center justify-between">
-        <div className="flex">
+      <div className="container px-2 sm:px-4 flex h-16 items-center justify-between">
+        <div className="flex items-center">
           {mobileMenu}
-          <Link href="/" className="mr-6 flex items-center space-x-2">
-            <TradeBikesLogo className="h-10 w-auto" />
+          <Link href="/" className="flex items-center space-x-2">
+            <TradeBikesLogo className="h-8 w-auto sm:h-10" />
           </Link>
           {desktopNav}
         </div>
@@ -200,6 +200,25 @@ export default function Header() {
         <div className="flex items-center space-x-1">
           {user && <NotificationsPopover />}
           {!isMobile && userMenu}
+          {user && isMobile && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className="rounded-full">
+                  <Avatar className="h-8 w-8">
+                    <AvatarFallback>{getInitials(user.companyName)}</AvatarFallback>
+                  </Avatar>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={handleLogout}>
+                  <LogOut className="mr-2 h-4 w-4" />
+                  <span>Log out</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
           {!user && !isMobile && (
             <Link href="/auth">
               <Button>Sign In</Button>
