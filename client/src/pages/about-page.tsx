@@ -136,7 +136,7 @@ export default function AboutPage() {
                 <h3 className="text-xl font-bold mb-2">Free Trial</h3>
                 <div className="mb-4">
                   <span className="text-3xl font-bold">£0</span>
-                  <span className="text-gray-500 ml-1">/ 14 days</span>
+                  <span className="text-gray-500 ml-1">/ 1 month</span>
                 </div>
                 <p className="text-sm text-muted-foreground mb-6">
                   Experience all platform features with no commitment

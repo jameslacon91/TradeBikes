@@ -79,9 +79,11 @@ export default function HomePage() {
                     <p className="text-xl font-bold text-amber-300">01:23:45</p>
                   </div>
                 </div>
-                <Button className="w-full bg-amber-500 hover:bg-amber-600 text-white" size="lg">
-                  Join Auction
-                </Button>
+                <Link href="/register" className="w-full">
+                  <Button className="w-full bg-amber-500 hover:bg-amber-600 text-white" size="lg">
+                    Join Now
+                  </Button>
+                </Link>
               </div>
             </div>
           </div>
@@ -455,7 +457,7 @@ export default function HomePage() {
                     <svg className="h-5 w-5 text-amber-300 mr-2 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                       <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                     </svg>
-                    <span className="text-white">14-day free trial</span>
+                    <span className="text-white">1-month free trial</span>
                   </li>
                 </ul>
               </div>
