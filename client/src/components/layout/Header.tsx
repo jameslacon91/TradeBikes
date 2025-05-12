@@ -1,48 +1,15 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'wouter';
-import { useAuth } from '@/hooks/use-auth';
-import { useQuery } from '@tanstack/react-query';
-import { Bell } from 'lucide-react';
 import { TradeBikesLogo } from '@/components/logo';
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuLabel, 
-  DropdownMenuSeparator, 
-  DropdownMenuTrigger 
-} from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 
+// Simplified header for now - without auth dependencies
 export default function Header() {
   const [location] = useLocation();
-  const { user, logoutMutation } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
-  // Get unread notifications count
-  const { data: notifications = [] } = useQuery<any[]>({
-    queryKey: ['/api/notifications'],
-    enabled: !!user,
-  });
-
-  const unreadCount = Array.isArray(notifications) 
-    ? notifications.filter((n: any) => !n.read).length 
-    : 0;
-
-  // Get user initials for avatar
-  const getInitials = () => {
-    if (!user) return '';
-    const names = user.companyName.split(' ');
-    if (names.length >= 2) {
-      return `${names[0][0]}${names[1][0]}`.toUpperCase();
-    }
-    return user.companyName.substring(0, 2).toUpperCase();
-  };
-
-  const handleLogout = () => {
-    logoutMutation.mutate();
-  };
+  
+  // Temporarily disable auth
+  const user = null;
 
   return (
     <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
