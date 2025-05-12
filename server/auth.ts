@@ -21,7 +21,15 @@ export function setupAuth(app: Express) {
   });
 
   const sessionSecret = process.env.SESSION_SECRET || 'tradebikes-secret-key';
-  const isProduction = process.env.NODE_ENV === 'production';
+  
+  // Multiple ways to detect production environment for maximum compatibility
+  const isProduction = 
+    process.env.NODE_ENV === 'production' || 
+    process.env.REPLIT_DEPLOYMENT === 'true' ||
+    process.env.REPLIT_ENVIRONMENT === 'production';
+  
+  console.log(`Server environment: ${isProduction ? 'PRODUCTION' : 'DEVELOPMENT'}`);
+  console.log(`NODE_ENV: ${process.env.NODE_ENV || 'not set'}`);
   
   // Configuration for cookies based on environment
   let cookieSettings: session.CookieOptions = {
@@ -31,14 +39,20 @@ export function setupAuth(app: Express) {
   
   // In production, we need secure cookies with proper sameSite setting for cross-origin
   if (isProduction) {
+    console.log('Using production cookie settings');
     cookieSettings.secure = true;
     cookieSettings.sameSite = 'none';
+  } else {
+    console.log('Using development cookie settings');
   }
   
+  // Force this setting for Replit deployment
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+
   const sessionSettings: session.SessionOptions = {
     secret: sessionSecret,
     resave: false,
-    saveUninitialized: false,
+    saveUninitialized: true, // Changed to true for better compatibility
     store: sessionStore,
     cookie: cookieSettings,
     // For Replit deployment, allow sessions without full security in dev
@@ -79,14 +93,24 @@ export function setupAuth(app: Express) {
   );
 
   passport.serializeUser((user, done) => {
+    console.log(`Serializing user: ${user.username} (${user.id})`);
     done(null, user.id);
   });
 
   passport.deserializeUser(async (id: number, done) => {
     try {
+      console.log(`Deserializing user ID: ${id}`);
       const user = await storage.getUser(id);
+      
+      if (!user) {
+        console.log(`User not found during deserialization. ID: ${id}`);
+        return done(null, false);
+      }
+      
+      console.log(`User deserialized successfully: ${user.username}`);
       done(null, user);
     } catch (error) {
+      console.error(`Error deserializing user (ID: ${id}):`, error);
       done(error);
     }
   });
@@ -94,33 +118,52 @@ export function setupAuth(app: Express) {
   // Auth routes
   app.post("/api/register", async (req, res, next) => {
     try {
-      const { username, password, email, role, companyName, phone, address, city, postcode } = req.body;
+      console.log("Registration attempt:", req.body.username);
       
+      const { username, password, email, companyName, phone, address, city, postcode } = req.body;
+      
+      // Check for existing user
       const existingUser = await storage.getUserByUsername(username);
       if (existingUser) {
+        console.log(`Registration failed - username already exists: ${username}`);
         return res.status(400).json({ message: "Username already exists" });
       }
       
+      console.log(`Creating new user: ${username}`);
+      
+      // Always create users with dealer role
       const user = await storage.createUser({
         username,
         password,
         email,
-        role,
+        role: 'dealer', // Force role to be dealer
         companyName,
         phone,
         address,
         city,
-        postcode
+        postcode,
+        // Set default values for new users
+        rating: 0,
+        totalRatings: 0,
+        favoriteDealers: []
       });
+      
+      console.log(`User created successfully: ${username} (ID: ${user.id})`);
       
       // Remove password from response
       const { password: _, ...userWithoutPassword } = user;
       
+      // Log the user in automatically
       req.login(user, (err) => {
-        if (err) return next(err);
+        if (err) {
+          console.error(`Error during auto-login for new user: ${username}`, err);
+          return next(err);
+        }
+        console.log(`New user logged in: ${username}`);
         res.status(201).json(userWithoutPassword);
       });
     } catch (error) {
+      console.error("Registration error:", error);
       next(error);
     }
   });
@@ -164,7 +207,15 @@ export function setupAuth(app: Express) {
   });
 
   app.get("/api/user", (req, res) => {
-    if (!req.isAuthenticated()) return res.status(401).json({ message: "Not authenticated" });
+    console.log("GET /api/user - Auth status:", req.isAuthenticated());
+    console.log("Session data:", req.session);
+    
+    if (!req.isAuthenticated()) {
+      console.log("User not authenticated");
+      return res.status(401).json({ message: "Not authenticated" });
+    }
+    
+    console.log("User authenticated:", req.user.username);
     
     // Remove password from response
     const { password, ...userWithoutPassword } = req.user;
