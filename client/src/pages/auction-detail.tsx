@@ -98,7 +98,7 @@ export default function AuctionDetail() {
               {motorcycle.make} {motorcycle.model}
             </h3>
             <span className={`inline-flex items-center px-2.5 py-0.5 rounded-md text-sm font-medium ${isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
-              {isActive ? 'Active Auction' : 'Auction Ended'}
+              {isActive ? 'Active Underwrite' : 'Underwriting Ended'}
             </span>
           </div>
           <p className="mt-1 max-w-2xl text-sm text-gray-500">

@@ -46,7 +46,7 @@ export default function Header() {
 
   const navLinks = [
     { name: 'Home', href: '/', icon: <Home className="h-5 w-5 mr-2" /> },
-    { name: 'Auctions', href: '/auctions', icon: <Gavel className="h-5 w-5 mr-2" /> },
+    { name: 'Underwrites', href: '/auctions', icon: <Gavel className="h-5 w-5 mr-2" /> },
     { name: 'Search', href: '/search', icon: <Search className="h-5 w-5 mr-2" /> },
     { name: 'Map', href: '/map', icon: <Map className="h-5 w-5 mr-2" /> },
     { name: 'Events', href: '/events', icon: <Calendar className="h-5 w-5 mr-2" /> },
