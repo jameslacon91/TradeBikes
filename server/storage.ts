@@ -604,6 +604,16 @@ export class MemStorage implements IStorage {
     const eightHoursFromNow = new Date();
     eightHoursFromNow.setHours(eightHoursFromNow.getHours() + 8);
     
+    const twelveHoursFromNow = new Date();
+    twelveHoursFromNow.setHours(twelveHoursFromNow.getHours() + 12);
+    
+    const twentyFourHoursFromNow = new Date();
+    twentyFourHoursFromNow.setHours(twentyFourHoursFromNow.getHours() + 24);
+    
+    const fortyEightHoursFromNow = new Date();
+    fortyEightHoursFromNow.setHours(fortyEightHoursFromNow.getHours() + 48);
+    
+    // Create auctions for original motorcycles
     const auction1: Auction = {
       id: this.auctionId++,
       motorcycleId: motorcycle1.id,
@@ -649,7 +659,113 @@ export class MemStorage implements IStorage {
     };
     this.auctions.set(auction3.id, auction3);
     
-    // Create some bids
+    // Create auctions for new motorcycles
+    const auction4: Auction = {
+      id: this.auctionId++,
+      motorcycleId: motorcycle4.id,
+      dealerId: dealer2.id,
+      startingPrice: 8500,
+      reservePrice: 9000,
+      startTime: new Date(Date.now() - 5400000), // 1.5 hours ago
+      endTime: twelveHoursFromNow,
+      status: 'active',
+      winningBidId: null,
+      winningTraderId: null,
+      createdAt: new Date(Date.now() - 5400000)
+    };
+    this.auctions.set(auction4.id, auction4);
+    
+    const auction5: Auction = {
+      id: this.auctionId++,
+      motorcycleId: motorcycle5.id,
+      dealerId: dealer2.id,
+      startingPrice: 7200,
+      reservePrice: 7800,
+      startTime: new Date(Date.now() - 14400000), // 4 hours ago
+      endTime: twentyFourHoursFromNow,
+      status: 'active',
+      winningBidId: null,
+      winningTraderId: null,
+      createdAt: new Date(Date.now() - 14400000)
+    };
+    this.auctions.set(auction5.id, auction5);
+    
+    const auction6: Auction = {
+      id: this.auctionId++,
+      motorcycleId: motorcycle6.id,
+      dealerId: dealer.id,
+      startingPrice: 6800,
+      reservePrice: 7200,
+      startTime: new Date(Date.now() - 18000000), // 5 hours ago
+      endTime: fortyEightHoursFromNow,
+      status: 'active',
+      winningBidId: null,
+      winningTraderId: null,
+      createdAt: new Date(Date.now() - 18000000)
+    };
+    this.auctions.set(auction6.id, auction6);
+    
+    const auction7: Auction = {
+      id: this.auctionId++,
+      motorcycleId: motorcycle7.id,
+      dealerId: dealer2.id,
+      startingPrice: 15500,
+      reservePrice: 16000,
+      startTime: new Date(Date.now() - 21600000), // 6 hours ago
+      endTime: twentyFourHoursFromNow,
+      status: 'active',
+      winningBidId: null,
+      winningTraderId: null,
+      createdAt: new Date(Date.now() - 21600000)
+    };
+    this.auctions.set(auction7.id, auction7);
+    
+    const auction8: Auction = {
+      id: this.auctionId++,
+      motorcycleId: motorcycle8.id,
+      dealerId: dealer.id,
+      startingPrice: 13500,
+      reservePrice: 14000,
+      startTime: new Date(Date.now() - 25200000), // 7 hours ago
+      endTime: fortyEightHoursFromNow,
+      status: 'active',
+      winningBidId: null,
+      winningTraderId: null,
+      createdAt: new Date(Date.now() - 25200000)
+    };
+    this.auctions.set(auction8.id, auction8);
+    
+    const auction9: Auction = {
+      id: this.auctionId++,
+      motorcycleId: motorcycle9.id,
+      dealerId: dealer2.id,
+      startingPrice: 11000,
+      reservePrice: 11500,
+      startTime: new Date(Date.now() - 28800000), // 8 hours ago
+      endTime: twentyFourHoursFromNow,
+      status: 'active',
+      winningBidId: null,
+      winningTraderId: null,
+      createdAt: new Date(Date.now() - 28800000)
+    };
+    this.auctions.set(auction9.id, auction9);
+    
+    const auction10: Auction = {
+      id: this.auctionId++,
+      motorcycleId: motorcycle10.id,
+      dealerId: dealer.id,
+      startingPrice: 18000,
+      reservePrice: 19000,
+      startTime: new Date(Date.now() - 32400000), // 9 hours ago
+      endTime: fortyEightHoursFromNow,
+      status: 'active',
+      winningBidId: null,
+      winningTraderId: null,
+      createdAt: new Date(Date.now() - 32400000)
+    };
+    this.auctions.set(auction10.id, auction10);
+    
+    // Create bids for auction 1
     const bid1: Bid = {
       id: this.bidId++,
       auctionId: auction1.id,
@@ -686,7 +802,150 @@ export class MemStorage implements IStorage {
     };
     this.bids.set(bid4.id, bid4);
     
-    // Create notification
+    // Create bids for auction 2
+    const bid5: Bid = {
+      id: this.bidId++,
+      auctionId: auction2.id,
+      traderId: trader.id,
+      amount: 14200,
+      createdAt: new Date(Date.now() - 5400000) // 1.5 hours ago
+    };
+    this.bids.set(bid5.id, bid5);
+    
+    const bid6: Bid = {
+      id: this.bidId++,
+      auctionId: auction2.id,
+      traderId: trader.id,
+      amount: 14350,
+      createdAt: new Date(Date.now() - 3600000) // 1 hour ago
+    };
+    this.bids.set(bid6.id, bid6);
+    
+    // Create bids for auction 3
+    const bid7: Bid = {
+      id: this.bidId++,
+      auctionId: auction3.id,
+      traderId: trader.id,
+      amount: 12100,
+      createdAt: new Date(Date.now() - 7200000) // 2 hours ago
+    };
+    this.bids.set(bid7.id, bid7);
+    
+    // Create bids for auction 4
+    const bid8: Bid = {
+      id: this.bidId++,
+      auctionId: auction4.id,
+      traderId: trader.id,
+      amount: 8650,
+      createdAt: new Date(Date.now() - 5000000) // ~1.4 hours ago
+    };
+    this.bids.set(bid8.id, bid8);
+    
+    const bid9: Bid = {
+      id: this.bidId++,
+      auctionId: auction4.id,
+      traderId: trader.id,
+      amount: 8800,
+      createdAt: new Date(Date.now() - 4000000) // ~1.1 hours ago
+    };
+    this.bids.set(bid9.id, bid9);
+    
+    const bid10: Bid = {
+      id: this.bidId++,
+      auctionId: auction4.id,
+      traderId: trader.id,
+      amount: 8950,
+      createdAt: new Date(Date.now() - 2000000) // ~33 minutes ago
+    };
+    this.bids.set(bid10.id, bid10);
+    
+    // Create bids for auction 5
+    const bid11: Bid = {
+      id: this.bidId++,
+      auctionId: auction5.id,
+      traderId: trader.id,
+      amount: 7300,
+      createdAt: new Date(Date.now() - 12600000) // 3.5 hours ago
+    };
+    this.bids.set(bid11.id, bid11);
+    
+    // Create bids for auction 7
+    const bid12: Bid = {
+      id: this.bidId++,
+      auctionId: auction7.id,
+      traderId: trader.id,
+      amount: 15700,
+      createdAt: new Date(Date.now() - 19800000) // 5.5 hours ago
+    };
+    this.bids.set(bid12.id, bid12);
+    
+    const bid13: Bid = {
+      id: this.bidId++,
+      auctionId: auction7.id,
+      traderId: trader.id,
+      amount: 15900,
+      createdAt: new Date(Date.now() - 16200000) // 4.5 hours ago
+    };
+    this.bids.set(bid13.id, bid13);
+    
+    // Create bids for auction 8
+    const bid14: Bid = {
+      id: this.bidId++,
+      auctionId: auction8.id,
+      traderId: trader.id,
+      amount: 13650,
+      createdAt: new Date(Date.now() - 21600000) // 6 hours ago
+    };
+    this.bids.set(bid14.id, bid14);
+    
+    // Create bids for auction 9
+    const bid15: Bid = {
+      id: this.bidId++,
+      auctionId: auction9.id,
+      traderId: trader.id,
+      amount: 11200,
+      createdAt: new Date(Date.now() - 27000000) // 7.5 hours ago
+    };
+    this.bids.set(bid15.id, bid15);
+    
+    const bid16: Bid = {
+      id: this.bidId++,
+      auctionId: auction9.id,
+      traderId: trader.id,
+      amount: 11350,
+      createdAt: new Date(Date.now() - 25200000) // 7 hours ago
+    };
+    this.bids.set(bid16.id, bid16);
+    
+    const bid17: Bid = {
+      id: this.bidId++,
+      auctionId: auction9.id,
+      traderId: trader.id,
+      amount: 11500,
+      createdAt: new Date(Date.now() - 21600000) // 6 hours ago
+    };
+    this.bids.set(bid17.id, bid17);
+    
+    // Create bids for auction 10
+    const bid18: Bid = {
+      id: this.bidId++,
+      auctionId: auction10.id,
+      traderId: trader.id,
+      amount: 18200,
+      createdAt: new Date(Date.now() - 30600000) // 8.5 hours ago
+    };
+    this.bids.set(bid18.id, bid18);
+    
+    const bid19: Bid = {
+      id: this.bidId++,
+      auctionId: auction10.id,
+      traderId: trader.id,
+      amount: 18500,
+      createdAt: new Date(Date.now() - 27000000) // 7.5 hours ago
+    };
+    this.bids.set(bid19.id, bid19);
+    
+    // Create notifications for dealer 1
     const notification1: Notification = {
       id: this.notificationId++,
       userId: dealer.id,
@@ -697,6 +956,118 @@ export class MemStorage implements IStorage {
       createdAt: new Date(Date.now() - 600000) // 10 minutes ago
     };
     this.notifications.set(notification1.id, notification1);
+    
+    const notification2: Notification = {
+      id: this.notificationId++,
+      userId: dealer.id,
+      type: 'bid',
+      content: 'New bid received on Ducati Panigale V4',
+      relatedId: auction2.id,
+      read: false,
+      createdAt: new Date(Date.now() - 3600000) // 1 hour ago
+    };
+    this.notifications.set(notification2.id, notification2);
+    
+    const notification3: Notification = {
+      id: this.notificationId++,
+      userId: dealer.id,
+      type: 'bid',
+      content: 'New bid received on BMW R1250GS Adventure',
+      relatedId: auction3.id,
+      read: false,
+      createdAt: new Date(Date.now() - 7200000) // 2 hours ago
+    };
+    this.notifications.set(notification3.id, notification3);
+    
+    const notification4: Notification = {
+      id: this.notificationId++,
+      userId: dealer.id,
+      type: 'auction_ending',
+      content: 'Your auction for Honda CBR650R is ending soon',
+      relatedId: auction1.id,
+      read: false,
+      createdAt: new Date(Date.now() - 1800000) // 30 minutes ago
+    };
+    this.notifications.set(notification4.id, notification4);
+    
+    const notification5: Notification = {
+      id: this.notificationId++,
+      userId: dealer.id,
+      type: 'message',
+      content: 'New message from Mike at Fast Wheels Trading',
+      relatedId: trader.id,
+      read: true,
+      createdAt: new Date(Date.now() - 10800000) // 3 hours ago
+    };
+    this.notifications.set(notification5.id, notification5);
+    
+    // Create notifications for dealer 2
+    const notification6: Notification = {
+      id: this.notificationId++,
+      userId: dealer2.id,
+      type: 'bid',
+      content: 'New bid received on Triumph Street Triple RS',
+      relatedId: auction4.id,
+      read: false,
+      createdAt: new Date(Date.now() - 2000000) // ~33 minutes ago
+    };
+    this.notifications.set(notification6.id, notification6);
+    
+    const notification7: Notification = {
+      id: this.notificationId++,
+      userId: dealer2.id,
+      type: 'bid',
+      content: 'New bid received on Kawasaki Z900',
+      relatedId: auction5.id,
+      read: false,
+      createdAt: new Date(Date.now() - 12600000) // 3.5 hours ago
+    };
+    this.notifications.set(notification7.id, notification7);
+    
+    const notification8: Notification = {
+      id: this.notificationId++,
+      userId: dealer2.id,
+      type: 'bid',
+      content: 'New bid received on Harley-Davidson Street Glide Special',
+      relatedId: auction7.id,
+      read: true,
+      createdAt: new Date(Date.now() - 16200000) // 4.5 hours ago
+    };
+    this.notifications.set(notification8.id, notification8);
+    
+    // Create notifications for trader
+    const notification9: Notification = {
+      id: this.notificationId++,
+      userId: trader.id,
+      type: 'auction_created',
+      content: 'New auction created: Ducati Multistrada V4S',
+      relatedId: auction10.id,
+      read: false,
+      createdAt: new Date(Date.now() - 32400000) // 9 hours ago
+    };
+    this.notifications.set(notification9.id, notification9);
+    
+    const notification10: Notification = {
+      id: this.notificationId++,
+      userId: trader.id,
+      type: 'auction_created',
+      content: 'New auction created: KTM 1290 Super Duke R',
+      relatedId: auction8.id,
+      read: true,
+      createdAt: new Date(Date.now() - 25200000) // 7 hours ago
+    };
+    this.notifications.set(notification10.id, notification10);
+    
+    const notification11: Notification = {
+      id: this.notificationId++,
+      userId: trader.id,
+      type: 'auction_ending',
+      content: 'Auction ending soon: Honda CBR650R',
+      relatedId: auction1.id,
+      read: false,
+      createdAt: new Date(Date.now() - 1800000) // 30 minutes ago
+    };
+    this.notifications.set(notification11.id, notification11);
   }
 }
 

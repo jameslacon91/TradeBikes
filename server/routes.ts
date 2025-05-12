@@ -113,7 +113,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/auctions", isAuthenticated, async (req, res, next) => {
+  app.get("/api/auctions", async (req, res, next) => {
     try {
       const activeAuctions = await storage.getActiveAuctions();
       res.json(activeAuctions);
@@ -131,7 +131,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/auctions/:id", isAuthenticated, async (req, res, next) => {
+  app.get("/api/auctions/:id", async (req, res, next) => {
     try {
       const id = parseInt(req.params.id, 10);
       const auction = await storage.getAuctionWithDetails(id);
