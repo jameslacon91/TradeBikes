@@ -39,11 +39,17 @@ export default function AuctionCard({
   return (
     <div className="bg-white shadow rounded-lg overflow-hidden border border-gray-200">
       <div className="relative">
-        <img 
-          src={motorcycle.images[0]} 
-          alt={`${motorcycle.make} ${motorcycle.model}`} 
-          className="w-full h-48 object-cover"
-        />
+        {motorcycle.images && motorcycle.images.length > 0 ? (
+          <img 
+            src={motorcycle.images[0]} 
+            alt={`${motorcycle.make} ${motorcycle.model}`} 
+            className="w-full h-48 object-cover"
+          />
+        ) : (
+          <div className="w-full h-48 bg-gray-200 flex items-center justify-center">
+            <p className="text-gray-500">No image available</p>
+          </div>
+        )}
         <div className="absolute top-0 right-0 m-2">
           <span className={`inline-flex items-center px-2.5 py-0.5 rounded-md text-sm font-medium ${isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
             {isActive ? 'Live' : 'Ended'}
