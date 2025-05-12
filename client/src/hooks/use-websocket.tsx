@@ -85,6 +85,26 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
       }
     };
   }, []); // Only run on component mount
+  
+  // Listen for auth events
+  useEffect(() => {
+    if (!isBrowser) return;
+    
+    const handleAuthEvent = (event: Event) => {
+      const customEvent = event as CustomEvent<{userId?: number}>;
+      const newUserId = customEvent.detail.userId;
+      
+      if (newUserId) {
+        setUserId(newUserId);
+      }
+    };
+    
+    window.addEventListener('auth-state-change', handleAuthEvent);
+    
+    return () => {
+      window.removeEventListener('auth-state-change', handleAuthEvent);
+    };
+  }, []);
 
   // Register user ID when it changes
   useEffect(() => {

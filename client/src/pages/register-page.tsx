@@ -16,7 +16,6 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { insertUserSchema } from "@shared/schema";
 
@@ -40,7 +39,6 @@ type RegisterFormValues = z.infer<typeof registerSchema>;
 export default function RegisterPage() {
   const [_, navigate] = useLocation();
   const { user, registerMutation } = useAuth();
-  const [selectedRole, setSelectedRole] = useState<"dealer" | "trader">("dealer");
 
   // Redirect if already logged in
   if (user) {
@@ -63,14 +61,11 @@ export default function RegisterPage() {
       postCode: "",
       vatNumber: "",
       termsAccepted: false,
-      role: "dealer",
+      role: "dealer", // Default role, can be changed by admin if needed
     },
   });
 
   const onSubmit = (data: RegisterFormValues) => {
-    // Update role based on selected tab
-    data.role = selectedRole;
-    
     registerMutation.mutate(data, {
       onSuccess: () => {
         navigate("/verify-email");
@@ -89,24 +84,14 @@ export default function RegisterPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Tabs defaultValue="dealer" className="w-full mb-6" onValueChange={(value) => setSelectedRole(value as "dealer" | "trader")}>
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="dealer">Register as Dealer</TabsTrigger>
-                <TabsTrigger value="trader">Register as Trader</TabsTrigger>
-              </TabsList>
-              <TabsContent value="dealer" className="pt-4">
-                <p className="text-muted-foreground mb-4">
-                  Register as a Dealer to list motorcycles for sale in our marketplace.
-                  Dealers can create auctions, track bids, and manage inventory.
-                </p>
-              </TabsContent>
-              <TabsContent value="trader" className="pt-4">
-                <p className="text-muted-foreground mb-4">
-                  Register as a Trader to bid on and purchase motorcycles.
-                  Traders can browse listings, place bids, and buy motorcycles from dealers.
-                </p>
-              </TabsContent>
-            </Tabs>
+            <div className="mb-6">
+              <h3 className="text-lg font-semibold mb-2">Business Registration</h3>
+              <p className="text-muted-foreground mb-4">
+                Register your company to access our B2B motorcycle trading platform.
+                Whether you want to list bikes for sale or find inventory to purchase,
+                we'll help you streamline your motorcycle trading process.
+              </p>
+            </div>
 
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">

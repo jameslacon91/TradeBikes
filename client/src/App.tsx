@@ -13,6 +13,7 @@ import RegisterPage from "@/pages/register-page";
 import VerifyEmailPage from "@/pages/verify-email";
 import SubscriptionPage from "@/pages/subscription-page";
 import AboutPage from "@/pages/about-page";
+import MapSearchPage from "@/pages/map-search-page";
 import { ProtectedRoute } from "./lib/protected-route";
 import { useAuth } from "./hooks/use-auth";
 import { QueryClientProvider } from "@tanstack/react-query";
@@ -54,7 +55,7 @@ function Router() {
       }} />
       
       {/* Map and search routes */}
-      <ProtectedRoute path="/search-map" component={AuctionsPage} />
+      <ProtectedRoute path="/search-map" component={MapSearchPage} />
       <ProtectedRoute path="/search-list" component={AuctionsPage} />
       
       {/* Fallback to 404 */}

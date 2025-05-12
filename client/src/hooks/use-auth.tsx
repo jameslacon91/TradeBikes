@@ -7,7 +7,6 @@ import {
 import { InsertUser, User } from "@shared/schema";
 import { getQueryFn, apiRequest, queryClient } from "../lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { useWebSocket } from "@/hooks/use-websocket";
 
 type AuthContextType = {
   user: User | null;
@@ -22,9 +21,18 @@ type LoginData = Pick<InsertUser, "username" | "password">;
 
 export const AuthContext = createContext<AuthContextType | null>(null);
 
+// Custom event for auth state changes that WebSocket can listen to
+export const dispatchAuthEvent = (userId?: number) => {
+  if (typeof window !== 'undefined') {
+    const event = new CustomEvent('auth-state-change', { 
+      detail: { userId } 
+    });
+    window.dispatchEvent(event);
+  }
+};
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const { toast } = useToast();
-  const webSocket = useWebSocket();
   
   const {
     data: user,
@@ -35,12 +43,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     queryFn: getQueryFn({ on401: "returnNull" }),
   });
 
-  // Register authenticated user with WebSocket when user changes
+  // Emit auth event when user changes
   useEffect(() => {
     if (user) {
-      webSocket.registerAuthenticatedUser(user.id);
+      dispatchAuthEvent(user.id);
     }
-  }, [user, webSocket]);
+  }, [user]);
 
   const loginMutation = useMutation({
     mutationFn: async (credentials: LoginData) => {
@@ -49,10 +57,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     },
     onSuccess: (user: User) => {
       queryClient.setQueryData(["/api/user"], user);
-      // Register with WebSocket on login
-      if (user) {
-        webSocket.registerAuthenticatedUser(user.id);
-      }
+      // Notify about successful login
+      dispatchAuthEvent(user.id);
+      
       toast({
         title: "Login successful",
         description: `Welcome back, ${user.companyName}!`,
@@ -74,10 +81,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     },
     onSuccess: (user: User) => {
       queryClient.setQueryData(["/api/user"], user);
-      // Register with WebSocket on registration
-      if (user) {
-        webSocket.registerAuthenticatedUser(user.id);
-      }
+      // Notify about successful registration
+      dispatchAuthEvent(user.id);
+      
       toast({
         title: "Registration successful",
         description: `Welcome to TradeBikes, ${user.companyName}!`,
@@ -98,6 +104,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     },
     onSuccess: () => {
       queryClient.setQueryData(["/api/user"], null);
+      // Notify about logout
+      dispatchAuthEvent(undefined);
+      
       toast({
         title: "Logged out",
         description: "You have been logged out successfully.",
