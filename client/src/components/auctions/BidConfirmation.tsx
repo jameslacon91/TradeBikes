@@ -14,9 +14,9 @@ interface BidConfirmationProps {
   auctionId: number;
   bid: Bid;
   isAccepted: boolean;
-  isDealer: boolean;
-  isTrader: boolean;
-  traderId: number;
+  isDealer: boolean; // The seller - the dealer who created the auction
+  isBuyer: boolean;  // The buyer - the dealer who placed the bid
+  bidderId: number;  // ID of the dealer who placed the winning bid
   dealConfirmed: boolean;
   collectionConfirmed: boolean;
   onSuccess?: () => void;
@@ -27,8 +27,8 @@ export default function BidConfirmation({
   bid,
   isAccepted,
   isDealer,
-  isTrader,
-  traderId,
+  isBuyer,
+  bidderId,
   dealConfirmed,
   collectionConfirmed,
   onSuccess
@@ -36,19 +36,19 @@ export default function BidConfirmation({
   const [date, setDate] = useState<Date | undefined>(undefined);
   const { toast } = useToast();
 
-  // Accept bid mutation (dealer only)
+  // Accept bid mutation (seller only)
   const acceptBidMutation = useMutation({
     mutationFn: async () => {
       const response = await apiRequest('POST', `/api/auctions/${auctionId}/accept-bid`, {
         bidId: bid.id,
-        traderId: traderId
+        bidderId: bidderId
       });
       return response.json();
     },
     onSuccess: () => {
       toast({
         title: 'Bid accepted',
-        description: 'The trader has been notified.',
+        description: 'The buyer has been notified.',
       });
       queryClient.invalidateQueries({ queryKey: [`/api/auctions/${auctionId}`] });
       if (onSuccess) onSuccess();
@@ -62,7 +62,7 @@ export default function BidConfirmation({
     }
   });
 
-  // Confirm deal mutation (trader only)
+  // Confirm deal mutation (buyer only)
   const confirmDealMutation = useMutation({
     mutationFn: async () => {
       const response = await apiRequest('POST', `/api/auctions/${auctionId}/confirm-deal`, {});
@@ -71,7 +71,7 @@ export default function BidConfirmation({
     onSuccess: () => {
       toast({
         title: 'Deal confirmed',
-        description: 'The dealer has been notified.',
+        description: 'The seller has been notified.',
       });
       queryClient.invalidateQueries({ queryKey: [`/api/auctions/${auctionId}`] });
       if (onSuccess) onSuccess();
@@ -85,7 +85,7 @@ export default function BidConfirmation({
     }
   });
 
-  // Schedule collection mutation (dealer only)
+  // Schedule collection mutation (seller only)
   const scheduleCollectionMutation = useMutation({
     mutationFn: async () => {
       if (!date) return;
@@ -97,7 +97,7 @@ export default function BidConfirmation({
     onSuccess: () => {
       toast({
         title: 'Collection scheduled',
-        description: 'The trader has been notified of the collection date.',
+        description: 'The buyer has been notified of the collection date.',
       });
       queryClient.invalidateQueries({ queryKey: [`/api/auctions/${auctionId}`] });
       if (onSuccess) onSuccess();
