@@ -5,7 +5,7 @@ import { useMutation } from "@tanstack/react-query";
 import { insertMotorcycleSchema, insertAuctionSchema } from "@shared/schema";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
-import { useNavigate } from 'wouter';
+import { useLocation } from 'wouter';
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -41,7 +41,7 @@ type FormData = z.infer<typeof motorcycleFormSchema>;
 
 export default function BikeUploadForm() {
   const { toast } = useToast();
-  const [_, navigate] = useNavigate();
+  const [_, navigate] = useLocation();
 
   // Form definition
   const form = useForm<FormData>({

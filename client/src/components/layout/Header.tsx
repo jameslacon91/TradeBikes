@@ -3,6 +3,7 @@ import { Link, useLocation } from 'wouter';
 import { useAuth } from '@/hooks/use-auth';
 import { useQuery } from '@tanstack/react-query';
 import { Bell } from 'lucide-react';
+import { TradeBikesLogo } from '@/components/logo';
 import { 
   DropdownMenu, 
   DropdownMenuContent, 
@@ -20,12 +21,14 @@ export default function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // Get unread notifications count
-  const { data: notifications = [] } = useQuery({
+  const { data: notifications = [] } = useQuery<any[]>({
     queryKey: ['/api/notifications'],
     enabled: !!user,
   });
 
-  const unreadCount = notifications.filter((n: any) => !n.read).length;
+  const unreadCount = Array.isArray(notifications) 
+    ? notifications.filter((n: any) => !n.read).length 
+    : 0;
 
   // Get user initials for avatar
   const getInitials = () => {
@@ -50,7 +53,7 @@ export default function Header() {
             <div className="flex-shrink-0 flex items-center">
               <Link href="/">
                 <div className="flex items-center cursor-pointer">
-                  <img src="/src/assets/logo.jpeg" alt="TradeBikes Logo" className="h-8 w-auto" />
+                  <TradeBikesLogo className="h-8 w-auto" />
                   <span className="ml-2 text-xl font-bold text-gray-900">TradeBikes</span>
                 </div>
               </Link>

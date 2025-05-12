@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { useAuth } from './use-auth';
 import { WSMessage } from '@shared/types';
+import { queryClient } from '@/lib/queryClient';
 
 interface WebSocketContextType {
   connected: boolean;
@@ -12,57 +12,51 @@ const WebSocketContext = createContext<WebSocketContextType | null>(null);
 export function WebSocketProvider({ children }: { children: ReactNode }) {
   const [socket, setSocket] = useState<WebSocket | null>(null);
   const [connected, setConnected] = useState(false);
-  const { user } = useAuth();
 
   useEffect(() => {
-    if (!user) return;
-
     // Create WebSocket connection
-    const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-    const wsUrl = `${protocol}//${window.location.host}/ws`;
-    const ws = new WebSocket(wsUrl);
+    try {
+      const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+      const wsUrl = `${protocol}//${window.location.host}/ws`;
+      const ws = new WebSocket(wsUrl);
 
-    // Connection opened
-    ws.addEventListener('open', () => {
-      console.log('WebSocket connection established');
-      setConnected(true);
-      
-      // Identify user to the server
-      ws.send(JSON.stringify({
-        type: 'identify',
-        data: { userId: user.id },
-        timestamp: Date.now()
-      }));
-    });
+      // Connection opened
+      ws.addEventListener('open', () => {
+        console.log('WebSocket connection established');
+        setConnected(true);
+      });
 
-    // Connection closed
-    ws.addEventListener('close', () => {
-      console.log('WebSocket connection closed');
-      setConnected(false);
-    });
+      // Connection closed
+      ws.addEventListener('close', () => {
+        console.log('WebSocket connection closed');
+        setConnected(false);
+      });
 
-    // Listen for messages
-    ws.addEventListener('message', (event) => {
-      try {
-        const message = JSON.parse(event.data) as WSMessage;
-        handleWebSocketMessage(message);
-      } catch (error) {
-        console.error('Error parsing WebSocket message:', error);
-      }
-    });
+      // Listen for messages
+      ws.addEventListener('message', (event) => {
+        try {
+          const message = JSON.parse(event.data) as WSMessage;
+          handleWebSocketMessage(message);
+        } catch (error) {
+          console.error('Error parsing WebSocket message:', error);
+        }
+      });
 
-    // Error handler
-    ws.addEventListener('error', (error) => {
-      console.error('WebSocket error:', error);
-    });
+      // Error handler
+      ws.addEventListener('error', (error) => {
+        console.error('WebSocket error:', error);
+      });
 
-    setSocket(ws);
+      setSocket(ws);
 
-    // Cleanup on unmount
-    return () => {
-      ws.close();
-    };
-  }, [user]);
+      // Cleanup on unmount
+      return () => {
+        ws.close();
+      };
+    } catch (error) {
+      console.error('Error establishing WebSocket connection:', error);
+    }
+  }, []);
 
   // Handle incoming WebSocket messages
   const handleWebSocketMessage = (message: WSMessage) => {
@@ -117,5 +111,4 @@ export function useWebSocket() {
   return context;
 }
 
-// Import queryClient here to avoid circular dependencies
-import { queryClient } from '../lib/queryClient';
+

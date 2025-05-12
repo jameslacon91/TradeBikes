@@ -3,6 +3,7 @@ import { Link, useLocation } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
 import Layout from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
+import { TradeBikesLogo } from "@/components/logo";
 
 export default function HomePage() {
   const { user } = useAuth();
@@ -24,7 +25,7 @@ export default function HomePage() {
             <div className="md:flex md:items-center md:justify-between">
               <div className="md:w-1/2 text-white">
                 <div className="flex items-center mb-6">
-                  <img src="/src/assets/logo.jpeg" alt="TradeBikes Logo" className="h-12 w-auto mr-4" />
+                  <TradeBikesLogo className="h-12 w-auto mr-4" />
                   <h1 className="text-4xl font-bold">
                     Modernizing Used Motorcycle Trading
                   </h1>
