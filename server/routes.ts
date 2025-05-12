@@ -143,6 +143,65 @@ export async function registerRoutes(app: Express): Promise<Server> {
       next(error);
     }
   });
+  
+  // Motorcycles
+  app.post("/api/motorcycles", isAuthenticated, hasRole("dealer"), async (req, res, next) => {
+    try {
+      const validationResult = insertMotorcycleSchema.safeParse(req.body);
+      if (!validationResult.success) {
+        return res.status(400).json({ message: "Invalid motorcycle data", errors: validationResult.error.format() });
+      }
+      
+      // Add dealer ID from logged in user
+      const motorcycle = await storage.createMotorcycle({
+        ...validationResult.data,
+        dealerId: req.user.id
+      });
+      
+      res.status(201).json(motorcycle);
+    } catch (error) {
+      next(error);
+    }
+  });
+  
+  // Create a new auction
+  app.post("/api/auctions", isAuthenticated, hasRole("dealer"), async (req, res, next) => {
+    try {
+      const validationResult = insertAuctionSchema.safeParse(req.body);
+      if (!validationResult.success) {
+        return res.status(400).json({ message: "Invalid auction data", errors: validationResult.error.format() });
+      }
+      
+      const { motorcycleId, startingPrice, reservePrice, startTime, endTime } = validationResult.data;
+      
+      // Verify motorcycle exists and belongs to dealer
+      const motorcycle = await storage.getMotorcycle(motorcycleId);
+      if (!motorcycle) {
+        return res.status(404).json({ message: "Motorcycle not found" });
+      }
+      
+      if (motorcycle.dealerId !== req.user.id) {
+        return res.status(403).json({ message: "You can only create auctions for your own motorcycles" });
+      }
+      
+      // Create auction
+      const auction = await storage.createAuction({
+        motorcycleId,
+        dealerId: req.user.id,
+        startingPrice,
+        reservePrice,
+        startTime: new Date(startTime),
+        endTime: new Date(endTime),
+        status: "active",
+        winningBidId: null,
+        winningTraderId: null
+      });
+      
+      res.status(201).json(auction);
+    } catch (error) {
+      next(error);
+    }
+  });
 
   // Bids
   app.post("/api/bids", isAuthenticated, hasRole("trader"), async (req, res, next) => {
