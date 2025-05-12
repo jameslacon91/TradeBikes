@@ -201,7 +201,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/bids/auction/:auctionId", isAuthenticated, async (req, res, next) => {
+  app.get("/api/bids/auction/:auctionId", async (req, res, next) => {
     try {
       const auctionId = parseInt(req.params.auctionId, 10);
       const bids = await storage.getBidsByAuctionId(auctionId);

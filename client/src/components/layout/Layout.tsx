@@ -44,22 +44,22 @@ export default function Layout({ children }: LayoutProps) {
           
           <nav className="hidden md:flex space-x-6">
             <Link href="/">
-              <a className="text-gray-600 hover:text-primary">Home</a>
+              <span className="text-gray-600 hover:text-primary cursor-pointer">Home</span>
             </Link>
             <Link href="/about">
-              <a className="text-gray-600 hover:text-primary">About</a>
+              <span className="text-gray-600 hover:text-primary cursor-pointer">About</span>
             </Link>
             <Link href="/stock">
-              <a className="text-gray-600 hover:text-primary">View Stock</a>
+              <span className="text-gray-600 hover:text-primary cursor-pointer">View Stock</span>
             </Link>
             {user && user.role === 'dealer' && (
               <Link href="/create-auction">
-                <a className="text-gray-600 hover:text-primary">List a Vehicle</a>
+                <span className="text-gray-600 hover:text-primary cursor-pointer">List a Vehicle</span>
               </Link>
             )}
             {user && (
               <Link href="/search-map">
-                <a className="text-gray-600 hover:text-primary">Map Search</a>
+                <span className="text-gray-600 hover:text-primary cursor-pointer">Map Search</span>
               </Link>
             )}
           </nav>
