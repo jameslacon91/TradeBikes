@@ -200,7 +200,6 @@ export default function AuctionDetail() {
                     <BidForm
                       auctionId={auction.id}
                       currentBid={auction.currentBid}
-                      startingPrice={auction.startingPrice}
                     />
                   </div>
                 )}

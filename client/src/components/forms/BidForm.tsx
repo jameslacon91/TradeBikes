@@ -20,17 +20,18 @@ import { Button } from '@/components/ui/button';
 interface BidFormProps {
   auctionId: number;
   currentBid?: number;
-  startingPrice: number;
 }
 
-export default function BidForm({ auctionId, currentBid, startingPrice }: BidFormProps) {
+export default function BidForm({ auctionId, currentBid }: BidFormProps) {
   const { user } = useAuth();
   const { sendMessage } = useWebSocket();
   const { toast } = useToast();
-  const [bidAmount, setBidAmount] = useState<number | string>(currentBid ? (currentBid + 50) : startingPrice);
+  // Default starting bid if no current bid
+  const DEFAULT_STARTING_BID = 500;
+  const [bidAmount, setBidAmount] = useState<number | string>(currentBid ? (currentBid + 50) : DEFAULT_STARTING_BID);
 
-  // Minimum bid is current bid + 50 or starting price if no bids
-  const minBid = currentBid ? currentBid + 50 : startingPrice;
+  // Minimum bid is current bid + 50 or default starting bid if no bids
+  const minBid = currentBid ? currentBid + 50 : DEFAULT_STARTING_BID;
 
   // Create zod schema for bid validation
   const bidSchema = z.object({
@@ -47,7 +48,7 @@ export default function BidForm({ auctionId, currentBid, startingPrice }: BidFor
   const form = useForm<BidFormValues>({
     resolver: zodResolver(bidSchema),
     defaultValues: {
-      amount: currentBid ? (currentBid + 50).toString() : startingPrice.toString(),
+      amount: currentBid ? (currentBid + 50).toString() : DEFAULT_STARTING_BID.toString(),
     },
   });
 
