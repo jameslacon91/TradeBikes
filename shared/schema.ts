@@ -50,6 +50,11 @@ export const auctions = pgTable("auctions", {
   status: text("status").notNull().default("pending"), // pending, active, completed, cancelled
   winningBidId: integer("winning_bid_id"), // foreign key to bids
   winningTraderId: integer("winning_trader_id"), // foreign key to users
+  bidAccepted: boolean("bid_accepted").default(false), // dealer has accepted the winning bid
+  dealConfirmed: boolean("deal_confirmed").default(false), // both parties confirmed the deal
+  collectionConfirmed: boolean("collection_confirmed").default(false), // trader has confirmed collection
+  collectionDate: timestamp("collection_date"), // scheduled collection date
+  highestBidderId: integer("highest_bidder_id"), // current highest bidder (trader)
   createdAt: timestamp("created_at").defaultNow(),
 });
 

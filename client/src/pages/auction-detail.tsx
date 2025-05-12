@@ -5,6 +5,7 @@ import { useAuth } from '@/hooks/use-auth';
 import Layout from '@/components/layout/Layout';
 import BidForm from '@/components/forms/BidForm';
 import BidHistory from '@/components/auctions/BidHistory';
+import BidConfirmation from '@/components/auctions/BidConfirmation';
 import AuctionReviews from '@/components/reviews/AuctionReviews';
 import { formatTimeDifference, isEndingSoon } from '@/lib/countdownTimer';
 import { AuctionWithDetails } from '@shared/types';
@@ -175,6 +176,16 @@ export default function AuctionDetail() {
                       <h4 className="text-sm font-medium text-gray-500">Mileage</h4>
                       <p className="mt-1 text-sm text-gray-900">{motorcycle.mileage.toLocaleString()} miles</p>
                     </div>
+                    <div>
+                      <h4 className="text-sm font-medium text-gray-500">Availability Date</h4>
+                      <p className="mt-1 text-sm text-gray-900">
+                        {motorcycle.dateAvailable ? new Date(motorcycle.dateAvailable).toLocaleDateString() : 'Upon auction completion'}
+                      </p>
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-medium text-gray-500">Registration</h4>
+                      <p className="mt-1 text-sm text-gray-900">{motorcycle.regNumber || 'Not specified'}</p>
+                    </div>
                   </div>
                 </TabsContent>
               </Tabs>
@@ -239,14 +250,14 @@ export default function AuctionDetail() {
         </div>
         
         {/* Reviews section - only show for completed auctions */}
-        {timeLeft === 'Ended' && (user?.id === auction.dealerId || user?.id === auction.highestBidderId) && (
+        {timeLeft === 'Ended' && (user?.id === auction.dealerId || user?.id === auction.winningTraderId) && (
           <div className="mt-8 px-4 sm:px-6 lg:px-8">
             <AuctionReviews
               auctionId={auction.id}
               motorcycleId={motorcycle.id}
               dealerId={auction.dealerId}
               dealerName="Dealer Name" // In a real implementation, this would be fetched from the dealer data
-              traderId={auction.highestBidderId || 0}
+              traderId={auction.winningTraderId || 0}
               traderName="Trader Name" // In a real implementation, this would be fetched from the trader data
               isCompleted={timeLeft === 'Ended'}
             />

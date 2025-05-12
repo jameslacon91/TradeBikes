@@ -37,7 +37,11 @@ export type WSMessageType =
   'auction_ending' | 
   'auction_completed' | 
   'new_message' | 
-  'auction_created';
+  'auction_created' |
+  'bid_accepted' | 
+  'deal_confirmed' | 
+  'collection_scheduled' |
+  'collection_confirmed';
 
 export interface WSMessage {
   type: WSMessageType;
