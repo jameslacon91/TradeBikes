@@ -1,4 +1,4 @@
-import { createContext, useState, useContext, useEffect, ReactNode } from 'react';
+import React, { createContext, useState, useContext, useEffect, ReactNode } from 'react';
 import { useToast } from './use-toast';
 import { Bell, AlertCircle, Tag, ShoppingCart, Clock } from 'lucide-react';
 import { useWebSocket } from './use-websocket';
@@ -103,13 +103,17 @@ export function NotificationsProvider({ children }: { children: ReactNode }) {
       }
     };
 
-    // Just listen for WebSocket messages, they'll be passed to our handler
-    const handleNotifications = (message: WSMessage) => {
-      handleWebSocketMessage(message);
-    };
-    
-    // Update the reference to our handler
-    webSocket.handleWebSocketMessage = handleNotifications;
+    // Define a function to handle incoming WebSocket messages for notifications
+    if (webSocket.connected) {
+      // Create a message handler that will process notification events
+      const notificationHandler = (message: WSMessage) => {
+        // Process the message for notifications
+        handleWebSocketMessage(message);
+      };
+      
+      // Set our handler
+      webSocket.handleWebSocketMessage = notificationHandler;
+    }
 
     // No cleanup needed as we're just hooking into the existing WebSocket
   }, [webSocket.connected, webSocket]);

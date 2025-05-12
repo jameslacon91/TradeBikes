@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { WSMessage } from '@shared/types';
 import { queryClient } from '@/lib/queryClient';
 

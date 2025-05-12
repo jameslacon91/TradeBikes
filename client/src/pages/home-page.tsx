@@ -4,6 +4,7 @@ import { useAuth } from "@/hooks/use-auth";
 import NotificationTest from "@/components/notifications/NotificationTest";
 import { Button } from "@/components/ui/button";
 import { TradeBikesLogo } from "@/components/logo";
+import Layout from "@/components/layout/Layout";
 
 export default function HomePage() {
   const [_, navigate] = useLocation();
@@ -17,13 +18,14 @@ export default function HomePage() {
   }, [user, navigate]);
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="max-w-4xl mx-auto mb-12">
-        <h2 className="text-2xl font-bold mb-4">Notifications Test Panel</h2>
-        <NotificationTest />
-      </div>
-    
-      <div className="relative">
+    <Layout>
+      <div className="container mx-auto px-4 py-8">
+        <div className="max-w-4xl mx-auto mb-12">
+          <h2 className="text-2xl font-bold mb-4">Notifications Test Panel</h2>
+          <NotificationTest />
+        </div>
+      
+        <div className="relative">
         {/* Hero Section */}
         <div className="bg-primary-light py-12 md:py-24 rounded-lg">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -235,8 +237,9 @@ export default function HomePage() {
               <Link href="/auth">Get Started Now</Link>
             </Button>
           </div>
+          </div>
         </div>
       </div>
-    </div>
+    </Layout>
   );
 }
