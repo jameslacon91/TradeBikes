@@ -46,11 +46,6 @@ export default function HomePage() {
                     Register Now
                   </Button>
                 </Link>
-                <Link href="/about">
-                  <Button size="lg" variant="outline" className="text-white border-white hover:bg-white/10 transition-all duration-300">
-                    Learn More
-                  </Button>
-                </Link>
               </div>
               <p className="mt-6 text-white/70 text-sm">
                 Free 1-month trial • £125/month + VAT thereafter • No credit card required
