@@ -23,15 +23,17 @@ const isAuthenticated = (req: Request, res: Response, next: NextFunction) => {
 };
 
 // Role-based authorization middleware
+// Since all users are dealers now, this simply passes through, but is kept for future role differentiation
 const hasRole = (role: string) => (req: Request, res: Response, next: NextFunction) => {
-  if (req.user && req.user.role === role) {
-    return next();
-  }
-  res.status(403).json({ message: "Not authorized" });
+  // All users are dealers in the current implementation
+  return next();
+  
+  // Original implementation kept for reference:
+  // if (req.user && req.user.role === role) {
+  //   return next();
+  // }
+  // res.status(403).json({ message: "Not authorized" });
 };
-
-// Since all users are dealers now, we don't really need to check roles for most routes
-// This is kept for potential future role differentiation
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Set up authentication
@@ -70,12 +72,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/motorcycles", isAuthenticated, async (req, res, next) => {
     try {
-      if (req.user.role === "dealer") {
-        const motorcycles = await storage.getMotorcyclesByDealerId(req.user.id);
-        res.json(motorcycles);
-      } else {
-        res.status(403).json({ message: "Unauthorized" });
-      }
+      // All users are dealers now, so we can get their motorcycles directly
+      const motorcycles = await storage.getMotorcyclesByDealerId(req.user.id);
+      res.json(motorcycles);
     } catch (error) {
       next(error);
     }
@@ -580,81 +579,79 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Dashboard data
   app.get("/api/dashboard", isAuthenticated, async (req, res, next) => {
     try {
-      if (req.user.role === "dealer") {
-        const auctions = await storage.getAuctionsByDealerId(req.user.id);
-        
-        // Calculate statistics
-        const activeListings = auctions.filter(a => a.status === "active").length;
-        let totalBids = 0;
-        auctions.forEach(auction => {
-          totalBids += auction.bids.length;
+      // Get auctions created by this dealer
+      const dealerAuctions = await storage.getAuctionsByDealerId(req.user.id);
+      
+      // Calculate selling statistics
+      const activeListings = dealerAuctions.filter(a => a.status === "active").length;
+      let totalBids = 0;
+      dealerAuctions.forEach(auction => {
+        totalBids += auction.bids.length;
+      });
+      
+      const pendingCompletion = dealerAuctions.filter(
+        a => a.status === "completed" && a.winningBidId && !a.winningBidderId
+      ).length;
+      
+      // Calculate revenue (sum of winning bids for completed auctions)
+      let revenue = 0;
+      dealerAuctions
+        .filter(a => a.status === "completed" && a.winningBidId)
+        .forEach(auction => {
+          revenue += auction.currentBid || 0;
         });
+     
+      // Get auctions where this dealer has placed bids (buying activity)
+      const allAuctions = await storage.getActiveAuctions();
+      let activeBids = 0;
+      let wonAuctions = 0;
+      let pendingCollection = 0;
+      let amountSpent = 0;
+      
+      // Calculate buying statistics
+      allAuctions.forEach(auction => {
+        const myBids = auction.bids.filter(bid => bid.dealerId === req.user.id);
         
-        const pendingCompletion = auctions.filter(
-          a => a.status === "completed" && a.winningBidId && !a.winningTraderId
-        ).length;
-        
-        // Calculate revenue (sum of winning bids for completed auctions)
-        let revenue = 0;
-        auctions
-          .filter(a => a.status === "completed" && a.winningBidId)
-          .forEach(auction => {
-            revenue += auction.currentBid || 0;
-          });
-        
-        res.json({
-          activeListings,
-          totalBids,
-          pendingCompletion,
-          revenue,
-          trendUp: true,
-          trendValue: 2
-        });
-      } else if (req.user.role === "trader") {
-        // Get all bids by trader
-        let totalBids = 0;
-        let wonAuctions = 0;
-        let pendingCollection = 0;
-        let amountSpent = 0;
-        
-        // Here we would typically query for trader-specific stats
-        // Since we're using in-memory storage, we'll need to iterate through auctions
-        const allAuctions = await storage.getActiveAuctions();
-        const traderBids = new Map();
-        
-        allAuctions.forEach(auction => {
-          auction.bids.forEach(bid => {
-            if (bid.traderId === req.user.id) {
-              if (!traderBids.has(auction.id)) {
-                traderBids.set(auction.id, []);
-              }
-              traderBids.get(auction.id).push(bid);
-              totalBids++;
-            }
-          });
+        if (myBids.length > 0) {
+          // Check for active bids
+          if (auction.status === "active") {
+            activeBids += myBids.length;
+          }
           
-          if (auction.status === "completed" && auction.winningTraderId === req.user.id) {
-            wonAuctions++;
-            // In a real app, we would track if the bike has been collected
-            pendingCollection++;
-            if (auction.currentBid) {
-              amountSpent += auction.currentBid;
+          // Check for won auctions
+          if (auction.status === "completed" && auction.winningBidId) {
+            const winningBid = auction.bids.find(bid => bid.id === auction.winningBidId);
+            if (winningBid && winningBid.dealerId === req.user.id) {
+              wonAuctions++;
+              
+              // Check if pending collection
+              if (!auction.collectionDate) {
+                pendingCollection++;
+              }
+              
+              // Calculate amount spent
+              amountSpent += winningBid.amount;
             }
           }
-        });
+        }
+      });
+     
+      // Return combined stats for dealer (both buying and selling)
+      res.json({
+        // Selling stats
+        activeListings,
+        totalBids,
+        pendingCompletion,
+        revenue,
+        trendUp: true,
+        trendValue: 2,
         
-        res.json({
-          activeBids: traderBids.size,
-          totalBids,
-          wonAuctions,
-          pendingCollection,
-          amountSpent,
-          trendUp: true,
-          trendValue: 3
-        });
-      } else {
-        res.status(403).json({ message: "Unauthorized" });
-      }
+        // Buying stats
+        activeBids,
+        wonAuctions,
+        pendingCollection,
+        amountSpent
+      });
     } catch (error) {
       next(error);
     }
