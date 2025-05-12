@@ -12,8 +12,10 @@ import {
   insertMessageSchema 
 } from "@shared/schema";
 
+import { Request, Response, NextFunction } from "express";
+
 // Authentication middleware
-const isAuthenticated = (req: any, res: any, next: any) => {
+const isAuthenticated = (req: Request, res: Response, next: NextFunction) => {
   if (req.isAuthenticated()) {
     return next();
   }
@@ -21,8 +23,8 @@ const isAuthenticated = (req: any, res: any, next: any) => {
 };
 
 // Role-based authorization middleware
-const hasRole = (role: string) => (req: any, res: any, next: any) => {
-  if (req.user.role === role) {
+const hasRole = (role: string) => (req: Request, res: Response, next: NextFunction) => {
+  if (req.user && req.user.role === role) {
     return next();
   }
   res.status(403).json({ message: "Not authorized" });
@@ -145,7 +147,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Motorcycles
-  app.post("/api/motorcycles", isAuthenticated, hasRole("dealer"), async (req, res, next) => {
+  app.post("/api/motorcycles", isAuthenticated, hasRole("dealer"), async (req: Request, res: Response, next: NextFunction) => {
     try {
       const validationResult = insertMotorcycleSchema.safeParse(req.body);
       if (!validationResult.success) {
@@ -153,6 +155,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Add dealer ID from logged in user
+      if (!req.user || !req.user.id) {
+        return res.status(401).json({ message: "Authentication required" });
+      }
+      
       const motorcycle = await storage.createMotorcycle({
         ...validationResult.data,
         dealerId: req.user.id
@@ -165,11 +171,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Create a new auction
-  app.post("/api/auctions", isAuthenticated, hasRole("dealer"), async (req, res, next) => {
+  app.post("/api/auctions", isAuthenticated, hasRole("dealer"), async (req: Request, res: Response, next: NextFunction) => {
     try {
       const validationResult = insertAuctionSchema.safeParse(req.body);
       if (!validationResult.success) {
         return res.status(400).json({ message: "Invalid auction data", errors: validationResult.error.format() });
+      }
+      
+      if (!req.user || !req.user.id) {
+        return res.status(401).json({ message: "Authentication required" });
       }
       
       const { motorcycleId, startingPrice, reservePrice, startTime, endTime } = validationResult.data;
@@ -184,17 +194,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "You can only create auctions for your own motorcycles" });
       }
       
+      // Parse dates properly if they're provided as strings
+      const startTimeDate = startTime ? new Date(startTime) : new Date();
+      const endTimeDate = new Date(endTime);
+      
       // Create auction
       const auction = await storage.createAuction({
         motorcycleId,
         dealerId: req.user.id,
         startingPrice,
         reservePrice,
-        startTime: new Date(startTime),
-        endTime: new Date(endTime),
-        status: "active",
-        winningBidId: null,
-        winningTraderId: null
+        startTime: startTimeDate,
+        endTime: endTimeDate
       });
       
       res.status(201).json(auction);

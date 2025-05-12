@@ -150,12 +150,12 @@ export default function BikeUploadForm() {
     setImageUrls(prev => prev.filter((_, i) => i !== index));
   };
 
-  // Handle mock image upload - in a real app, you would upload to a cloud storage
+  // Handle image upload using local URLs for development
   const uploadImages = async (files: File[]): Promise<string[]> => {
-    // This is a mock placeholder for image URLs
-    // In a real implementation, you would upload each file to cloud storage
-    // and return the resulting URLs
-    return files.map((file, index) => `https://example.com/motorcycle-image-${index + 1}.jpg`);
+    // In a production implementation, you would upload each file to cloud storage
+    // For now, we'll use the existing object URLs that we created for the previews
+    // This is just for development, as these URLs will not persist after the page reloads
+    return imageUrls;
   };
 
   // Convert auction duration to milliseconds
@@ -452,6 +452,7 @@ export default function BikeUploadForm() {
                 <FormControl>
                   <Textarea 
                     {...field} 
+                    value={field.value || ''}
                     placeholder="Provide a detailed description of the motorcycle, including any modifications, special features, service history, etc."
                     rows={5}
                   />
