@@ -30,6 +30,9 @@ const hasRole = (role: string) => (req: Request, res: Response, next: NextFuncti
   res.status(403).json({ message: "Not authorized" });
 };
 
+// Since all users are dealers now, we don't really need to check roles for most routes
+// This is kept for potential future role differentiation
+
 export async function registerRoutes(app: Express): Promise<Server> {
   // Set up authentication
   setupAuth(app);
@@ -260,7 +263,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         type: "new_bid",
         data: { 
           auctionId, 
-          traderId: req.user.id,
+          dealerId: req.user.id,
           amount 
         },
         timestamp: Date.now()
@@ -374,7 +377,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/auctions/:id/accept-bid", isAuthenticated, hasRole("dealer"), async (req, res, next) => {
     try {
       const auctionId = parseInt(req.params.id);
-      const { bidId, traderId } = req.body;
+      const { bidId, bidderId } = req.body;
       
       const auction = await storage.getAuction(auctionId);
       
@@ -389,27 +392,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const updatedAuction = await storage.updateAuction(auctionId, {
         bidAccepted: true,
         winningBidId: bidId,
-        winningTraderId: traderId,
+        winningBidderId: bidderId,
         status: "completed"
       });
 
-      // Send notification via WebSocket to the trader
+      // Send notification via WebSocket to the winning bidder
       const wsMessage: WSMessage = {
         type: "bid_accepted",
         data: {
           auctionId: auctionId,
           motorcycleId: auction.motorcycleId,
-          dealerId: auction.dealerId,
-          traderId: traderId
+          sellerId: auction.dealerId,
+          bidderId: bidderId
         },
         timestamp: Date.now()
       };
       
-      sendToUser(traderId, wsMessage);
+      sendToUser(bidderId, wsMessage);
       
       // Create a notification record
       await storage.createNotification({
-        userId: traderId,
+        userId: bidderId,
         type: "bid_accepted",
         content: `Your bid on auction #${auctionId} has been accepted.`,
         relatedId: auctionId
@@ -421,8 +424,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  // API for deal confirmation (trader only)
-  app.post("/api/auctions/:id/confirm-deal", isAuthenticated, hasRole("trader"), async (req, res, next) => {
+  // API for deal confirmation (winning bidder only)
+  app.post("/api/auctions/:id/confirm-deal", isAuthenticated, async (req, res, next) => {
     try {
       const auctionId = parseInt(req.params.id);
       
@@ -432,7 +435,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Auction not found" });
       }
       
-      if (auction.winningTraderId !== req.user.id) {
+      if (auction.winningBidderId !== req.user.id) {
         return res.status(403).json({ message: "Not authorized to confirm this deal" });
       }
       
@@ -440,14 +443,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         dealConfirmed: true
       });
 
-      // Send notification via WebSocket to the dealer
+      // Send notification via WebSocket to the seller
       const wsMessage: WSMessage = {
         type: "deal_confirmed",
         data: {
           auctionId: auctionId,
           motorcycleId: auction.motorcycleId,
-          dealerId: auction.dealerId,
-          traderId: req.user.id
+          sellerId: auction.dealerId,
+          bidderId: req.user.id
         },
         timestamp: Date.now()
       };
@@ -458,7 +461,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       await storage.createNotification({
         userId: auction.dealerId,
         type: "deal_confirmed",
-        content: `The trader has confirmed the deal for auction #${auctionId}.`,
+        content: `The buyer has confirmed the deal for auction #${auctionId}.`,
         relatedId: auctionId
       });
       
@@ -496,27 +499,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      // Send notification via WebSocket to the trader
+      // Send notification via WebSocket to the winning bidder
       const wsMessage: WSMessage = {
         type: "collection_scheduled",
         data: {
           auctionId: auctionId,
           motorcycleId: auction.motorcycleId,
-          dealerId: auction.dealerId,
-          traderId: auction.winningTraderId,
+          sellerId: auction.dealerId,
+          bidderId: auction.winningBidderId,
           collectionDate: collectionDate
         },
         timestamp: Date.now()
       };
       
-      if (auction.winningTraderId) {
-        sendToUser(auction.winningTraderId, wsMessage);
+      if (auction.winningBidderId) {
+        sendToUser(auction.winningBidderId, wsMessage);
         
         // Create a notification record
         await storage.createNotification({
-          userId: auction.winningTraderId,
+          userId: auction.winningBidderId,
           type: "collection_scheduled",
-          content: `The dealer has scheduled collection for auction #${auctionId} on ${new Date(collectionDate).toLocaleDateString()}.`,
+          content: `The seller has scheduled collection for auction #${auctionId} on ${new Date(collectionDate).toLocaleDateString()}.`,
           relatedId: auctionId
         });
       }
@@ -527,8 +530,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  // API for confirming collection (trader only)
-  app.post("/api/auctions/:id/confirm-collection", isAuthenticated, hasRole("trader"), async (req, res, next) => {
+  // API for confirming collection (winning bidder only)
+  app.post("/api/auctions/:id/confirm-collection", isAuthenticated, async (req, res, next) => {
     try {
       const auctionId = parseInt(req.params.id);
       
@@ -538,7 +541,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Auction not found" });
       }
       
-      if (auction.winningTraderId !== req.user.id) {
+      if (auction.winningBidderId !== req.user.id) {
         return res.status(403).json({ message: "Not authorized to confirm collection for this auction" });
       }
       
@@ -546,14 +549,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         collectionConfirmed: true
       });
 
-      // Send notification via WebSocket to the dealer
+      // Send notification via WebSocket to the seller
       const wsMessage: WSMessage = {
         type: "collection_confirmed",
         data: {
           auctionId: auctionId,
           motorcycleId: auction.motorcycleId,
-          dealerId: auction.dealerId,
-          traderId: req.user.id
+          sellerId: auction.dealerId,
+          bidderId: req.user.id
         },
         timestamp: Date.now()
       };
@@ -564,7 +567,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       await storage.createNotification({
         userId: auction.dealerId,
         type: "collection_confirmed",
-        content: `The trader has confirmed collection for auction #${auctionId}.`,
+        content: `The buyer has confirmed collection for auction #${auctionId}.`,
         relatedId: auctionId
       });
       

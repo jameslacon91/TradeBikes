@@ -10,7 +10,7 @@ import RegisterPage from "@/pages/register-page";
 import VerifyEmailPage from "@/pages/verify-email";
 import SubscriptionPage from "@/pages/subscription-page";
 import DealerDashboard from "@/pages/dealer-dashboard";
-import TraderDashboard from "@/pages/trader-dashboard";
+// Dealer dashboard handles both selling and buying functionality
 import AuctionsPage from "@/pages/auctions-page";
 import AuctionDetail from "@/pages/auction-detail";
 import CreateAuction from "@/pages/create-auction";
