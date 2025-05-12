@@ -183,15 +183,15 @@ export class MemStorage implements IStorage {
     };
     this.users.set(dealer3.id, dealer3);
     
-    // Create trader accounts
-    const traderPassword = await hashPassword('password123');
+    // Create bidder accounts (all users are dealers now, but these were originally traders)
+    const bidderPassword = await hashPassword('password123');
     
     const trader1: User = {
       id: this.userId++,
       username: 'miketrader',
-      password: traderPassword,
+      password: bidderPassword,
       email: 'mike@example.com',
-      role: 'trader',
+      role: 'dealer', // Changed from 'trader' to 'dealer'
       companyName: 'Mikes Trading Co',
       phone: '07987654321',
       address: '456 Trade Avenue',
@@ -207,9 +207,9 @@ export class MemStorage implements IStorage {
     const trader2: User = {
       id: this.userId++,
       username: 'sarahtrader',
-      password: traderPassword,
+      password: bidderPassword,
       email: 'sarah@example.com',
-      role: 'trader',
+      role: 'dealer', // Changed from 'trader' to 'dealer'
       companyName: 'Sarah\'s Motorcycle Exchange',
       phone: '07712345678',
       address: '789 Market St',
@@ -225,9 +225,9 @@ export class MemStorage implements IStorage {
     const trader3: User = {
       id: this.userId++,
       username: 'davidtrader',
-      password: traderPassword,
+      password: bidderPassword,
       email: 'david@example.com',
-      role: 'trader',
+      role: 'dealer', // Changed from 'trader' to 'dealer'
       companyName: 'Premier Bike Traders',
       phone: '07823456789',
       address: '23 Station Road',
