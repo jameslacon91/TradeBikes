@@ -250,7 +250,7 @@ export default function HomePage() {
       <div className="py-24 bg-gradient-to-b from-gray-50 to-white">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold mb-6">Built For Both Dealers & Traders</h2>
+            <h2 className="text-3xl md:text-4xl font-bold mb-6">Built For Both Buyers & Sellers</h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
               Our platform offers tailored features for both sides of the motorcycle trading ecosystem.
             </p>
@@ -271,7 +271,7 @@ export default function HomePage() {
                         <path d="M8 9a3 3 0 100-6 3 3 0 000 6zM8 11a6 6 0 016 6H2a6 6 0 016-6zM16 7a1 1 0 10-2 0v1h-1a1 1 0 100 2h1v1a1 1 0 102 0v-1h1a1 1 0 100-2h-1V7z" />
                       </svg>
                     </div>
-                    <span className="font-medium text-primary">For Dealers</span>
+                    <span className="font-medium text-primary">For Sellers</span>
                   </div>
                   
                   <h3 className="text-2xl font-bold mb-6">Sell Your Motorcycles Faster</h3>
@@ -321,7 +321,7 @@ export default function HomePage() {
                   
                   <Link href="/register">
                     <Button className="bg-primary hover:bg-primary-dark text-white w-full md:w-auto transition-all duration-300 shadow-md hover:shadow-lg">
-                      Register as Dealer
+                      Register as Seller
                     </Button>
                   </Link>
                 </div>
@@ -340,7 +340,7 @@ export default function HomePage() {
                         <path fillRule="evenodd" d="M10 2a4 4 0 00-4 4v1H5a1 1 0 00-.994.89l-1 9A1 1 0 004 18h12a1 1 0 00.994-1.11l-1-9A1 1 0 0015 7h-1V6a4 4 0 00-4-4zm2 5V6a2 2 0 10-4 0v1h4zm-6 3a1 1 0 112 0 1 1 0 01-2 0zm7-1a1 1 0 100 2 1 1 0 000-2z" clipRule="evenodd" />
                       </svg>
                     </div>
-                    <span className="font-medium text-amber-600">For Traders</span>
+                    <span className="font-medium text-amber-600">For Buyers</span>
                   </div>
                   
                   <h3 className="text-2xl font-bold mb-6">Find the Best Motorcycles</h3>
@@ -390,7 +390,7 @@ export default function HomePage() {
                   
                   <Link href="/register">
                     <Button className="bg-amber-500 hover:bg-amber-600 text-white w-full md:w-auto transition-all duration-300 shadow-md hover:shadow-lg">
-                      Register as Trader
+                      Register as Buyer
                     </Button>
                   </Link>
                 </div>
