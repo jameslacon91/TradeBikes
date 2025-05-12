@@ -124,7 +124,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/auctions", async (req, res, next) => {
     try {
-      const activeAuctions = await storage.getActiveAuctions();
+      // If user is logged in, pass their ID to get personalized results
+      const currentUserId = req.isAuthenticated() ? req.user.id : null;
+      const activeAuctions = await storage.getActiveAuctions(currentUserId);
       res.json(activeAuctions);
     } catch (error) {
       next(error);

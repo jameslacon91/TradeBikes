@@ -45,7 +45,7 @@ export interface IStorage {
   createAuction(auction: InsertAuction): Promise<Auction>;
   getAuction(id: number): Promise<Auction | undefined>;
   getAuctionWithDetails(id: number): Promise<AuctionWithDetails | undefined>;
-  getActiveAuctions(): Promise<AuctionWithDetails[]>;
+  getActiveAuctions(currentUserId?: number | null): Promise<AuctionWithDetails[]>;
   getAuctionsByDealerId(dealerId: number): Promise<AuctionWithDetails[]>;
   updateAuction(id: number, auction: Partial<Auction>): Promise<Auction | undefined>;
   
@@ -812,15 +812,23 @@ export class MemStorage implements IStorage {
     };
   }
   
-  async getActiveAuctions(): Promise<AuctionWithDetails[]> {
+  async getActiveAuctions(currentUserId: number | null = null): Promise<AuctionWithDetails[]> {
     const now = new Date();
     const result: AuctionWithDetails[] = [];
     
+    // Get current user if logged in
+    const currentUser = currentUserId ? await this.getUser(currentUserId) : null;
+    
     for (const auction of this.auctions.values()) {
       if (auction.status === 'active' && now < auction.endTime) {
-        const details = await this.getAuctionWithDetails(auction.id);
-        if (details) {
-          result.push(details);
+        // Check visibility restrictions
+        const isVisible = await this.isAuctionVisibleToUser(auction, currentUser);
+        
+        if (isVisible) {
+          const details = await this.getAuctionWithDetails(auction.id);
+          if (details) {
+            result.push(details);
+          }
         }
       }
     }
@@ -830,6 +838,49 @@ export class MemStorage implements IStorage {
       if (!a.endTime || !b.endTime) return 0;
       return a.endTime.getTime() - b.endTime.getTime();
     });
+  }
+  
+  // Helper method to check if an auction is visible to a specific user
+  private async isAuctionVisibleToUser(auction: Auction, user: User | null | undefined): Promise<boolean> {
+    // If user is not logged in, only show 'all' visibility auctions
+    if (!user) {
+      return auction.visibilityType === 'all';
+    }
+    
+    // Auction owner can always see their own auctions
+    if (auction.dealerId === user.id) {
+      return true;
+    }
+    
+    // Check visibility settings
+    switch (auction.visibilityType) {
+      case 'all':
+        // Visible to all users
+        return true;
+        
+      case 'favorites':
+        // Check if auction owner has current user in their favorites
+        const sellerUser = await this.getUser(auction.dealerId);
+        if (!sellerUser || !sellerUser.favoriteDealers) {
+          return false;
+        }
+        return sellerUser.favoriteDealers.includes(user.id);
+        
+      case 'radius':
+        // For simplicity in this demo, we'll implement a mock distance calculation
+        // In a real app, you would use geocoding and calculate actual distances
+        // TODO: Implement proper distance calculation using dealer addresses
+        if (!auction.visibilityRadius) {
+          return false;
+        }
+        
+        // Mock implementation: if radius is > 100, show to all
+        // If radius is <= 100, randomly determine visibility
+        return auction.visibilityRadius > 100 || (user.id % 2 === 0);
+        
+      default:
+        return false;
+    }
   }
   
   async getAuctionsByDealerId(dealerId: number): Promise<AuctionWithDetails[]> {

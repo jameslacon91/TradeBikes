@@ -745,7 +745,9 @@ export default function BikeUploadForm() {
                       <FormControl>
                         <Input 
                           type="number" 
-                          {...field} 
+                          name={field.name}
+                          ref={field.ref}
+                          onBlur={field.onBlur} 
                           onChange={(e) => {
                             const value = e.target.value === '' ? null : parseInt(e.target.value, 10);
                             field.onChange(value);
