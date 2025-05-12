@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'wouter';
 import { useAuth } from '@/hooks/use-auth';
@@ -6,6 +6,7 @@ import Layout from '@/components/layout/Layout';
 import StatCard from '@/components/dashboard/StatCard';
 import ActivityItem from '@/components/dashboard/ActivityItem';
 import AuctionCard from '@/components/auctions/AuctionCard';
+import FavoriteDealers from '@/components/dealers/FavoriteDealers';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
