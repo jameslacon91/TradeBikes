@@ -263,7 +263,7 @@ export default function Header() {
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link href="/auctions">
+                  <Link href="/underwrites">
                     <a className="flex w-full items-center">
                       <Search className="mr-2 h-4 w-4" />
                       View Bikes

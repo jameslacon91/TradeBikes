@@ -16,7 +16,7 @@ import { Clipboard, Clock, AlertCircle, DollarSign, Filter, TrendingUp, Truck, A
 // Extended dashboard stats interface to include buyer-specific metrics
 interface ExtendedDashboardStats extends DashboardStats {
   activeBids?: number;
-  wonAuctions?: number;
+  wonUnderwrites?: number; // Renamed from wonAuctions
   pendingCollection?: number; 
   amountSpent?: number;
 }
@@ -30,12 +30,12 @@ export default function DealerDashboard() {
     queryKey: ['/api/dashboard'],
   });
 
-  // Fetch all auctions (for buying)
+  // Fetch all underwrites (for buying)
   const { data: allAuctions = [], isLoading: allAuctionsLoading } = useQuery<AuctionWithDetails[]>({
     queryKey: ['/api/auctions'],
   });
 
-  // Fetch dealer's own auctions (for selling)
+  // Fetch dealer's own underwrites (for selling)
   const { data: myAuctions = [], isLoading: myAuctionsLoading } = useQuery<AuctionWithDetails[]>({
     queryKey: ['/api/auctions/dealer'],
   });
@@ -191,7 +191,7 @@ export default function DealerDashboard() {
             {/* Stats for Buying */}
             <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
               {/* Active Bids */}
-              <Link href="/auctions?filter=active-bids">
+              <Link href="/underwrites?filter=active-bids">
                 <StatCard 
                   title="Active Bids" 
                   value={statsLoading ? "Loading..." : stats?.activeBids || 0}
@@ -202,10 +202,10 @@ export default function DealerDashboard() {
               </Link>
 
               {/* Won Underwrites */}
-              <Link href="/auctions?filter=won">
+              <Link href="/underwrites?filter=won">
                 <StatCard 
                   title="Won Underwrites" 
-                  value={statsLoading ? "Loading..." : stats?.wonAuctions || 0}
+                  value={statsLoading ? "Loading..." : stats?.wonUnderwrites || 0}
                   icon={<Archive className="h-6 w-6 text-white" />}
                   bgColor="bg-accent"
                   className="cursor-pointer transition-transform hover:translate-y-[-5px]"
