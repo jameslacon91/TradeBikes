@@ -54,7 +54,7 @@ export default function BidHistory({ auctionId, currentBid }: BidHistoryProps) {
               <tr key={bid.id} className={bid.amount === currentBid ? "bg-green-50" : ""}>
                 <td className="px-3 py-2 whitespace-nowrap text-xs font-medium text-gray-900">Trader #{bid.traderId}</td>
                 <td className="px-3 py-2 whitespace-nowrap text-xs text-gray-900 text-right">£{bid.amount.toLocaleString()}</td>
-                <td className="px-3 py-2 whitespace-nowrap text-xs text-gray-500 text-right">{timeAgo(bid.createdAt)}</td>
+                <td className="px-3 py-2 whitespace-nowrap text-xs text-gray-500 text-right">{bid.createdAt ? timeAgo(new Date(bid.createdAt)) : ''}</td>
               </tr>
             ))}
           </tbody>

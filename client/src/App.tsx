@@ -35,6 +35,7 @@ function Router() {
       
       {/* Stock viewing route - limited view without login */}
       <Route path="/stock" component={AuctionsPage} />
+      <Route path="/stock/:id" component={AuctionDetail} />
       
       {/* Protected routes */}
       <ProtectedRoute path="/dashboard" component={() => {

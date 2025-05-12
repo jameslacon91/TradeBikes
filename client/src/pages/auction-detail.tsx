@@ -12,7 +12,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { MessageSquare, Bookmark } from 'lucide-react';
 
 export default function AuctionDetail() {
-  const [_, params] = useRoute<{ id: string }>('/auctions/:id');
+  const [auctionsMatch, auctionsParams] = useRoute<{ id: string }>('/auctions/:id');
+  const [stockMatch, stockParams] = useRoute<{ id: string }>('/stock/:id');
+  
+  const params = auctionsParams || stockParams;
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [timeLeft, setTimeLeft] = useState<string>('');
   const [endingSoon, setEndingSoon] = useState(false);
@@ -97,14 +100,20 @@ export default function AuctionDetail() {
             {/* Left column - Images */}
             <div className="p-4 border-r border-gray-200">
               <div className="mb-4">
-                <img 
-                  src={motorcycle.images[selectedImageIndex]} 
-                  alt={`${motorcycle.make} ${motorcycle.model}`} 
-                  className="w-full h-auto rounded-lg"
-                />
+                {motorcycle.images && motorcycle.images.length > 0 ? (
+                  <img 
+                    src={motorcycle.images[selectedImageIndex]} 
+                    alt={`${motorcycle.make} ${motorcycle.model}`} 
+                    className="w-full h-auto rounded-lg"
+                  />
+                ) : (
+                  <div className="w-full h-48 bg-gray-200 flex items-center justify-center rounded-lg">
+                    <p className="text-gray-500">No image available</p>
+                  </div>
+                )}
               </div>
               <div className="grid grid-cols-4 gap-2">
-                {motorcycle.images.map((image, index) => (
+                {motorcycle.images && motorcycle.images.map((image, index) => (
                   <img
                     key={index}
                     src={image}

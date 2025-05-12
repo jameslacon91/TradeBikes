@@ -7,7 +7,13 @@ import { useAuth } from '@/hooks/use-auth';
 import { useWebSocket } from '@/hooks/use-websocket';
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest, queryClient } from '@/lib/queryClient';
-import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
+} from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 
@@ -59,47 +65,45 @@ export default function BidForm({ auctionId, currentBid, startingPrice }: BidFor
         title: "Bid placed successfully",
         description: `Your bid of £${data.amount.toLocaleString()} has been placed.`,
       });
-
-      // Send WebSocket message to notify others about the new bid
-      sendMessage({
-        type: "new_bid",
-        data: {
-          auctionId,
-          traderId: user?.id,
-          amount: data.amount,
-        },
-        timestamp: Date.now(),
-      });
-
-      // Reset form and update bid amount suggestion
-      form.reset({
-        amount: (data.amount + 50).toString(),
-      });
-      setBidAmount(data.amount + 50);
-
-      // Invalidate query to refresh auction data
+      // Invalidate queries to refresh the auction data
       queryClient.invalidateQueries({ queryKey: [`/api/auctions/${auctionId}`] });
       queryClient.invalidateQueries({ queryKey: [`/api/bids/auction/${auctionId}`] });
+      
+      // Reset form with new minimum bid
+      const newMinBid = data.amount + 50;
+      setBidAmount(newMinBid);
+      form.reset({ amount: newMinBid.toString() });
     },
-    onError: (error: Error) => {
+    onError: (error: any) => {
       toast({
         title: "Failed to place bid",
-        description: error.message,
+        description: error.message || "An error occurred while placing your bid.",
         variant: "destructive",
       });
     },
   });
 
-  const onSubmit = (data: BidFormValues) => {
+  function onSubmit(data: BidFormValues) {
+    if (!user) {
+      toast({
+        title: "Authentication required",
+        description: "You must be logged in to place a bid.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     bidMutation.mutate(data);
-  };
+  }
 
-  const handleBidIncrement = (increment: number) => {
-    const currentValue = form.getValues("amount");
-    const newValue = parseInt(currentValue) + increment;
-    form.setValue("amount", newValue.toString());
-    setBidAmount(newValue);
-  };
+  function handleBidIncrement(amount: number) {
+    const current = typeof bidAmount === 'string' ? parseInt(bidAmount, 10) : bidAmount;
+    if (isNaN(current)) return;
+    
+    const newAmount = current + amount;
+    setBidAmount(newAmount);
+    form.setValue('amount', newAmount.toString());
+  }
 
   return (
     <div>
