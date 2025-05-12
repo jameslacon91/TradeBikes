@@ -21,18 +21,28 @@ export function setupAuth(app: Express) {
   });
 
   const sessionSecret = process.env.SESSION_SECRET || 'tradebikes-secret-key';
+  const isProduction = process.env.NODE_ENV === 'production';
+  
+  // Configuration for cookies based on environment
+  let cookieSettings: session.CookieOptions = {
+    httpOnly: true,
+    maxAge: 24 * 60 * 60 * 1000, // 24 hours
+  };
+  
+  // In production, we need secure cookies with proper sameSite setting for cross-origin
+  if (isProduction) {
+    cookieSettings.secure = true;
+    cookieSettings.sameSite = 'none';
+  }
   
   const sessionSettings: session.SessionOptions = {
     secret: sessionSecret,
     resave: false,
     saveUninitialized: false,
     store: sessionStore,
-    cookie: {
-      httpOnly: true,
-      maxAge: 24 * 60 * 60 * 1000, // 24 hours
-      secure: process.env.NODE_ENV === 'production', // Only use HTTPS in production
-      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax' // Allow cross-site in production (for Replit deployment)
-    }
+    cookie: cookieSettings,
+    // For Replit deployment, allow sessions without full security in dev
+    proxy: true
   };
 
   app.set("trust proxy", 1);
@@ -43,18 +53,26 @@ export function setupAuth(app: Express) {
   passport.use(
     new LocalStrategy(async (username, password, done) => {
       try {
+        console.log(`Authenticating user: ${username}`);
         const user = await storage.getUserByUsername(username);
+        
         if (!user) {
+          console.log(`User not found: ${username}`);
           return done(null, false, { message: "Incorrect username" });
         }
         
+        console.log(`User found, validating password for: ${username}`);
         const isPasswordValid = await storage.comparePasswords(password, user.password);
+        
         if (!isPasswordValid) {
+          console.log(`Invalid password for user: ${username}`);
           return done(null, false, { message: "Incorrect password" });
         }
         
+        console.log(`Password validated for user: ${username}`);
         return done(null, user);
       } catch (error) {
+        console.error(`Authentication error for ${username}:`, error);
         return done(error);
       }
     }),
@@ -108,12 +126,28 @@ export function setupAuth(app: Express) {
   });
 
   app.post("/api/login", (req, res, next) => {
+    console.log(`Login attempt for username: ${req.body.username}`);
+    
     passport.authenticate("local", (err, user, info) => {
-      if (err) return next(err);
-      if (!user) return res.status(401).json({ message: info.message || "Authentication failed" });
+      if (err) {
+        console.error("Login authentication error:", err);
+        return next(err);
+      }
+      
+      if (!user) {
+        console.log("Login failed:", info.message || "Authentication failed");
+        return res.status(401).json({ message: info.message || "Authentication failed" });
+      }
+      
+      console.log(`User authenticated successfully: ${user.username}`);
       
       req.login(user, (loginErr) => {
-        if (loginErr) return next(loginErr);
+        if (loginErr) {
+          console.error("Login session error:", loginErr);
+          return next(loginErr);
+        }
+        
+        console.log(`Login session created for: ${user.username}`);
         
         // Remove password from response
         const { password, ...userWithoutPassword } = user;
