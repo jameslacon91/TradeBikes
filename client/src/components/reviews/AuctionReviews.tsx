@@ -13,12 +13,12 @@ interface AuctionReviewsProps {
   motorcycleId: number;
   dealerId: number;
   dealerName: string;
-  traderId: number;
-  traderName: string;
+  bidderId: number;
+  bidderName: string;
   isCompleted: boolean;
   reviewStatus?: {
-    dealerReviewed: boolean;
-    traderReviewed: boolean;
+    sellerReviewed: boolean;
+    buyerReviewed: boolean;
   };
 }
 
@@ -27,10 +27,10 @@ export default function AuctionReviews({
   motorcycleId,
   dealerId,
   dealerName,
-  traderId,
-  traderName,
+  bidderId,
+  bidderName,
   isCompleted,
-  reviewStatus = { dealerReviewed: false, traderReviewed: false }
+  reviewStatus = { sellerReviewed: false, buyerReviewed: false }
 }: AuctionReviewsProps) {
   const { user } = useAuth();
   const { toast } = useToast();

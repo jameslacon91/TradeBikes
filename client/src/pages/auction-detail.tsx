@@ -82,8 +82,8 @@ export default function AuctionDetail() {
   // Define role and ownership variables
   // Since all users are dealers now, we define seller/buyer relationships based on the auction
   const isDealer = true; // All users are dealers in the unified model
-  const isSeller = user?.id === auction.dealerId; // This dealer created the auction
-  const isBuyer = user?.id !== auction.dealerId; // This dealer is viewing another's auction
+  const isSeller = user?.id === auction.dealerId; // This dealer created the auction (seller)
+  const isBuyer = user?.id !== auction.dealerId; // This dealer is viewing another's auction (potential buyer)
   const dealerOwnsAuction = isSeller; // Simplified for clarity
   
   // Check if auction is active
@@ -294,15 +294,15 @@ export default function AuctionDetail() {
         </div>
         
         {/* Reviews section - only show for completed auctions */}
-        {timeLeft === 'Ended' && (user?.id === auction.dealerId || user?.id === auction.winningTraderId) && (
+        {timeLeft === 'Ended' && (user?.id === auction.dealerId || user?.id === auction.winningBidderId) && (
           <div className="mt-8 px-4 sm:px-6 lg:px-8">
             <AuctionReviews
               auctionId={auction.id}
               motorcycleId={motorcycle.id}
               dealerId={auction.dealerId}
               dealerName="Dealer Name" // In a real implementation, this would be fetched from the dealer data
-              traderId={auction.winningTraderId || 0}
-              traderName="Trader Name" // In a real implementation, this would be fetched from the trader data
+              bidderId={auction.winningBidderId || 0}
+              bidderName="Winning Bidder" // In a real implementation, this would be fetched from the dealer data
               isCompleted={timeLeft === 'Ended'}
             />
           </div>
