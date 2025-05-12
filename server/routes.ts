@@ -276,9 +276,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/bids/auction/:auctionId", async (req, res, next) => {
+  app.get("/api/bids/auction/:auctionId", isAuthenticated, async (req, res, next) => {
     try {
       const auctionId = parseInt(req.params.auctionId, 10);
+      
+      // First get the auction to check if this user is the selling dealer
+      const auction = await storage.getAuction(auctionId);
+      if (!auction) {
+        return res.status(404).json({ message: "Auction not found" });
+      }
+      
+      // Only the dealer who created the auction can see the bids (blind auction)
+      if (req.user.id !== auction.dealerId && req.user.role !== 'admin') {
+        return res.status(403).json({ 
+          message: "Access denied - This is a blind auction. Only the selling dealer can view bids."
+        });
+      }
+      
       const bids = await storage.getBidsByAuctionId(auctionId);
       res.json(bids);
     } catch (error) {

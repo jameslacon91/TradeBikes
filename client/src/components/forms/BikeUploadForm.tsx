@@ -118,14 +118,23 @@ export default function BikeUploadForm() {
       year: currentYear,
       color: 'Black',
       condition: 'Excellent',
-      mileage: 0,
+      mileage: undefined, // Changed from 0 to undefined to fix mileage issue
       engineSize: '',
       power: '',
       description: '',
-      startingPrice: 0,
+      startingPrice: undefined, // Changed from 0 to undefined
       reservePrice: undefined,
       auctionDuration: '1hr',
-      images: []
+      images: [],
+      
+      // New fields from the site plan
+      regNumber: '',
+      serviceHistory: '',
+      tyreCondition: '',
+      accessories: '',
+      driveType: undefined,
+      damage: '',
+      dateAvailable: undefined
     },
   });
 
@@ -134,13 +143,14 @@ export default function BikeUploadForm() {
     if (e.target.files) {
       const filesArray = Array.from(e.target.files);
       
-      // Limit to 5 images
-      const newFiles = filesArray.slice(0, 5 - imageFiles.length);
+      // Limit to 20 images
+      const maxImages = 20;
+      const newFiles = filesArray.slice(0, maxImages - imageFiles.length);
       
-      if (imageFiles.length + newFiles.length > 5) {
+      if (imageFiles.length + newFiles.length > maxImages) {
         toast({
-          title: "Maximum 5 images allowed",
-          description: "You can upload a maximum of 5 images per motorcycle.",
+          title: `Maximum ${maxImages} images allowed`,
+          description: `You can upload a maximum of ${maxImages} images per motorcycle.`,
           variant: "destructive",
         });
       }
@@ -452,6 +462,177 @@ export default function BikeUploadForm() {
           </div>
         </div>
         
+        {/* Registration Number */}
+        <div>
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">Registration Information</h2>
+          <FormField
+            control={form.control}
+            name="regNumber"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Registration Number</FormLabel>
+                <FormControl>
+                  <Input 
+                    {...field} 
+                    placeholder="e.g. AB12 CDE" 
+                  />
+                </FormControl>
+                <FormDescription>Enter the vehicle registration number</FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+        
+        <Separator />
+        
+        {/* Additional Vehicle Details Section */}
+        <div>
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">Vehicle Condition</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <FormField
+              control={form.control}
+              name="serviceHistory"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Service History</FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select service history" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="Full">Full Service History</SelectItem>
+                      <SelectItem value="Partial">Partial Service History</SelectItem>
+                      <SelectItem value="None">No Service History</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            
+            <FormField
+              control={form.control}
+              name="tyreCondition"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Tyre Condition</FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select tyre condition" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="New">New (90-100%)</SelectItem>
+                      <SelectItem value="Excellent">Excellent (70-90%)</SelectItem>
+                      <SelectItem value="Good">Good (50-70%)</SelectItem>
+                      <SelectItem value="Fair">Fair (30-50%)</SelectItem>
+                      <SelectItem value="Poor">Poor (Less than 30%)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            
+            <FormField
+              control={form.control}
+              name="driveType"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Drive Type</FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select drive type" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="Chain">Chain</SelectItem>
+                      <SelectItem value="Belt">Belt</SelectItem>
+                      <SelectItem value="Shaft">Shaft</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            
+            <FormField
+              control={form.control}
+              name="dateAvailable"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Date Available</FormLabel>
+                  <FormControl>
+                    <Input 
+                      type="date" 
+                      {...field} 
+                      value={field.value ? new Date(field.value).toISOString().split('T')[0] : ''}
+                      onChange={(e) => {
+                        const date = e.target.value ? new Date(e.target.value) : undefined;
+                        field.onChange(date);
+                      }}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+        </div>
+        
+        <Separator />
+        
+        {/* Accessories & Damage */}
+        <div>
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">Accessories & Damage</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <FormField
+              control={form.control}
+              name="accessories"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Accessories</FormLabel>
+                  <FormControl>
+                    <Textarea 
+                      {...field} 
+                      value={field.value || ''}
+                      placeholder="List any accessories included with the bike (e.g., panniers, heated grips, aftermarket exhaust)"
+                      rows={3}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            
+            <FormField
+              control={form.control}
+              name="damage"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Damage</FormLabel>
+                  <FormControl>
+                    <Textarea 
+                      {...field} 
+                      value={field.value || ''}
+                      placeholder="Describe any damage or defects (e.g., scratches, dents, mechanical issues)"
+                      rows={3}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+        </div>
+        
+        <Separator />
+        
         {/* Description Section */}
         <div>
           <h2 className="text-lg font-semibold text-gray-900 mb-4">Description</h2>
@@ -465,7 +646,7 @@ export default function BikeUploadForm() {
                   <Textarea 
                     {...field} 
                     value={field.value || ''}
-                    placeholder="Provide a detailed description of the motorcycle, including any modifications, special features, service history, etc."
+                    placeholder="Provide a detailed description of the motorcycle, including any modifications, special features, etc."
                     rows={5}
                   />
                 </FormControl>

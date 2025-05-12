@@ -20,6 +20,8 @@ export default function AuctionDetail() {
   const [timeLeft, setTimeLeft] = useState<string>('');
   const [endingSoon, setEndingSoon] = useState(false);
   const { user } = useAuth();
+  
+  // These variables will be set after auction data is loaded
 
   const auctionId = params ? parseInt(params.id) : 0;
 
@@ -73,10 +75,14 @@ export default function AuctionDetail() {
   }
 
   const { motorcycle } = auction;
-  const isActive = auction.status === 'active' && timeLeft !== 'Ended';
+  
+  // Define role and ownership variables
   const isTrader = user?.role === 'trader';
   const isDealer = user?.role === 'dealer';
-  const isAuctionOwner = isDealer && auction.dealerId === user.id;
+  const dealerOwnsAuction = isDealer && auction.dealerId === user?.id;
+  
+  // Check if auction is active
+  const isActive = auction.status === 'active' && timeLeft !== 'Ended';
 
   return (
     <Layout>
@@ -195,8 +201,23 @@ export default function AuctionDetail() {
                   </div>
                 )}
                 
-                {/* Bid history */}
-                <BidHistory auctionId={auction.id} currentBid={auction.currentBid} />
+                {/* Blind auction notice for traders */}
+                {isTrader && (
+                  <div className="mt-4 bg-blue-50 text-blue-800 p-4 rounded-md">
+                    <h4 className="font-medium">Blind Auction Information</h4>
+                    <p className="text-sm mt-1">
+                      This is a blind auction. Your bid is only visible to the selling dealer.
+                      Other traders cannot see any bid information, ensuring a fair and competitive bidding process.
+                    </p>
+                  </div>
+                )}
+                
+                {/* Bid history - only visible to the dealer who created the auction */}
+                {dealerOwnsAuction && (
+                  <div className="mt-4">
+                    <BidHistory auctionId={auction.id} currentBid={auction.currentBid} />
+                  </div>
+                )}
               </div>
               
               <div className="mt-auto flex justify-between pt-4">
