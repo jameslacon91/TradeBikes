@@ -106,7 +106,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         dealerId: req.user.id
       });
 
-      // Notify potential traders via WebSocket
+      // Notify potential buyers via WebSocket
       broadcast({
         type: "auction_created",
         data: { 
