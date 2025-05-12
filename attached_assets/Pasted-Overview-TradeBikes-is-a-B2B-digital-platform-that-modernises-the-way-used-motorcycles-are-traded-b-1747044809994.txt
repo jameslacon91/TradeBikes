@@ -1,0 +1,68 @@
+Overview:
+TradeBikes is a B2B digital platform that modernises the way used motorcycles are traded between dealerships and traders. It replaces outdated methods (WhatsApp, calls, spreadsheets) with a real-time, user-friendly web and mobile solution.
+
+⸻
+
+Core Purpose:
+
+To create a fast, transparent, and professional environment where dealers list bikes and traders bid in real-time — all in one central platform.
+
+⸻
+
+Key User Roles:
+	1.	Dealers – Motorcycle dealerships uploading used stock to sell.
+	2.	Traders – Independent or trade buyers placing bids on that stock.
+
+⸻
+
+Primary Features:
+
+1. For Dealers:
+	•	Simple bike upload form (images, condition, mileage, price expectations, etc.)
+	•	Set auction time (e.g. 15 mins to 24 hours).
+	•	Notification of bids and winning trader.
+	•	Post-auction messaging or contact details exchange.
+	•	Dashboard to manage listings, history, and trader ratings.
+
+2. For Traders:
+	•	Browse live auctions with filters (make, model, year, region, etc.).
+	•	Place live bids with a countdown.
+	•	See bid history and win confirmation.
+	•	Saved searches or bike alerts.
+	•	Rate dealers post-transaction.
+
+⸻
+
+Technology Requirements:
+
+Phase 1 – MVP (Web App):
+	•	Mobile-responsive web app.
+	•	Real-time bidding via WebSockets or similar.
+	•	Secure user authentication (email, phone, or invite-only).
+	•	Admin dashboard for managing users and listings.
+	•	Basic user profiles with reviews/ratings.
+
+Phase 2 – Native Apps (iOS/Android):
+	•	Push notifications for bids and auction activity.
+	•	Camera integration for bike uploads.
+	•	Saved preferences & real-time syncing with web version.
+
+⸻
+
+Monetisation Model:
+	•	Dealers: Monthly subscriptions based on listing volume and feature access.
+	•	Traders: Free to browse; pay-per-transaction or low monthly fee.
+
+⸻
+
+Design Focus:
+	•	Fast and intuitive UX (especially for busy dealership staff).
+	•	Clean, trade-focused aesthetic — professional, not consumer-style.
+	•	Optimised for mobile use (quick uploads, fast bidding).
+
+⸻
+
+Security & Compliance:
+	•	Verified, approved users only.
+	•	Secure messaging and data protection (GDPR-compliant).
+	•	Option for dealer/trader reviews to maintain trust.
