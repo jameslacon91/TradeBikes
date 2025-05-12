@@ -75,11 +75,8 @@ function App() {
           <NotificationsProvider>
             <TooltipProvider>
               <Toaster />
-              <div className="min-h-screen flex flex-col">
-                <Header />
-                <main className="flex-1">
-                  <Router />
-                </main>
+              <div className="min-h-screen">
+                <Router />
               </div>
             </TooltipProvider>
           </NotificationsProvider>
