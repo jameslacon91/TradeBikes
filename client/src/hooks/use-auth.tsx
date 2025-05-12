@@ -15,6 +15,7 @@ type AuthContextType = {
   loginMutation: UseMutationResult<User, Error, LoginData>;
   logoutMutation: UseMutationResult<void, Error, void>;
   registerMutation: UseMutationResult<User, Error, InsertUser>;
+  refetchUser: () => Promise<User | null>;
 };
 
 type LoginData = Pick<InsertUser, "username" | "password">;
@@ -46,12 +47,37 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     retryDelay: 1000,
   });
 
-  // Emit auth event when user changes
+  // Detect authentication status and page load
   useEffect(() => {
+    console.log("Auth provider mounted or user state changed");
+    
     if (user) {
+      console.log("User is authenticated:", user.username);
       dispatchAuthEvent(user.id);
+    } else if (!isLoading) {
+      console.log("User is not authenticated (after loading)");
     }
-  }, [user]);
+    
+    // When the page first loads, always refetch user status
+    const handlePageVisibility = () => {
+      if (document.visibilityState === 'visible') {
+        console.log("Page became visible, refreshing auth status");
+        refetchUser();
+      }
+    };
+    
+    // Setup page visibility detection
+    document.addEventListener('visibilitychange', handlePageVisibility);
+    window.addEventListener('focus', () => refetchUser());
+    
+    // Initial fetch
+    refetchUser();
+    
+    return () => {
+      document.removeEventListener('visibilitychange', handlePageVisibility);
+      window.removeEventListener('focus', () => refetchUser());
+    };
+  }, [user, isLoading, refetchUser]);
 
   const loginMutation = useMutation({
     mutationFn: async (credentials: LoginData) => {
@@ -167,6 +193,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         loginMutation,
         logoutMutation,
         registerMutation,
+        refetchUser, // Include the refetch function
       }}
     >
       {children}

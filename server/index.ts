@@ -6,10 +6,19 @@ import cors from "cors";
 const app = express();
 
 // Configure CORS for cross-site requests
+// Must come before any other middleware that might set headers
 app.use(cors({
-  origin: true, // Reflect the request origin
+  origin: function(origin, callback) {
+    // Allow any origin in development
+    // In production, this should be restricted to known domains
+    console.log(`CORS request from origin: ${origin || 'same-origin'}`);
+    callback(null, true);
+  },
   credentials: true, // Allow cookies to be sent
-  exposedHeaders: ['set-cookie']
+  exposedHeaders: ['set-cookie'],
+  optionsSuccessStatus: 200, // For legacy browser support
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept']
 }));
 
 app.use(express.json());
