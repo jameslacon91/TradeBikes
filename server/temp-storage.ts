@@ -111,8 +111,8 @@ export class MemStorage implements IStorage {
     this.notificationId = 1;
     
     // Create memory store for session management
-    const MemoryStoreFactory = MemoryStore(session);
-    this.sessionStore = new MemoryStoreFactory({
+    const MemoryStore = require('memorystore')(session);
+    this.sessionStore = new MemoryStore({
       checkPeriod: 86400000 // Prune expired entries every 24h
     });
     
