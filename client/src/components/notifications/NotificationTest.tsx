@@ -56,29 +56,48 @@ export default function NotificationTest() {
 
   // Test for browser notification permission
   const requestNotificationPermission = async () => {
-    if (!("Notification" in window)) {
-      alert("This browser does not support desktop notifications");
+    // Check if we're in a browser environment and if Notification API is supported
+    const isBrowser = typeof window !== 'undefined';
+    const hasNotificationSupport = isBrowser && 'Notification' in window;
+    
+    if (!hasNotificationSupport) {
+      addNotification({
+        title: 'Notifications Not Supported',
+        message: 'This browser or environment does not support desktop notifications',
+        type: 'warning',
+        icon: <Bell className="h-5 w-5" />
+      });
       return;
     }
     
-    if (Notification.permission === "granted") {
-      addNotification({
-        title: 'Notifications Enabled',
-        message: 'You will now receive push notifications',
-        type: 'success',
-        icon: <Bell className="h-5 w-5" />
-      });
-    } else if (Notification.permission !== "denied") {
-      const permission = await Notification.requestPermission();
-      
-      if (permission === "granted") {
+    try {
+      if (Notification.permission === "granted") {
         addNotification({
           title: 'Notifications Enabled',
           message: 'You will now receive push notifications',
           type: 'success',
           icon: <Bell className="h-5 w-5" />
         });
+      } else if (Notification.permission !== "denied") {
+        const permission = await Notification.requestPermission();
+        
+        if (permission === "granted") {
+          addNotification({
+            title: 'Notifications Enabled',
+            message: 'You will now receive push notifications',
+            type: 'success',
+            icon: <Bell className="h-5 w-5" />
+          });
+        }
       }
+    } catch (error) {
+      console.error('Error with notification permission:', error);
+      addNotification({
+        title: 'Notification Error',
+        message: 'Could not request notification permissions',
+        type: 'error',
+        icon: <Bell className="h-5 w-5" />
+      });
     }
   };
 

@@ -44,9 +44,17 @@ export function NotificationsProvider({ children }: { children: ReactNode }) {
 
   // Check if browser supports notifications and request permission if needed
   useEffect(() => {
-    if (isBrowser && "Notification" in window) {
-      if (Notification.permission !== "denied" && Notification.permission !== "granted") {
-        Notification.requestPermission();
+    const hasNotificationSupport = isBrowser && 'Notification' in window;
+    
+    if (hasNotificationSupport) {
+      try {
+        if (Notification.permission !== "denied" && Notification.permission !== "granted") {
+          Notification.requestPermission().catch(err => {
+            console.error('Error requesting notification permission:', err);
+          });
+        }
+      } catch (error) {
+        console.error('Error checking notification permission:', error);
       }
     }
   }, []);
@@ -137,12 +145,18 @@ export function NotificationsProvider({ children }: { children: ReactNode }) {
       variant: notification.type === 'error' ? 'destructive' : 'default',
     });
 
-    // Show system notification if permission granted
-    if (isBrowser && "Notification" in window && Notification.permission === "granted") {
-      new Notification(notification.title, {
-        body: notification.message,
-        icon: '/notification-icon.png', // Use app icon
-      });
+    // Show system notification if permission granted and API is available
+    if (isBrowser && "Notification" in window) {
+      try {
+        if (Notification.permission === "granted") {
+          new Notification(notification.title, {
+            body: notification.message,
+            icon: '/notification-icon.png', // Use app icon
+          });
+        }
+      } catch (error) {
+        console.error('Error showing system notification:', error);
+      }
     }
   };
 
