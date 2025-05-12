@@ -60,15 +60,7 @@ const yearOptions = Array.from({ length: 50 }, (_, i) => currentYear - i);
 
 // Extend the motorcycle schema for form validation
 const uploadSchema = insertMotorcycleSchema.extend({
-  startingPrice: z.preprocess(
-    (a) => parseInt(z.string().parse(a), 10),
-    z.number().positive("Starting price must be positive").min(1, "Starting price is required")
-  ),
-  reservePrice: z.preprocess(
-    (a) => a === '' ? undefined : parseInt(z.string().parse(a), 10),
-    z.number().positive("Reserve price must be positive").optional()
-  ),
-  auctionDuration: z.enum(['15min', '30min', '1hr', '2hr', '4hr', '8hr', '12hr', '24hr'], {
+  auctionDuration: z.enum(['1day', '1week', '2weeks', '1month'], {
     required_error: "Please select an auction duration",
   }),
   images: z.any().optional(),
@@ -77,7 +69,6 @@ const uploadSchema = insertMotorcycleSchema.extend({
   serviceHistory: z.string().optional(),
   tyreCondition: z.string().optional(),
   accessories: z.string().optional(),
-  driveType: z.enum(['Chain', 'Belt', 'Shaft']).optional(),
   damage: z.string().optional(),
   dateAvailable: z.preprocess(
     (a) => a ? new Date(z.string().parse(a)) : undefined,
@@ -100,14 +91,10 @@ export default function BikeUploadForm() {
 
   // Define auction duration options
   const durationOptions = [
-    { value: '15min', label: '15 minutes' },
-    { value: '30min', label: '30 minutes' },
-    { value: '1hr', label: '1 hour' },
-    { value: '2hr', label: '2 hours' },
-    { value: '4hr', label: '4 hours' },
-    { value: '8hr', label: '8 hours' },
-    { value: '12hr', label: '12 hours' },
-    { value: '24hr', label: '24 hours' },
+    { value: '1day', label: '1 day' },
+    { value: '1week', label: '1 week' },
+    { value: '2weeks', label: '2 weeks' },
+    { value: '1month', label: '1 month' },
   ];
 
   const form = useForm<UploadFormValues>({
@@ -120,19 +107,15 @@ export default function BikeUploadForm() {
       condition: 'Excellent',
       mileage: undefined, // Changed from 0 to undefined to fix mileage issue
       engineSize: '',
-      power: '',
       description: '',
-      startingPrice: undefined, // Changed from 0 to undefined
-      reservePrice: undefined,
-      auctionDuration: '1hr',
+      auctionDuration: '1day',
       images: [],
       
-      // New fields from the site plan
+      // Fields from the site plan
       regNumber: '',
       serviceHistory: '',
       tyreCondition: '',
       accessories: '',
-      driveType: undefined,
       damage: '',
       dateAvailable: undefined
     },
@@ -661,7 +644,7 @@ export default function BikeUploadForm() {
           <h2 className="text-lg font-semibold text-gray-900 mb-4">Images</h2>
           
           <div className="mb-4">
-            <Label htmlFor="images">Upload Images (max 5)</Label>
+            <Label htmlFor="images">Upload Images (max 20)</Label>
             <div className="mt-2 flex items-center">
               <label className="cursor-pointer inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
                 <Upload className="h-4 w-4 mr-2" />
