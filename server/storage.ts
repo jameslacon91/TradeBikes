@@ -141,6 +141,7 @@ export class MemStorage implements IStorage {
       postcode: 'E1 6AN',
       rating: 4,
       totalRatings: 15,
+      favoriteDealers: [],
       createdAt: new Date()
     };
     this.users.set(dealer1.id, dealer1);

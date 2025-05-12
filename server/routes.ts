@@ -657,6 +657,107 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Favorite Dealers
+  app.get("/api/favorite-dealers", isAuthenticated, async (req, res, next) => {
+    try {
+      const user = await storage.getUser(req.user.id);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Return empty array if no favorites are set
+      if (!user.favoriteDealers) {
+        return res.json([]);
+      }
+      
+      // Get details for each favorite dealer
+      const favoriteDealers = await Promise.all(
+        user.favoriteDealers.map(async (dealerId) => {
+          const dealer = await storage.getUser(dealerId);
+          if (!dealer) return null;
+          
+          // Return only safe dealer info (no passwords)
+          return {
+            id: dealer.id,
+            username: dealer.username,
+            companyName: dealer.companyName,
+            rating: dealer.rating,
+            totalRatings: dealer.totalRatings
+          };
+        })
+      );
+      
+      // Filter out any nulls (dealers that might have been deleted)
+      res.json(favoriteDealers.filter(dealer => dealer !== null));
+    } catch (error) {
+      next(error);
+    }
+  });
+  
+  app.post("/api/favorite-dealers", isAuthenticated, async (req, res, next) => {
+    try {
+      const { dealerId } = req.body;
+      if (!dealerId) {
+        return res.status(400).json({ message: "dealerId is required" });
+      }
+      
+      // Check if dealer exists
+      const dealer = await storage.getUser(dealerId);
+      if (!dealer) {
+        return res.status(404).json({ message: "Dealer not found" });
+      }
+      
+      // Get current user
+      const user = await storage.getUser(req.user.id);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Initialize favorites array if it doesn't exist
+      const currentFavorites = user.favoriteDealers || [];
+      
+      // Check if already in favorites
+      if (currentFavorites.includes(dealerId)) {
+        return res.status(400).json({ message: "Dealer already in favorites" });
+      }
+      
+      // Add to favorites
+      const updatedUser = await storage.updateUser(req.user.id, {
+        favoriteDealers: [...currentFavorites, dealerId]
+      });
+      
+      res.status(200).json({ message: "Dealer added to favorites" });
+    } catch (error) {
+      next(error);
+    }
+  });
+  
+  app.delete("/api/favorite-dealers/:dealerId", isAuthenticated, async (req, res, next) => {
+    try {
+      const dealerId = parseInt(req.params.dealerId, 10);
+      
+      // Get current user
+      const user = await storage.getUser(req.user.id);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Check if favorites exist
+      if (!user.favoriteDealers || !user.favoriteDealers.includes(dealerId)) {
+        return res.status(400).json({ message: "Dealer not in favorites" });
+      }
+      
+      // Remove from favorites
+      const updatedUser = await storage.updateUser(req.user.id, {
+        favoriteDealers: user.favoriteDealers.filter(id => id !== dealerId)
+      });
+      
+      res.status(200).json({ message: "Dealer removed from favorites" });
+    } catch (error) {
+      next(error);
+    }
+  });
+
   // Recent activity
   app.get("/api/activity", isAuthenticated, async (req, res, next) => {
     try {
