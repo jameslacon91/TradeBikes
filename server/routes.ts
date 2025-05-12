@@ -39,6 +39,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Set up WebSocket server
   const wss = setupWebSocket(httpServer);
+  
+  // Basic health check endpoint
+  app.get('/api/health', (req, res) => {
+    res.status(200).json({ status: 'ok', timestamp: new Date() });
+  });
 
   // API routes
   // Motorcycles

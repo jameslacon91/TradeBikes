@@ -72,6 +72,18 @@ const uploadSchema = insertMotorcycleSchema.extend({
     required_error: "Please select an auction duration",
   }),
   images: z.any().optional(),
+  
+  // Additional fields based on site plan
+  serviceHistory: z.string().optional(),
+  tyreCondition: z.string().optional(),
+  accessories: z.string().optional(),
+  driveType: z.enum(['Chain', 'Belt', 'Shaft']).optional(),
+  damage: z.string().optional(),
+  dateAvailable: z.preprocess(
+    (a) => a ? new Date(z.string().parse(a)) : undefined,
+    z.date().optional()
+  ),
+  regNumber: z.string().optional(),
 });
 
 type UploadFormValues = z.infer<typeof uploadSchema>;
