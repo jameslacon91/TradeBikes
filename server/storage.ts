@@ -442,6 +442,158 @@ export class MemStorage implements IStorage {
     };
     this.motorcycles.set(motorcycle3.id, motorcycle3);
     
+    // Create a second dealer
+    const dealer2: User = {
+      id: this.userId++,
+      username: 'motorsGalore',
+      password: await hashPassword('password123'),
+      email: 'sales@motorsgalore.com',
+      role: 'dealer',
+      companyName: 'Motors Galore Ltd',
+      phone: '07765432109',
+      address: '789 Park Lane',
+      city: 'Birmingham',
+      postcode: 'B1 1AB',
+      rating: 5,
+      totalRatings: 27,
+      createdAt: new Date()
+    };
+    this.users.set(dealer2.id, dealer2);
+    
+    // Add more diverse motorcycle options
+    const motorcycle4: Motorcycle = {
+      id: this.motorcycleId++,
+      dealerId: dealer2.id,
+      make: 'Triumph',
+      model: 'Street Triple RS',
+      year: 2022,
+      mileage: 3450,
+      color: 'Silver',
+      condition: 'Excellent',
+      engineSize: '765cc',
+      power: '121bhp',
+      description: 'Nearly new Triumph Street Triple RS with Arrow exhaust. Full service history and still under manufacturer warranty until 2025. Quickshifter and autoblipper fitted. Tail tidy and frame sliders included.',
+      images: [
+        'https://images.unsplash.com/photo-1547549082-6bc09f2049ae'
+      ],
+      createdAt: new Date()
+    };
+    this.motorcycles.set(motorcycle4.id, motorcycle4);
+    
+    const motorcycle5: Motorcycle = {
+      id: this.motorcycleId++,
+      dealerId: dealer2.id,
+      make: 'Kawasaki',
+      model: 'Z900',
+      year: 2021,
+      mileage: 6720,
+      color: 'Green',
+      condition: 'Good',
+      engineSize: '948cc',
+      power: '125bhp',
+      description: 'Kawasaki Z900 with Akrapovic exhaust and K&N air filter. Great condition with some cosmetic mods including tinted screen and LED indicators. Recent service and new tires.',
+      images: [
+        'https://images.unsplash.com/photo-1591637333184-19aa84b3e01f'
+      ],
+      createdAt: new Date()
+    };
+    this.motorcycles.set(motorcycle5.id, motorcycle5);
+    
+    const motorcycle6: Motorcycle = {
+      id: this.motorcycleId++,
+      dealerId: dealer.id,
+      make: 'Yamaha',
+      model: 'MT-09 SP',
+      year: 2020,
+      mileage: 8900,
+      color: 'Blue/Silver',
+      condition: 'Good',
+      engineSize: '889cc',
+      power: '117bhp',
+      description: 'Yamaha MT-09 SP with Öhlins rear shock and upgraded front suspension. Akrapovic exhaust, USB charging port, and heated grips fitted. Full service history and two keys.',
+      images: [
+        'https://images.unsplash.com/photo-1571646750134-f19967f97042'
+      ],
+      createdAt: new Date()
+    };
+    this.motorcycles.set(motorcycle6.id, motorcycle6);
+    
+    const motorcycle7: Motorcycle = {
+      id: this.motorcycleId++,
+      dealerId: dealer2.id,
+      make: 'Harley-Davidson',
+      model: 'Street Glide Special',
+      year: 2019,
+      mileage: 15200,
+      color: 'Black',
+      condition: 'Excellent',
+      engineSize: '1868cc',
+      power: '93bhp',
+      description: 'Beautiful Harley-Davidson Street Glide Special with lots of chrome upgrades. Stage 1 tuning, Vance & Hines exhaust, and comfortable touring seat. Perfect for long rides with outstanding comfort.',
+      images: [
+        'https://images.unsplash.com/photo-1558980394-4c7c9299fe96'
+      ],
+      createdAt: new Date()
+    };
+    this.motorcycles.set(motorcycle7.id, motorcycle7);
+    
+    const motorcycle8: Motorcycle = {
+      id: this.motorcycleId++,
+      dealerId: dealer.id,
+      make: 'KTM',
+      model: '1290 Super Duke R',
+      year: 2021,
+      mileage: 5600,
+      color: 'Orange',
+      condition: 'Excellent',
+      engineSize: '1301cc',
+      power: '180bhp',
+      description: 'KTM 1290 Super Duke R "The Beast" in stunning condition. Akrapovic exhaust, PowerParts upgrades, and recently serviced. Incredible performance and handling with all rider modes fully functional.',
+      images: [
+        'https://images.unsplash.com/photo-1562582138-15793fb8031a'
+      ],
+      createdAt: new Date()
+    };
+    this.motorcycles.set(motorcycle8.id, motorcycle8);
+    
+    const motorcycle9: Motorcycle = {
+      id: this.motorcycleId++,
+      dealerId: dealer2.id,
+      make: 'Suzuki',
+      model: 'GSX-R1000R',
+      year: 2020,
+      mileage: 7800,
+      color: 'Blue/White',
+      condition: 'Good',
+      engineSize: '999cc',
+      power: '202bhp',
+      description: 'Suzuki GSX-R1000R in excellent condition. Recently serviced with new chain and sprockets. Yoshimura exhaust, frame sliders, and rear paddock stand included. Track-ready with all stock parts included.',
+      images: [
+        'https://images.unsplash.com/photo-1563051424-5af0e5617eeb'
+      ],
+      createdAt: new Date()
+    };
+    this.motorcycles.set(motorcycle9.id, motorcycle9);
+    
+    const motorcycle10: Motorcycle = {
+      id: this.motorcycleId++,
+      dealerId: dealer.id,
+      make: 'Ducati',
+      model: 'Multistrada V4S',
+      year: 2022,
+      mileage: 4200,
+      color: 'Red',
+      condition: 'Excellent',
+      engineSize: '1158cc',
+      power: '170bhp',
+      description: 'Top-spec Ducati Multistrada V4S with full luggage, radar cruise control, and heated grips. Almost new condition with full service history and remaining manufacturer warranty. Full luggage set and all accessories included.',
+      images: [
+        'https://images.unsplash.com/photo-1626240130051-68871c71e405'
+      ],
+      createdAt: new Date()
+    };
+    this.motorcycles.set(motorcycle10.id, motorcycle10);
+    
     // Create active auctions
     const oneHourFromNow = new Date();
     oneHourFromNow.setHours(oneHourFromNow.getHours() + 1);
