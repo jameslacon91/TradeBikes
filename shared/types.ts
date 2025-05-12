@@ -32,6 +32,7 @@ export interface DashboardStats {
 
 // WebSocket message types
 export type WSMessageType = 
+  'register' |
   'new_bid' | 
   'auction_ending' | 
   'auction_completed' | 

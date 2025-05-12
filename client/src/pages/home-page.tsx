@@ -8,15 +8,13 @@ import { TradeBikesLogo } from "@/components/logo";
 export default function HomePage() {
   const [_, navigate] = useLocation();
 
-  // Temporarily disable redirection
-  /*
+  // Re-enable redirection for authenticated users
   const { user } = useAuth();
   useEffect(() => {
     if (user) {
       navigate("/dashboard");
     }
   }, [user, navigate]);
-  */
 
   return (
     <Layout>

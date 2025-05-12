@@ -2,28 +2,48 @@ import { createContext, useContext, useEffect, useState, ReactNode } from 'react
 import { WSMessage } from '@shared/types';
 import { queryClient } from '@/lib/queryClient';
 
+// Define what functionality our WebSocket context will provide
 interface WebSocketContextType {
   connected: boolean;
   sendMessage: (message: WSMessage) => void;
+  registerAuthenticatedUser: (userId: number) => void;
 }
 
-const WebSocketContext = createContext<WebSocketContextType | null>(null);
+// Create the context with a default value
+const WebSocketContext = createContext<WebSocketContextType>({
+  connected: false,
+  sendMessage: () => console.warn('WebSocket not initialized'),
+  registerAuthenticatedUser: () => console.warn('WebSocket not initialized')
+});
 
+// Export the provider component that will wrap our app
 export function WebSocketProvider({ children }: { children: ReactNode }) {
   const [socket, setSocket] = useState<WebSocket | null>(null);
   const [connected, setConnected] = useState(false);
+  const [userId, setUserId] = useState<number | null>(null);
 
+  // Setup WebSocket connection
   useEffect(() => {
-    // Create WebSocket connection
+    let ws: WebSocket | null = null;
+    
     try {
       const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
       const wsUrl = `${protocol}//${window.location.host}/ws`;
-      const ws = new WebSocket(wsUrl);
+      ws = new WebSocket(wsUrl);
 
       // Connection opened
       ws.addEventListener('open', () => {
         console.log('WebSocket connection established');
         setConnected(true);
+        
+        // If user is already authenticated, register them
+        if (userId && ws && ws.readyState === WebSocket.OPEN) {
+          ws.send(JSON.stringify({
+            type: 'register',
+            data: { userId },
+            timestamp: Date.now()
+          }));
+        }
       });
 
       // Connection closed
@@ -48,40 +68,51 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
       });
 
       setSocket(ws);
-
-      // Cleanup on unmount
-      return () => {
-        ws.close();
-      };
     } catch (error) {
       console.error('Error establishing WebSocket connection:', error);
     }
-  }, []);
+
+    // Cleanup on unmount
+    return () => {
+      if (ws) {
+        ws.close();
+      }
+    };
+  }, []); // Only run on component mount
+
+  // Register user ID when it changes
+  useEffect(() => {
+    if (socket && connected && userId) {
+      socket.send(JSON.stringify({
+        type: 'register',
+        data: { userId },
+        timestamp: Date.now()
+      }));
+    }
+  }, [userId, connected, socket]);
+
+  // Function to register authenticated user
+  const registerAuthenticatedUser = (newUserId: number) => {
+    setUserId(newUserId);
+  };
 
   // Handle incoming WebSocket messages
   const handleWebSocketMessage = (message: WSMessage) => {
-    // We'll handle specific message types in the components that need them
-    // This is just a central place to log and potentially do global handling
     console.log('Received WebSocket message:', message);
     
-    // You could dispatch events/actions here based on message types
-    // For example, refreshing queries when data changes
+    // Handle based on message type
     switch (message.type) {
       case 'new_bid':
-        // Invalidate auction queries to refresh data
         queryClient.invalidateQueries({ queryKey: [`/api/auctions/${message.data.auctionId}`] });
         break;
       case 'auction_completed':
-        // Invalidate auction and dashboard queries
         queryClient.invalidateQueries({ queryKey: [`/api/auctions/${message.data.auctionId}`] });
         queryClient.invalidateQueries({ queryKey: ['/api/dashboard'] });
         break;
       case 'new_message':
-        // Invalidate messages query
         queryClient.invalidateQueries({ queryKey: ['/api/notifications'] });
         break;
       case 'auction_created':
-        // Invalidate auctions query
         queryClient.invalidateQueries({ queryKey: ['/api/auctions'] });
         break;
     }
@@ -92,23 +123,26 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
     if (socket && connected) {
       socket.send(JSON.stringify(message));
     } else {
-      console.error('Cannot send message, WebSocket not connected');
+      console.warn('Cannot send message, WebSocket not connected');
     }
   };
 
+  // Provide the WebSocket context to children
   return (
-    <WebSocketContext.Provider value={{ connected, sendMessage }}>
+    <WebSocketContext.Provider 
+      value={{ 
+        connected, 
+        sendMessage, 
+        registerAuthenticatedUser 
+      }}
+    >
       {children}
     </WebSocketContext.Provider>
   );
 }
 
+// Hook to use the WebSocket context
 export function useWebSocket() {
-  const context = useContext(WebSocketContext);
-  if (!context) {
-    throw new Error('useWebSocket must be used within a WebSocketProvider');
-  }
-  return context;
+  return useContext(WebSocketContext);
 }
-
 

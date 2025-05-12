@@ -1,4 +1,4 @@
-import { createContext, ReactNode, useContext } from "react";
+import { createContext, ReactNode, useContext, useEffect } from "react";
 import {
   useQuery,
   useMutation,
@@ -7,6 +7,7 @@ import {
 import { InsertUser, User } from "@shared/schema";
 import { getQueryFn, apiRequest, queryClient } from "../lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { useWebSocket } from "@/hooks/use-websocket";
 
 type AuthContextType = {
   user: User | null;
@@ -23,6 +24,8 @@ export const AuthContext = createContext<AuthContextType | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const { toast } = useToast();
+  const webSocket = useWebSocket();
+  
   const {
     data: user,
     error,
@@ -32,6 +35,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     queryFn: getQueryFn({ on401: "returnNull" }),
   });
 
+  // Register authenticated user with WebSocket when user changes
+  useEffect(() => {
+    if (user) {
+      webSocket.registerAuthenticatedUser(user.id);
+    }
+  }, [user, webSocket]);
+
   const loginMutation = useMutation({
     mutationFn: async (credentials: LoginData) => {
       const res = await apiRequest("POST", "/api/login", credentials);
@@ -39,6 +49,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     },
     onSuccess: (user: User) => {
       queryClient.setQueryData(["/api/user"], user);
+      // Register with WebSocket on login
+      if (user) {
+        webSocket.registerAuthenticatedUser(user.id);
+      }
       toast({
         title: "Login successful",
         description: `Welcome back, ${user.companyName}!`,
@@ -60,6 +74,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     },
     onSuccess: (user: User) => {
       queryClient.setQueryData(["/api/user"], user);
+      // Register with WebSocket on registration
+      if (user) {
+        webSocket.registerAuthenticatedUser(user.id);
+      }
       toast({
         title: "Registration successful",
         description: `Welcome to TradeBikes, ${user.companyName}!`,

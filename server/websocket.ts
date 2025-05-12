@@ -25,6 +25,13 @@ export function setupWebSocket(server: Server) {
         
         // Process message based on type
         switch (data.type) {
+          case 'register':
+            // Handle user registration
+            if (data.data?.userId) {
+              clients.set(data.data.userId, ws);
+              console.log(`User ${data.data.userId} registered with WebSocket`);
+            }
+            break;
           case 'new_bid':
             await handleNewBid(data);
             break;
@@ -256,18 +263,22 @@ async function handleAuctionCreated(message: WSMessage) {
     if (!auction) return;
     
     // Broadcast to all traders
-    clients.forEach((client, userId) => {
-      const user = storage.getUser(userId);
-      if (user && user.role === 'trader' && client.readyState === WebSocket.OPEN) {
-        client.send(JSON.stringify({
-          type: 'auction_created',
-          data: {
-            auction
-          },
-          timestamp: Date.now()
-        }));
+    for (const [userId, client] of clients.entries()) {
+      try {
+        const user = await storage.getUser(userId);
+        if (user && user.role === 'trader' && client.readyState === WebSocket.OPEN) {
+          client.send(JSON.stringify({
+            type: 'auction_created',
+            data: {
+              auction
+            },
+            timestamp: Date.now()
+          }));
+        }
+      } catch (error) {
+        console.error(`Error sending auction_created to user ${userId}:`, error);
       }
-    });
+    }
   } catch (error) {
     console.error('Error handling auction created:', error);
   }
