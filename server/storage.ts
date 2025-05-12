@@ -379,12 +379,14 @@ export class MemStorage implements IStorage {
       endTime: oneDayFromNow,
       status: 'active',
       winningBidId: null,
-      winningTraderId: null,
+      winningBidderId: null,
       bidAccepted: false,
       dealConfirmed: false,
       collectionConfirmed: false,
       collectionDate: null,
       highestBidderId: null,
+      visibilityType: 'all',
+      visibilityRadius: null,
       createdAt: new Date(now.getTime() - oneHour * 5)
     };
     this.auctions.set(auction1.id, auction1);
@@ -397,12 +399,14 @@ export class MemStorage implements IStorage {
       endTime: oneWeekFromNow,
       status: 'active',
       winningBidId: null,
-      winningTraderId: null,
+      winningBidderId: null,
       bidAccepted: false,
       dealConfirmed: false,
       collectionConfirmed: false,
       collectionDate: null,
       highestBidderId: null,
+      visibilityType: 'favorites',
+      visibilityRadius: null,
       createdAt: new Date(now.getTime() - oneHour * 10)
     };
     this.auctions.set(auction2.id, auction2);

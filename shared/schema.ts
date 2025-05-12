@@ -56,6 +56,9 @@ export const auctions = pgTable("auctions", {
   collectionConfirmed: boolean("collection_confirmed").default(false), // buyer has confirmed collection
   collectionDate: timestamp("collection_date"), // scheduled collection date
   highestBidderId: integer("highest_bidder_id"), // current highest bidder
+  // New visibility options
+  visibilityType: text("visibility_type").notNull().default("all"), // all, favorites, radius
+  visibilityRadius: integer("visibility_radius"), // radius in miles (used when visibilityType is 'radius')
   createdAt: timestamp("created_at").defaultNow(),
 });
 
