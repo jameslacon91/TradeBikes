@@ -32,7 +32,7 @@ export default function BidCollectionConfirmation({
   // Mutation to confirm collection has happened
   const confirmCollectionMutation = useMutation({
     mutationFn: async () => {
-      const response = await apiRequest('POST', `/api/auctions/${auctionId}/collection-confirm`);
+      const response = await apiRequest('POST', `/api/auctions/${auctionId}/confirm-collection`);
       return response.json();
     },
     onSuccess: (data: Auction) => {

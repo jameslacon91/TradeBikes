@@ -6,6 +6,7 @@ import Layout from '@/components/layout/Layout';
 import BidForm from '@/components/forms/BidForm';
 import BidHistory from '@/components/auctions/BidHistory';
 import BidConfirmation from '@/components/auctions/BidConfirmation';
+import BidCollectionConfirmation from '@/components/auctions/BidCollectionConfirmation';
 import AuctionReviews from '@/components/reviews/AuctionReviews';
 import { formatTimeDifference, isEndingSoon } from '@/lib/countdownTimer';
 import { AuctionWithDetails } from '@shared/types';
@@ -236,23 +237,43 @@ export default function AuctionDetail() {
                 
                 {/* Bid confirmation widget - show for ended auctions */}
                 {timeLeft === 'Ended' && (dealerOwnsAuction || (isTrader && user?.id === auction.winningTraderId)) && auction.currentBid && (
-                  <BidConfirmation
-                    auctionId={auction.id}
-                    bid={{
-                      id: auction.winningBidId || 0,
-                      auctionId: auction.id,
-                      traderId: auction.winningTraderId || 0,
-                      amount: auction.currentBid,
-                      createdAt: new Date()
-                    }}
-                    isAccepted={auction.bidAccepted || false}
-                    isDealer={isDealer}
-                    isTrader={isTrader}
-                    traderId={auction.winningTraderId || 0}
-                    dealConfirmed={auction.dealConfirmed || false}
-                    collectionConfirmed={auction.collectionConfirmed || false}
-                    onSuccess={() => {/* Refresh auction data */}}
-                  />
+                  <div className="space-y-4">
+                    <BidConfirmation
+                      auctionId={auction.id}
+                      bid={{
+                        id: auction.winningBidId || 0,
+                        auctionId: auction.id,
+                        traderId: auction.winningTraderId || 0,
+                        amount: auction.currentBid,
+                        createdAt: new Date()
+                      }}
+                      isAccepted={auction.bidAccepted || false}
+                      isDealer={isDealer}
+                      isTrader={isTrader}
+                      traderId={auction.winningTraderId || 0}
+                      dealConfirmed={auction.dealConfirmed || false}
+                      collectionConfirmed={auction.collectionConfirmed || false}
+                      onSuccess={() => {/* Refresh auction data */}}
+                    />
+                    
+                    {/* Show collection confirmation for accepted bids */}
+                    {auction.bidAccepted && isTrader && user?.id === auction.winningTraderId && (
+                      <BidCollectionConfirmation
+                        auctionId={auction.id}
+                        bid={{
+                          id: auction.winningBidId || 0,
+                          auctionId: auction.id,
+                          traderId: auction.winningTraderId || 0,
+                          amount: auction.currentBid,
+                          createdAt: new Date()
+                        }}
+                        dealConfirmed={auction.dealConfirmed || false}
+                        collectionConfirmed={auction.collectionConfirmed || false}
+                        collectionDate={auction.collectionDate ? new Date(auction.collectionDate) : null}
+                        onSuccess={() => {/* Refresh auction data */}}
+                      />
+                    )}
+                  </div>
                 )}
               </div>
               
