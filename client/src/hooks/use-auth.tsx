@@ -38,9 +38,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     data: user,
     error,
     isLoading,
+    refetch: refetchUser,
   } = useQuery<User | null, Error>({
     queryKey: ["/api/user"],
     queryFn: getQueryFn({ on401: "returnNull" }),
+    retry: 1,
+    retryDelay: 1000,
   });
 
   // Emit auth event when user changes
@@ -52,11 +55,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const loginMutation = useMutation({
     mutationFn: async (credentials: LoginData) => {
-      const res = await apiRequest("POST", "/api/login", credentials);
-      return await res.json();
+      try {
+        console.log("Attempting login for:", credentials.username);
+        const res = await apiRequest("POST", "/api/login", credentials);
+        const userData = await res.json();
+        console.log("Login successful, user data received:", userData);
+        return userData;
+      } catch (error) {
+        console.error("Login API error:", error);
+        throw error;
+      }
     },
     onSuccess: (user: User) => {
+      console.log("Login mutation successful, updating user data");
       queryClient.setQueryData(["/api/user"], user);
+      
+      // Explicitly refetch user data to ensure session is established
+      setTimeout(() => {
+        console.log("Refetching user data after login");
+        refetchUser();
+      }, 500);
+      
       // Notify about successful login
       dispatchAuthEvent(user.id);
       
@@ -66,9 +85,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       });
     },
     onError: (error: Error) => {
+      console.error("Login mutation error:", error);
       toast({
         title: "Login failed",
-        description: error.message,
+        description: error.message || "Invalid username or password",
         variant: "destructive",
       });
     },
@@ -76,11 +96,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const registerMutation = useMutation({
     mutationFn: async (credentials: InsertUser) => {
-      const res = await apiRequest("POST", "/api/register", credentials);
-      return await res.json();
+      try {
+        console.log("Attempting registration for:", credentials.username);
+        const res = await apiRequest("POST", "/api/register", credentials);
+        const userData = await res.json();
+        console.log("Registration successful, user data received:", userData);
+        return userData;
+      } catch (error) {
+        console.error("Registration API error:", error);
+        throw error;
+      }
     },
     onSuccess: (user: User) => {
+      console.log("Registration mutation successful, updating user data");
       queryClient.setQueryData(["/api/user"], user);
+      
+      // Explicitly refetch user data to ensure session is established
+      setTimeout(() => {
+        console.log("Refetching user data after registration");
+        refetchUser();
+      }, 500);
+      
       // Notify about successful registration
       dispatchAuthEvent(user.id);
       
@@ -90,9 +126,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       });
     },
     onError: (error: Error) => {
+      console.error("Registration mutation error:", error);
       toast({
         title: "Registration failed",
-        description: error.message,
+        description: error.message || "Unable to create account",
         variant: "destructive",
       });
     },
