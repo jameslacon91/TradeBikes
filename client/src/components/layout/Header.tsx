@@ -22,7 +22,7 @@ import { Menu, X, Home, Search, Gavel, Calendar, Map, User, Settings, LogOut } f
 import { useIsMobile } from '@/hooks/use-mobile';
 
 export default function Header() {
-  const { user, logoutMutation } = useAuth();
+  const { user, logoutMutation, isLoading } = useAuth();
   const [, navigate] = useLocation();
   const isMobile = useIsMobile();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -30,8 +30,19 @@ export default function Header() {
   const closeMenu = () => setIsMenuOpen(false);
 
   const handleLogout = () => {
-    logoutMutation.mutate();
-    navigate('/auth');
+    console.log('Logging out user...');
+    logoutMutation.mutate(undefined, {
+      onSuccess: () => {
+        console.log('Logout successful, redirecting to auth page');
+        // Small timeout to ensure state updates before redirect
+        setTimeout(() => {
+          navigate('/auth');
+        }, 100);
+      },
+      onError: (error) => {
+        console.error('Logout failed:', error);
+      }
+    });
   };
 
   // Create initials for avatar fallback

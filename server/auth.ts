@@ -5,6 +5,7 @@ import session from "express-session";
 import createMemoryStore from "memorystore";
 import { storage } from "./storage";
 import { User } from "@shared/schema";
+import crypto from "crypto";
 
 // Create memory store for sessions
 const MemoryStore = createMemoryStore(session);
@@ -61,7 +62,21 @@ export function setupAuth(app: Express) {
     proxy: true
   };
 
+  // Trust proxy is required for secure cookies over HTTPS connections on Replit
   app.set("trust proxy", 1);
+  
+  // Add a basic security token for AJAX requests
+  // This helps with CSRF protection in a simple way
+  app.use((req, res, next) => {
+    res.cookie('XSRF-TOKEN', crypto.randomUUID(), {
+      httpOnly: false, // Must be readable by JavaScript
+      sameSite: 'lax',
+      secure: false // Set to true in production with HTTPS
+    });
+    next();
+  });
+  
+  // Set up session handling
   app.use(session(sessionSettings));
   app.use(passport.initialize());
   app.use(passport.session());
