@@ -506,8 +506,12 @@ export class MemStorage implements IStorage {
       color: 'Green',
       condition: 'Good',
       engineSize: '948cc',
-      power: '125bhp',
+      serviceHistory: 'Service history available, last serviced 3 months ago',
+      tyreCondition: 'Excellent - newly fitted',
       description: 'Kawasaki Z900 with Akrapovic exhaust and K&N air filter. Great condition with some cosmetic mods including tinted screen and LED indicators. Recent service and new tires.',
+      dateAvailable: 'Immediate',
+      regNumber: 'LN71 KWS',
+      auctionDuration: '1day',
       images: [
         'https://images.unsplash.com/photo-1591637333184-19aa84b3e01f'
       ],
@@ -525,8 +529,12 @@ export class MemStorage implements IStorage {
       color: 'Blue/Silver',
       condition: 'Good',
       engineSize: '889cc',
-      power: '117bhp',
+      serviceHistory: 'Full service history with Yamaha dealer',
+      tyreCondition: 'Good - approximately 60% remaining',
       description: 'Yamaha MT-09 SP with Öhlins rear shock and upgraded front suspension. Akrapovic exhaust, USB charging port, and heated grips fitted. Full service history and two keys.',
+      dateAvailable: 'Immediate',
+      regNumber: 'WJ20 MTY',
+      auctionDuration: '1week',
       images: [
         'https://images.unsplash.com/photo-1571646750134-f19967f97042'
       ],
@@ -544,8 +552,12 @@ export class MemStorage implements IStorage {
       color: 'Black',
       condition: 'Excellent',
       engineSize: '1868cc',
-      power: '93bhp',
+      serviceHistory: 'Full Harley dealer service history',
+      tyreCondition: 'Good - approximately 70% remaining',
       description: 'Beautiful Harley-Davidson Street Glide Special with lots of chrome upgrades. Stage 1 tuning, Vance & Hines exhaust, and comfortable touring seat. Perfect for long rides with outstanding comfort.',
+      dateAvailable: 'Next Week',
+      regNumber: 'LK69 HDV',
+      auctionDuration: '2weeks',
       images: [
         'https://images.unsplash.com/photo-1558980394-4c7c9299fe96'
       ],
@@ -563,8 +575,12 @@ export class MemStorage implements IStorage {
       color: 'Orange',
       condition: 'Excellent',
       engineSize: '1301cc',
-      power: '180bhp',
+      serviceHistory: 'Full KTM dealer service history',
+      tyreCondition: 'Excellent - approximately 80% remaining',
       description: 'KTM 1290 Super Duke R "The Beast" in stunning condition. Akrapovic exhaust, PowerParts upgrades, and recently serviced. Incredible performance and handling with all rider modes fully functional.',
+      dateAvailable: 'This Week',
+      regNumber: 'LN21 KTM',
+      auctionDuration: '1week',
       images: [
         'https://images.unsplash.com/photo-1562582138-15793fb8031a'
       ],
@@ -582,8 +598,12 @@ export class MemStorage implements IStorage {
       color: 'Blue/White',
       condition: 'Good',
       engineSize: '999cc',
-      power: '202bhp',
+      serviceHistory: 'Partial service history, recently serviced with new chain and sprockets',
+      tyreCondition: 'Good - approximately 70% remaining',
       description: 'Suzuki GSX-R1000R in excellent condition. Recently serviced with new chain and sprockets. Yoshimura exhaust, frame sliders, and rear paddock stand included. Track-ready with all stock parts included.',
+      dateAvailable: 'Immediate',
+      regNumber: 'WR20 SZK',
+      auctionDuration: '1week',
       images: [
         'https://images.unsplash.com/photo-1563051424-5af0e5617eeb'
       ],
@@ -601,8 +621,12 @@ export class MemStorage implements IStorage {
       color: 'Red',
       condition: 'Excellent',
       engineSize: '1158cc',
-      power: '170bhp',
+      serviceHistory: 'Full Ducati dealer service history, under warranty until 2025',
+      tyreCondition: 'Excellent - approximately 90% remaining',
       description: 'Top-spec Ducati Multistrada V4S with full luggage, radar cruise control, and heated grips. Almost new condition with full service history and remaining manufacturer warranty. Full luggage set and all accessories included.',
+      dateAvailable: 'This Week',
+      regNumber: 'WP22 DUC',
+      auctionDuration: '2weeks',
       images: [
         'https://images.unsplash.com/photo-1626240130051-68871c71e405'
       ],
