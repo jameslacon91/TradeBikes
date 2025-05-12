@@ -321,7 +321,7 @@ export default function HomePage() {
                   
                   <Link href="/register">
                     <Button className="bg-primary hover:bg-primary-dark text-white w-full md:w-auto transition-all duration-300 shadow-md hover:shadow-lg">
-                      Register as Seller
+                      Register Now
                     </Button>
                   </Link>
                 </div>
@@ -390,7 +390,7 @@ export default function HomePage() {
                   
                   <Link href="/register">
                     <Button className="bg-amber-500 hover:bg-amber-600 text-white w-full md:w-auto transition-all duration-300 shadow-md hover:shadow-lg">
-                      Register as Buyer
+                      Register Now
                     </Button>
                   </Link>
                 </div>
