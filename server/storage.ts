@@ -117,9 +117,16 @@ export class MemStorage implements IStorage {
     const id = this.userId++;
     const hashedPassword = await hashPassword(insertUser.password);
     const user: User = { 
-      ...insertUser, 
       id, 
+      username: insertUser.username,
+      email: insertUser.email,
       password: hashedPassword,
+      role: insertUser.role,
+      companyName: insertUser.companyName,
+      phone: insertUser.phone || null,
+      address: insertUser.address || null,
+      city: insertUser.city || null,
+      postcode: insertUser.postcode || null,
       rating: 0,
       totalRatings: 0,
       createdAt: new Date()
@@ -141,8 +148,22 @@ export class MemStorage implements IStorage {
   async createMotorcycle(insertMotorcycle: InsertMotorcycle): Promise<Motorcycle> {
     const id = this.motorcycleId++;
     const motorcycle: Motorcycle = { 
-      ...insertMotorcycle, 
-      id, 
+      id,
+      dealerId: insertMotorcycle.dealerId,
+      make: insertMotorcycle.make,
+      model: insertMotorcycle.model,
+      year: insertMotorcycle.year,
+      mileage: insertMotorcycle.mileage,
+      color: insertMotorcycle.color,
+      condition: insertMotorcycle.condition,
+      engineSize: insertMotorcycle.engineSize || null,
+      description: insertMotorcycle.description || null,
+      serviceHistory: insertMotorcycle.serviceHistory || null,
+      tyreCondition: insertMotorcycle.tyreCondition || null,
+      dateAvailable: insertMotorcycle.dateAvailable || null,
+      regNumber: insertMotorcycle.regNumber || null,
+      auctionDuration: insertMotorcycle.auctionDuration || null,
+      images: insertMotorcycle.images || null,
       createdAt: new Date()
     };
     this.motorcycles.set(id, motorcycle);
@@ -171,9 +192,15 @@ export class MemStorage implements IStorage {
   // Auction methods
   async createAuction(insertAuction: InsertAuction): Promise<Auction> {
     const id = this.auctionId++;
+    // Ensure startTime is always a Date, default to now if not provided
+    const startTime = insertAuction.startTime || new Date();
+    
     const auction: Auction = { 
-      ...insertAuction, 
-      id, 
+      id,
+      dealerId: insertAuction.dealerId,
+      motorcycleId: insertAuction.motorcycleId,
+      startTime: startTime,
+      endTime: insertAuction.endTime,
       status: "active",
       winningBidId: null,
       winningTraderId: null,
