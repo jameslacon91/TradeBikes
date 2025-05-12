@@ -84,7 +84,13 @@ export default function AuctionCard({
       
       <div className="bg-gray-50 px-4 py-3 text-right">
         {/* Determine the link based on the current location */}
-        <Link href={window.location.pathname.includes('/stock') ? `/stock/${id}` : `/auctions/${id}`}>
+        <Link href={
+          window.location.pathname.includes('/stock') 
+            ? `/stock/${id}` 
+            : window.location.pathname.includes('/underwrites') 
+              ? `/underwrites/${id}` 
+              : `/auctions/${id}`
+        }>
           <Button>View Details</Button>
         </Link>
       </div>

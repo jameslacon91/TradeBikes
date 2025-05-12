@@ -45,8 +45,11 @@ function Router() {
       
       <ProtectedRoute path="/subscription" component={SubscriptionPage} />
       <ProtectedRoute path="/auctions" component={AuctionsPage} />
+      <ProtectedRoute path="/underwrites" component={AuctionsPage} /> {/* Alias for /auctions */}
       <ProtectedRoute path="/auctions/:id" component={AuctionDetail} />
+      <ProtectedRoute path="/underwrites/:id" component={AuctionDetail} /> {/* Alias for /auctions/:id */}
       <ProtectedRoute path="/create-auction" component={CreateAuction} />
+      <ProtectedRoute path="/create-underwrite" component={CreateAuction} /> {/* Alias for /create-auction */}
       
       {/* Map and search routes */}
       <ProtectedRoute path="/search-map" component={MapSearchPage} />
@@ -123,7 +126,7 @@ function MainNavigation() {
                     className="text-white bg-primary hover:bg-primary-dark rounded-md px-3 py-2 flex items-center ml-2"
                   >
                     <TrendingUp className="w-4 h-4 mr-1" />
-                    Bid On Auctions
+                    Bid On Underwrites
                   </Link>
                 </li>
                 
