@@ -40,11 +40,8 @@ function Router() {
       <ProtectedRoute path="/stock/:id" component={AuctionDetail} />
       
       {/* Protected routes */}
-      <ProtectedRoute path="/dashboard" component={() => {
-        const { user } = useAuth();
-        if (!user) return null;
-        return user.role === 'dealer' ? <DealerDashboard /> : <TraderDashboard />;
-      }} />
+      {/* All users are dealers who can both sell and buy */}
+      <ProtectedRoute path="/dashboard" component={DealerDashboard} />
       
       <ProtectedRoute path="/subscription" component={SubscriptionPage} />
       <ProtectedRoute path="/auctions" component={AuctionsPage} />
@@ -109,29 +106,26 @@ function MainNavigation() {
                   </Link>
                 </li>
                 
-                {user.role === 'dealer' && (
-                  <li>
-                    <Link 
-                      href="/create-auction" 
-                      className="text-white bg-primary hover:bg-primary-dark rounded-md px-3 py-2 flex items-center"
-                    >
-                      <Plus className="w-4 h-4 mr-1" />
-                      List Motorcycle
-                    </Link>
-                  </li>
-                )}
+                {/* All dealers can both list and bid */}
+                <li>
+                  <Link 
+                    href="/create-auction" 
+                    className="text-white bg-primary hover:bg-primary-dark rounded-md px-3 py-2 flex items-center"
+                  >
+                    <Plus className="w-4 h-4 mr-1" />
+                    List Motorcycle
+                  </Link>
+                </li>
                 
-                {user.role === 'trader' && (
-                  <li>
-                    <Link 
-                      href="/auctions" 
-                      className="text-white bg-primary hover:bg-primary-dark rounded-md px-3 py-2 flex items-center"
-                    >
-                      <TrendingUp className="w-4 h-4 mr-1" />
-                      Bid On Auctions
-                    </Link>
-                  </li>
-                )}
+                <li>
+                  <Link 
+                    href="/auctions" 
+                    className="text-white bg-primary hover:bg-primary-dark rounded-md px-3 py-2 flex items-center ml-2"
+                  >
+                    <TrendingUp className="w-4 h-4 mr-1" />
+                    Bid On Auctions
+                  </Link>
+                </li>
                 
                 <li>
                   <Button 
