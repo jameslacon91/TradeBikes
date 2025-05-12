@@ -3,7 +3,7 @@ import { Link, useLocation } from 'wouter';
 import { TradeBikesLogo } from '@/components/logo';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/use-auth';
-import { Bell } from 'lucide-react';
+import { Bell, Search, MapPin, User, Settings, CreditCard, MessageSquare, Star } from 'lucide-react';
 import { 
   DropdownMenu, 
   DropdownMenuContent, 
@@ -12,13 +12,10 @@ import {
   DropdownMenuSeparator, 
   DropdownMenuTrigger 
 } from '@/components/ui/dropdown-menu';
-import { Badge } from '@/components/ui/badge';
 
 export default function Header() {
   const [location] = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  
-  // Re-enable auth
   const { user, logoutMutation } = useAuth();
 
   // Function to get user initials for avatar
@@ -48,32 +45,42 @@ export default function Header() {
               <Link href="/">
                 <div className="flex items-center cursor-pointer">
                   <TradeBikesLogo className="h-10 w-auto" />
-                  <span className="ml-2 text-xl font-bold text-gray-900">TradeBikes</span>
                 </div>
               </Link>
             </div>
             
-            {user && (
-              <nav className="hidden md:ml-6 md:flex md:space-x-8">
-                <Link href="/dashboard">
-                  <a className={`${location === '/dashboard' ? 'border-primary-light text-gray-900' : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'} inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium`}>
-                    Dashboard
-                  </a>
-                </Link>
-                <Link href="/auctions">
-                  <a className={`${location === '/auctions' ? 'border-primary-light text-gray-900' : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'} inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium`}>
-                    Auctions
-                  </a>
-                </Link>
-                {user.role === 'dealer' && (
-                  <Link href="/create-auction">
-                    <a className={`${location === '/create-auction' ? 'border-primary-light text-gray-900' : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'} inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium`}>
-                      Create Auction
+            {/* Main Navigation - Visible for all users */}
+            <nav className="hidden md:ml-6 md:flex md:space-x-8">
+              <Link href="/about">
+                <a className={`${location === '/about' ? 'border-primary-light text-gray-900' : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'} inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium`}>
+                  About Us
+                </a>
+              </Link>
+              
+              <Link href="/stock">
+                <a className={`${location === '/stock' ? 'border-primary-light text-gray-900' : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'} inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium`}>
+                  View Current Stock
+                </a>
+              </Link>
+              
+              {user && (
+                <>
+                  <Link href="/search-map">
+                    <a className={`${location === '/search-map' ? 'border-primary-light text-gray-900' : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'} inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium`}>
+                      <MapPin className="w-4 h-4 mr-1" />
+                      Map View
                     </a>
                   </Link>
-                )}
-              </nav>
-            )}
+                  
+                  <Link href="/search-list">
+                    <a className={`${location === '/search-list' ? 'border-primary-light text-gray-900' : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'} inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium`}>
+                      <Search className="w-4 h-4 mr-1" />
+                      Search
+                    </a>
+                  </Link>
+                </>
+              )}
+            </nav>
           </div>
 
           {/* User Menu and Mobile Menu Button */}
@@ -106,22 +113,73 @@ export default function Header() {
                         </div>
                       </button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
+                    <DropdownMenuContent align="end" className="w-56">
                       <DropdownMenuLabel>{user.companyName}</DropdownMenuLabel>
                       <DropdownMenuLabel className="text-xs text-gray-500">
                         {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
                       </DropdownMenuLabel>
                       <DropdownMenuSeparator />
+                      
                       <DropdownMenuItem asChild>
-                        <Link href="/profile">
-                          <div className="cursor-pointer">Profile</div>
+                        <Link href="/account">
+                          <div className="cursor-pointer flex items-center">
+                            <User className="w-4 h-4 mr-2" />
+                            My Account
+                          </div>
                         </Link>
                       </DropdownMenuItem>
+                      
                       <DropdownMenuItem asChild>
-                        <Link href="/settings">
-                          <div className="cursor-pointer">Settings</div>
+                        <Link href="/account/personal-details">
+                          <div className="cursor-pointer flex items-center pl-8">
+                            Personal Details
+                          </div>
                         </Link>
                       </DropdownMenuItem>
+                      
+                      <DropdownMenuItem asChild>
+                        <Link href="/account/company-details">
+                          <div className="cursor-pointer flex items-center pl-8">
+                            Company Details
+                          </div>
+                        </Link>
+                      </DropdownMenuItem>
+                      
+                      <DropdownMenuItem asChild>
+                        <Link href="/account/users">
+                          <div className="cursor-pointer flex items-center pl-8">
+                            Add Users
+                          </div>
+                        </Link>
+                      </DropdownMenuItem>
+                      
+                      <DropdownMenuItem asChild>
+                        <Link href="/account/subscription">
+                          <div className="cursor-pointer flex items-center">
+                            <CreditCard className="w-4 h-4 mr-2" />
+                            Subscription
+                          </div>
+                        </Link>
+                      </DropdownMenuItem>
+                      
+                      <DropdownMenuItem asChild>
+                        <Link href="/messages">
+                          <div className="cursor-pointer flex items-center">
+                            <MessageSquare className="w-4 h-4 mr-2" />
+                            Messages
+                          </div>
+                        </Link>
+                      </DropdownMenuItem>
+                      
+                      <DropdownMenuItem asChild>
+                        <Link href="/reviews">
+                          <div className="cursor-pointer flex items-center">
+                            <Star className="w-4 h-4 mr-2" />
+                            Reviews
+                          </div>
+                        </Link>
+                      </DropdownMenuItem>
+                      
                       <DropdownMenuSeparator />
                       <DropdownMenuItem onClick={handleLogout}>
                         Log out
@@ -131,9 +189,14 @@ export default function Header() {
                 </div>
               </>
             ) : (
-              <Link href="/auth">
-                <Button size="sm">Sign In</Button>
-              </Link>
+              <div className="flex space-x-4">
+                <Link href="/register">
+                  <Button variant="outline" size="sm">Register</Button>
+                </Link>
+                <Link href="/auth">
+                  <Button size="sm">Login</Button>
+                </Link>
+              </div>
             )}
 
             {/* Mobile menu button */}
@@ -163,25 +226,38 @@ export default function Header() {
               </a>
             </Link>
             
+            <Link href="/about">
+              <a className={`${location === '/about' ? 'bg-primary-light text-white' : 'text-gray-600 hover:bg-gray-100'} block pl-3 pr-4 py-2 border-l-4 ${location === '/about' ? 'border-primary' : 'border-transparent'} text-base font-medium`}>
+                About Us
+              </a>
+            </Link>
+            
+            <Link href="/stock">
+              <a className={`${location === '/stock' ? 'bg-primary-light text-white' : 'text-gray-600 hover:bg-gray-100'} block pl-3 pr-4 py-2 border-l-4 ${location === '/stock' ? 'border-primary' : 'border-transparent'} text-base font-medium`}>
+                View Current Stock
+              </a>
+            </Link>
+            
             {user ? (
               <>
-                <Link href="/dashboard">
-                  <a className={`${location === '/dashboard' ? 'bg-primary-light text-white' : 'text-gray-600 hover:bg-gray-100'} block pl-3 pr-4 py-2 border-l-4 ${location === '/dashboard' ? 'border-primary' : 'border-transparent'} text-base font-medium`}>
-                    Dashboard
+                <Link href="/search-map">
+                  <a className={`${location === '/search-map' ? 'bg-primary-light text-white' : 'text-gray-600 hover:bg-gray-100'} block pl-3 pr-4 py-2 border-l-4 ${location === '/search-map' ? 'border-primary' : 'border-transparent'} text-base font-medium`}>
+                    Map View
                   </a>
                 </Link>
-                <Link href="/auctions">
-                  <a className={`${location === '/auctions' ? 'bg-primary-light text-white' : 'text-gray-600 hover:bg-gray-100'} block pl-3 pr-4 py-2 border-l-4 ${location === '/auctions' ? 'border-primary' : 'border-transparent'} text-base font-medium`}>
-                    Auctions
+                
+                <Link href="/search-list">
+                  <a className={`${location === '/search-list' ? 'bg-primary-light text-white' : 'text-gray-600 hover:bg-gray-100'} block pl-3 pr-4 py-2 border-l-4 ${location === '/search-list' ? 'border-primary' : 'border-transparent'} text-base font-medium`}>
+                    Search
                   </a>
                 </Link>
-                {user.role === 'dealer' && (
-                  <Link href="/create-auction">
-                    <a className={`${location === '/create-auction' ? 'bg-primary-light text-white' : 'text-gray-600 hover:bg-gray-100'} block pl-3 pr-4 py-2 border-l-4 ${location === '/create-auction' ? 'border-primary' : 'border-transparent'} text-base font-medium`}>
-                      Create Auction
-                    </a>
-                  </Link>
-                )}
+                
+                <Link href="/account">
+                  <a className={`${location === '/account' ? 'bg-primary-light text-white' : 'text-gray-600 hover:bg-gray-100'} block pl-3 pr-4 py-2 border-l-4 ${location === '/account' ? 'border-primary' : 'border-transparent'} text-base font-medium`}>
+                    My Account
+                  </a>
+                </Link>
+                
                 <button
                   onClick={handleLogout}
                   className="block w-full text-left pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-gray-600 hover:bg-gray-100"
@@ -190,11 +266,18 @@ export default function Header() {
                 </button>
               </>
             ) : (
-              <Link href="/auth">
-                <a className={`${location === '/auth' ? 'bg-primary-light text-white' : 'text-gray-600 hover:bg-gray-100'} block pl-3 pr-4 py-2 border-l-4 ${location === '/auth' ? 'border-primary' : 'border-transparent'} text-base font-medium`}>
-                  Sign In
-                </a>
-              </Link>
+              <>
+                <Link href="/register">
+                  <a className={`${location === '/register' ? 'bg-primary-light text-white' : 'text-gray-600 hover:bg-gray-100'} block pl-3 pr-4 py-2 border-l-4 ${location === '/register' ? 'border-primary' : 'border-transparent'} text-base font-medium`}>
+                    Register
+                  </a>
+                </Link>
+                <Link href="/auth">
+                  <a className={`${location === '/auth' ? 'bg-primary-light text-white' : 'text-gray-600 hover:bg-gray-100'} block pl-3 pr-4 py-2 border-l-4 ${location === '/auth' ? 'border-primary' : 'border-transparent'} text-base font-medium`}>
+                    Login
+                  </a>
+                </Link>
+              </>
             )}
           </div>
         </div>
