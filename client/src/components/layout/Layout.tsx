@@ -49,9 +49,11 @@ export default function Layout({ children }: LayoutProps) {
             <Link href="/about">
               <span className="text-gray-600 hover:text-primary cursor-pointer">About</span>
             </Link>
-            <Link href="/stock">
-              <span className="text-gray-600 hover:text-primary cursor-pointer">View Stock</span>
-            </Link>
+            {user && (
+              <Link href="/stock">
+                <span className="text-gray-600 hover:text-primary cursor-pointer">View Stock</span>
+              </Link>
+            )}
             {user && user.role === 'dealer' && (
               <Link href="/create-auction">
                 <span className="text-gray-600 hover:text-primary cursor-pointer">List a Vehicle</span>
@@ -146,7 +148,7 @@ export default function Layout({ children }: LayoutProps) {
               <ul className="space-y-2">
                 <li><Link href="/" className="text-gray-600 hover:text-primary text-sm">Home</Link></li>
                 <li><Link href="/about" className="text-gray-600 hover:text-primary text-sm">About Us</Link></li>
-                <li><Link href="/stock" className="text-gray-600 hover:text-primary text-sm">View Stock</Link></li>
+                {user && <li><Link href="/stock" className="text-gray-600 hover:text-primary text-sm">View Stock</Link></li>}
                 <li><Link href="/register" className="text-gray-600 hover:text-primary text-sm">Register</Link></li>
               </ul>
             </div>

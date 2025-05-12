@@ -34,9 +34,9 @@ function Router() {
       <Route path="/register" component={RegisterPage} />
       <Route path="/verify-email" component={VerifyEmailPage} />
       
-      {/* Stock viewing route - limited view without login */}
-      <Route path="/stock" component={AuctionsPage} />
-      <Route path="/stock/:id" component={AuctionDetail} />
+      {/* Stock viewing route - login required */}
+      <ProtectedRoute path="/stock" component={AuctionsPage} />
+      <ProtectedRoute path="/stock/:id" component={AuctionDetail} />
       
       {/* Protected routes */}
       <ProtectedRoute path="/dashboard" component={() => {
@@ -172,17 +172,7 @@ function App() {
         <AuthProvider>
           <TooltipProvider>
             <Toaster />
-            <div className="min-h-screen flex flex-col">
-              <MainNavigation />
-              <main className="flex-grow">
-                <Router />
-              </main>
-              <footer className="bg-gray-100 py-6">
-                <div className="container mx-auto px-4 text-center text-gray-600">
-                  © {new Date().getFullYear()} TradeBikes. All rights reserved.
-                </div>
-              </footer>
-            </div>
+            <Router />
           </TooltipProvider>
         </AuthProvider>
       </WebSocketProvider>
