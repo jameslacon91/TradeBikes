@@ -302,7 +302,10 @@ export class MemStorage implements IStorage {
   async getBidsByAuctionId(auctionId: number): Promise<Bid[]> {
     return Array.from(this.bids.values())
       .filter(bid => bid.auctionId === auctionId)
-      .sort((a, b) => b.amount - a.amount); // Sort by highest bid first
+      .sort((a, b) => {
+        // Sort by highest bid first
+        return b.amount - a.amount;
+      });
   }
 
   async getHighestBidForAuction(auctionId: number): Promise<Bid | undefined> {
@@ -314,8 +317,11 @@ export class MemStorage implements IStorage {
   async createMessage(insertMessage: InsertMessage): Promise<Message> {
     const id = this.messageId++;
     const message: Message = { 
-      ...insertMessage, 
-      id, 
+      id,
+      senderId: insertMessage.senderId,
+      receiverId: insertMessage.receiverId,
+      content: insertMessage.content,
+      auctionId: insertMessage.auctionId || null,
       read: false,
       createdAt: new Date()
     };
@@ -329,15 +335,22 @@ export class MemStorage implements IStorage {
         (message.senderId === userId1 && message.receiverId === userId2) ||
         (message.senderId === userId2 && message.receiverId === userId1)
       )
-      .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
+      .sort((a, b) => {
+        const timeA = a.createdAt ? a.createdAt.getTime() : 0;
+        const timeB = b.createdAt ? b.createdAt.getTime() : 0;
+        return timeA - timeB;
+      });
   }
 
   // Notification methods
   async createNotification(insertNotification: InsertNotification): Promise<Notification> {
     const id = this.notificationId++;
     const notification: Notification = { 
-      ...insertNotification, 
-      id, 
+      id,
+      userId: insertNotification.userId,
+      type: insertNotification.type,
+      content: insertNotification.content,
+      relatedId: insertNotification.relatedId || null,
       read: false,
       createdAt: new Date()
     };
@@ -348,7 +361,11 @@ export class MemStorage implements IStorage {
   async getNotificationsByUserId(userId: number): Promise<Notification[]> {
     return Array.from(this.notifications.values())
       .filter(notification => notification.userId === userId)
-      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+      .sort((a, b) => {
+        const timeA = a.createdAt ? a.createdAt.getTime() : 0;
+        const timeB = b.createdAt ? b.createdAt.getTime() : 0;
+        return timeB - timeA; // Descending order
+      });
   }
 
   async markNotificationAsRead(id: number): Promise<Notification | undefined> {
