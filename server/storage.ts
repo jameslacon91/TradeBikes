@@ -159,6 +159,7 @@ export class MemStorage implements IStorage {
       postcode: 'B1 1AA',
       rating: 4.5,
       totalRatings: 22,
+      favoriteDealers: [1], // Favorite dealer1
       createdAt: new Date()
     };
     this.users.set(dealer2.id, dealer2);
@@ -176,6 +177,7 @@ export class MemStorage implements IStorage {
       postcode: 'EH1 1AA',
       rating: 5,
       totalRatings: 30,
+      favoriteDealers: [1, 2], // Favorite dealer1 and dealer2
       createdAt: new Date()
     };
     this.users.set(dealer3.id, dealer3);
@@ -196,6 +198,7 @@ export class MemStorage implements IStorage {
       postcode: 'M1 2WD',
       rating: 5,
       totalRatings: 8,
+      favoriteDealers: [1, 3], // Favorite dealer1 and dealer3
       createdAt: new Date()
     };
     this.users.set(trader1.id, trader1);
@@ -213,6 +216,7 @@ export class MemStorage implements IStorage {
       postcode: 'LS1 1AA',
       rating: 4,
       totalRatings: 15,
+      favoriteDealers: [2], // Favorite dealer2
       createdAt: new Date()
     };
     this.users.set(trader2.id, trader2);
@@ -230,6 +234,7 @@ export class MemStorage implements IStorage {
       postcode: 'G1 2AA',
       rating: 4.5,
       totalRatings: 12,
+      favoriteDealers: [1, 2, 3], // Favorite all dealers
       createdAt: new Date()
     };
     this.users.set(trader3.id, trader3);
