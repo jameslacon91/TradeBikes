@@ -37,19 +37,19 @@ export default function AuctionReviews({
   const [dialogOpen, setDialogOpen] = useState(false);
   const [localReviewStatus, setLocalReviewStatus] = useState(reviewStatus);
   
-  // Determine if the current user is the dealer or trader in this auction
-  const isDealer = user?.id === dealerId;
-  const isTrader = user?.id === traderId;
+  // Determine if the current user is the seller or buyer in this auction
+  const isSeller = user?.id === dealerId;
+  const isBuyer = user?.id === bidderId;
   
   // Determine if the user has already submitted a review
-  const hasReviewed = isDealer 
-    ? localReviewStatus.dealerReviewed 
-    : isTrader 
-      ? localReviewStatus.traderReviewed 
+  const hasReviewed = isSeller 
+    ? localReviewStatus.sellerReviewed 
+    : isBuyer 
+      ? localReviewStatus.buyerReviewed 
       : false;
   
-  // If the auction is not completed or the user is neither the dealer nor trader, hide reviews section
-  if (!isCompleted || (!isDealer && !isTrader)) {
+  // If the auction is not completed or the user is neither the seller nor buyer, hide reviews section
+  if (!isCompleted || (!isSeller && !isBuyer)) {
     return null;
   }
   
@@ -57,10 +57,10 @@ export default function AuctionReviews({
     setDialogOpen(false);
     
     // Update local review status
-    if (isDealer) {
-      setLocalReviewStatus(prev => ({ ...prev, dealerReviewed: true }));
-    } else if (isTrader) {
-      setLocalReviewStatus(prev => ({ ...prev, traderReviewed: true }));
+    if (isSeller) {
+      setLocalReviewStatus(prev => ({ ...prev, sellerReviewed: true }));
+    } else if (isBuyer) {
+      setLocalReviewStatus(prev => ({ ...prev, buyerReviewed: true }));
     }
     
     toast({
@@ -93,9 +93,9 @@ export default function AuctionReviews({
           <CardHeader>
             <CardTitle>Share Your Experience</CardTitle>
             <CardDescription>
-              {isDealer 
-                ? `Rate your experience with trader ${traderName}`
-                : `Rate your experience with dealer ${dealerName}`}
+              {isSeller 
+                ? `Rate your experience with buyer ${bidderName}`
+                : `Rate your experience with seller ${dealerName}`}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -114,12 +114,12 @@ export default function AuctionReviews({
                   </DialogDescription>
                 </DialogHeader>
                 
-                {isDealer ? (
+                {isSeller ? (
                   <TraderReviewForm 
-                    traderId={traderId}
+                    traderId={bidderId}
                     auctionId={auctionId}
                     motorcycleId={motorcycleId}
-                    traderName={traderName}
+                    traderName={bidderName}
                     onSuccess={handleReviewSuccess}
                     onCancel={() => setDialogOpen(false)}
                   />
