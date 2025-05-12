@@ -6,9 +6,10 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Filter } from 'lucide-react';
 
-export default function AuctionGrid() {
+export default function AuctionGrid() { // Component name kept as-is for compatibility
   const [make, setMake] = useState<string>('all');
   
+  // Use the same API endpoint regardless of whether the URL is /auctions or /underwrites
   const { data: auctions = [], isLoading, error } = useQuery<AuctionWithDetails[]>({
     queryKey: ['/api/auctions'],
   });
@@ -19,12 +20,12 @@ export default function AuctionGrid() {
     : auctions.filter(auction => auction.motorcycle.make.toLowerCase() === make.toLowerCase());
   
   // Get unique motorcycle makes for filter
-  const makes = ['All', ...new Set(auctions.map(auction => auction.motorcycle.make))];
+  const makes = ['All', ...Array.from(new Set(auctions.map(auction => auction.motorcycle.make)))];
 
   if (isLoading) {
     return (
       <div className="flex justify-center items-center h-64">
-        <div className="text-lg text-gray-500">Loading auctions...</div>
+        <div className="text-lg text-gray-500">Loading underwrites...</div>
       </div>
     );
   }
@@ -32,7 +33,7 @@ export default function AuctionGrid() {
   if (error) {
     return (
       <div className="flex justify-center items-center h-64">
-        <div className="text-lg text-red-500">Error loading auctions. Please try again.</div>
+        <div className="text-lg text-red-500">Error loading underwrites. Please try again.</div>
       </div>
     );
   }
@@ -40,7 +41,7 @@ export default function AuctionGrid() {
   if (auctions.length === 0) {
     return (
       <div className="flex justify-center items-center h-64">
-        <div className="text-lg text-gray-500">No active auctions found.</div>
+        <div className="text-lg text-gray-500">No active underwrites found.</div>
       </div>
     );
   }
@@ -48,7 +49,7 @@ export default function AuctionGrid() {
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-xl font-semibold text-gray-900">Active Auctions</h2>
+        <h2 className="text-xl font-semibold text-gray-900">Active Underwrites</h2>
         <div className="flex items-center">
           <Button variant="outline" size="sm" className="mr-3">
             <Filter className="mr-2 h-4 w-4" />
@@ -85,7 +86,7 @@ export default function AuctionGrid() {
       
       {filteredAuctions.length === 0 && (
         <div className="text-center py-10">
-          <p className="text-gray-500">No auctions found matching the selected filter.</p>
+          <p className="text-gray-500">No underwrites found matching the selected filter.</p>
         </div>
       )}
     </div>
