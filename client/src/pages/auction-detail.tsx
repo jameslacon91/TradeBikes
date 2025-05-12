@@ -233,6 +233,27 @@ export default function AuctionDetail() {
                     <BidHistory auctionId={auction.id} currentBid={auction.currentBid} />
                   </div>
                 )}
+                
+                {/* Bid confirmation widget - show for ended auctions */}
+                {timeLeft === 'Ended' && (dealerOwnsAuction || (isTrader && user?.id === auction.winningTraderId)) && auction.currentBid && (
+                  <BidConfirmation
+                    auctionId={auction.id}
+                    bid={{
+                      id: auction.winningBidId || 0,
+                      auctionId: auction.id,
+                      traderId: auction.winningTraderId || 0,
+                      amount: auction.currentBid,
+                      createdAt: new Date()
+                    }}
+                    isAccepted={auction.bidAccepted || false}
+                    isDealer={isDealer}
+                    isTrader={isTrader}
+                    traderId={auction.winningTraderId || 0}
+                    dealConfirmed={auction.dealConfirmed || false}
+                    collectionConfirmed={auction.collectionConfirmed || false}
+                    onSuccess={() => {/* Refresh auction data */}}
+                  />
+                )}
               </div>
               
               <div className="mt-auto flex justify-between pt-4">

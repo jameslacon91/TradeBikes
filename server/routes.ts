@@ -369,6 +369,210 @@ export async function registerRoutes(app: Express): Promise<Server> {
       next(error);
     }
   });
+  
+  // API for bid acceptance (dealer only)
+  app.post("/api/auctions/:id/accept-bid", isAuthenticated, hasRole("dealer"), async (req, res, next) => {
+    try {
+      const auctionId = parseInt(req.params.id);
+      const { bidId, traderId } = req.body;
+      
+      const auction = await storage.getAuction(auctionId);
+      
+      if (!auction) {
+        return res.status(404).json({ message: "Auction not found" });
+      }
+      
+      if (auction.dealerId !== req.user.id) {
+        return res.status(403).json({ message: "Not authorized to accept bids for this auction" });
+      }
+      
+      const updatedAuction = await storage.updateAuction(auctionId, {
+        bidAccepted: true,
+        winningBidId: bidId,
+        winningTraderId: traderId,
+        status: "completed"
+      });
+
+      // Send notification via WebSocket to the trader
+      const wsMessage: WSMessage = {
+        type: "bid_accepted",
+        data: {
+          auctionId: auctionId,
+          motorcycleId: auction.motorcycleId,
+          dealerId: auction.dealerId,
+          traderId: traderId
+        },
+        timestamp: Date.now()
+      };
+      
+      sendToUser(traderId, wsMessage);
+      
+      // Create a notification record
+      await storage.createNotification({
+        userId: traderId,
+        type: "bid_accepted",
+        content: `Your bid on auction #${auctionId} has been accepted.`,
+        relatedId: auctionId
+      });
+      
+      res.json(updatedAuction);
+    } catch (error) {
+      next(error);
+    }
+  });
+  
+  // API for deal confirmation (trader only)
+  app.post("/api/auctions/:id/confirm-deal", isAuthenticated, hasRole("trader"), async (req, res, next) => {
+    try {
+      const auctionId = parseInt(req.params.id);
+      
+      const auction = await storage.getAuction(auctionId);
+      
+      if (!auction) {
+        return res.status(404).json({ message: "Auction not found" });
+      }
+      
+      if (auction.winningTraderId !== req.user.id) {
+        return res.status(403).json({ message: "Not authorized to confirm this deal" });
+      }
+      
+      const updatedAuction = await storage.updateAuction(auctionId, {
+        dealConfirmed: true
+      });
+
+      // Send notification via WebSocket to the dealer
+      const wsMessage: WSMessage = {
+        type: "deal_confirmed",
+        data: {
+          auctionId: auctionId,
+          motorcycleId: auction.motorcycleId,
+          dealerId: auction.dealerId,
+          traderId: req.user.id
+        },
+        timestamp: Date.now()
+      };
+      
+      sendToUser(auction.dealerId, wsMessage);
+      
+      // Create a notification record
+      await storage.createNotification({
+        userId: auction.dealerId,
+        type: "deal_confirmed",
+        content: `The trader has confirmed the deal for auction #${auctionId}.`,
+        relatedId: auctionId
+      });
+      
+      res.json(updatedAuction);
+    } catch (error) {
+      next(error);
+    }
+  });
+  
+  // API for scheduling collection (dealer only)
+  app.post("/api/auctions/:id/schedule-collection", isAuthenticated, hasRole("dealer"), async (req, res, next) => {
+    try {
+      const auctionId = parseInt(req.params.id);
+      const { collectionDate } = req.body;
+      
+      const auction = await storage.getAuction(auctionId);
+      
+      if (!auction) {
+        return res.status(404).json({ message: "Auction not found" });
+      }
+      
+      if (auction.dealerId !== req.user.id) {
+        return res.status(403).json({ message: "Not authorized to schedule collection for this auction" });
+      }
+      
+      const updatedAuction = await storage.updateAuction(auctionId, {
+        collectionDate: new Date(collectionDate)
+      });
+      
+      // Update the motorcycle availability date
+      const motorcycle = await storage.getMotorcycle(auction.motorcycleId);
+      if (motorcycle) {
+        await storage.updateMotorcycle(motorcycle.id, {
+          dateAvailable: collectionDate
+        });
+      }
+
+      // Send notification via WebSocket to the trader
+      const wsMessage: WSMessage = {
+        type: "collection_scheduled",
+        data: {
+          auctionId: auctionId,
+          motorcycleId: auction.motorcycleId,
+          dealerId: auction.dealerId,
+          traderId: auction.winningTraderId,
+          collectionDate: collectionDate
+        },
+        timestamp: Date.now()
+      };
+      
+      if (auction.winningTraderId) {
+        sendToUser(auction.winningTraderId, wsMessage);
+        
+        // Create a notification record
+        await storage.createNotification({
+          userId: auction.winningTraderId,
+          type: "collection_scheduled",
+          content: `The dealer has scheduled collection for auction #${auctionId} on ${new Date(collectionDate).toLocaleDateString()}.`,
+          relatedId: auctionId
+        });
+      }
+      
+      res.json(updatedAuction);
+    } catch (error) {
+      next(error);
+    }
+  });
+  
+  // API for confirming collection (trader only)
+  app.post("/api/auctions/:id/confirm-collection", isAuthenticated, hasRole("trader"), async (req, res, next) => {
+    try {
+      const auctionId = parseInt(req.params.id);
+      
+      const auction = await storage.getAuction(auctionId);
+      
+      if (!auction) {
+        return res.status(404).json({ message: "Auction not found" });
+      }
+      
+      if (auction.winningTraderId !== req.user.id) {
+        return res.status(403).json({ message: "Not authorized to confirm collection for this auction" });
+      }
+      
+      const updatedAuction = await storage.updateAuction(auctionId, {
+        collectionConfirmed: true
+      });
+
+      // Send notification via WebSocket to the dealer
+      const wsMessage: WSMessage = {
+        type: "collection_confirmed",
+        data: {
+          auctionId: auctionId,
+          motorcycleId: auction.motorcycleId,
+          dealerId: auction.dealerId,
+          traderId: req.user.id
+        },
+        timestamp: Date.now()
+      };
+      
+      sendToUser(auction.dealerId, wsMessage);
+      
+      // Create a notification record
+      await storage.createNotification({
+        userId: auction.dealerId,
+        type: "collection_confirmed",
+        content: `The trader has confirmed collection for auction #${auctionId}.`,
+        relatedId: auctionId
+      });
+      
+      res.json(updatedAuction);
+    } catch (error) {
+      next(error);
+    }
+  });
 
   // Dashboard data
   app.get("/api/dashboard", isAuthenticated, async (req, res, next) => {

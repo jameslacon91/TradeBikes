@@ -47,6 +47,18 @@ export function setupWebSocket(server: Server) {
           case 'auction_created':
             await handleAuctionCreated(data);
             break;
+          case 'bid_accepted':
+            await handleBidAccepted(data);
+            break;
+          case 'deal_confirmed':
+            await handleDealConfirmed(data);
+            break;
+          case 'collection_scheduled':
+            await handleCollectionScheduled(data);
+            break;
+          case 'collection_confirmed':
+            await handleCollectionConfirmed(data);
+            break;
         }
       } catch (error) {
         console.error('Error processing WebSocket message:', error);
@@ -281,5 +293,127 @@ async function handleAuctionCreated(message: WSMessage) {
     }
   } catch (error) {
     console.error('Error handling auction created:', error);
+  }
+}
+
+// Handle bid accepted event
+async function handleBidAccepted(message: WSMessage) {
+  const { auctionId, dealerId, traderId } = message.data;
+  
+  try {
+    const auction = await storage.getAuctionWithDetails(auctionId);
+    if (!auction) return;
+    
+    // Notify the trader
+    await storage.createNotification({
+      userId: traderId,
+      type: 'bid_accepted',
+      content: `Your bid on ${auction.motorcycle.make} ${auction.motorcycle.model} has been accepted by the dealer.`,
+      relatedId: auctionId
+    });
+
+    sendToUser(traderId, {
+      type: 'bid_accepted',
+      data: {
+        auctionId,
+        dealerId,
+        motorcycle: auction.motorcycle,
+        amount: auction.currentBid
+      },
+      timestamp: Date.now()
+    });
+  } catch (error) {
+    console.error('Error handling bid accepted:', error);
+  }
+}
+
+// Handle deal confirmation event
+async function handleDealConfirmed(message: WSMessage) {
+  const { auctionId, dealerId, traderId } = message.data;
+  
+  try {
+    const auction = await storage.getAuctionWithDetails(auctionId);
+    if (!auction) return;
+    
+    // Notify the dealer
+    await storage.createNotification({
+      userId: dealerId,
+      type: 'deal_confirmed',
+      content: `The trader has confirmed the deal for ${auction.motorcycle.make} ${auction.motorcycle.model}. Please schedule a collection date.`,
+      relatedId: auctionId
+    });
+
+    sendToUser(dealerId, {
+      type: 'deal_confirmed',
+      data: {
+        auctionId,
+        traderId,
+        motorcycle: auction.motorcycle
+      },
+      timestamp: Date.now()
+    });
+  } catch (error) {
+    console.error('Error handling deal confirmed:', error);
+  }
+}
+
+// Handle collection scheduled event
+async function handleCollectionScheduled(message: WSMessage) {
+  const { auctionId, dealerId, traderId, collectionDate } = message.data;
+  
+  try {
+    const auction = await storage.getAuctionWithDetails(auctionId);
+    if (!auction) return;
+    
+    // Notify the trader
+    await storage.createNotification({
+      userId: traderId,
+      type: 'collection_scheduled',
+      content: `Collection for ${auction.motorcycle.make} ${auction.motorcycle.model} has been scheduled for ${new Date(collectionDate).toLocaleDateString()}.`,
+      relatedId: auctionId
+    });
+
+    sendToUser(traderId, {
+      type: 'collection_scheduled',
+      data: {
+        auctionId,
+        dealerId,
+        motorcycle: auction.motorcycle,
+        collectionDate
+      },
+      timestamp: Date.now()
+    });
+  } catch (error) {
+    console.error('Error handling collection scheduled:', error);
+  }
+}
+
+// Handle collection confirmation event
+async function handleCollectionConfirmed(message: WSMessage) {
+  const { auctionId, dealerId, traderId } = message.data;
+  
+  try {
+    const auction = await storage.getAuctionWithDetails(auctionId);
+    if (!auction) return;
+    
+    // Notify the dealer
+    await storage.createNotification({
+      userId: dealerId,
+      type: 'collection_confirmed',
+      content: `The trader has confirmed collection of ${auction.motorcycle.make} ${auction.motorcycle.model}. The transaction is now complete.`,
+      relatedId: auctionId
+    });
+
+    sendToUser(dealerId, {
+      type: 'collection_confirmed',
+      data: {
+        auctionId,
+        traderId,
+        motorcycle: auction.motorcycle
+      },
+      timestamp: Date.now()
+    });
+  } catch (error) {
+    console.error('Error handling collection confirmed:', error);
   }
 }
