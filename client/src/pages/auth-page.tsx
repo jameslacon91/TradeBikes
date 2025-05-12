@@ -30,9 +30,8 @@ const registerSchema = z.object({
   username: z.string().min(3, "Username must be at least 3 characters"),
   password: z.string().min(6, "Password must be at least 6 characters"),
   email: z.string().email("Please enter a valid email address"),
-  role: z.enum(["dealer", "trader"], {
-    required_error: "Please select a role",
-  }),
+  // All users are dealers in the unified model
+  role: z.literal("dealer").default("dealer"),
   companyName: z.string().min(1, "Company name is required"),
   phone: z.string().optional(),
   address: z.string().optional(),
@@ -161,32 +160,7 @@ export default function AuthPage() {
                 </h2>
                 <Form {...registerForm}>
                   <form onSubmit={registerForm.handleSubmit(onRegisterSubmit)} className="space-y-6">
-                    <FormField
-                      control={registerForm.control}
-                      name="role"
-                      render={({ field }) => (
-                        <FormItem className="mb-4">
-                          <FormLabel>Account Type</FormLabel>
-                          <FormControl>
-                            <RadioGroup 
-                              onValueChange={field.onChange} 
-                              defaultValue={field.value} 
-                              className="flex space-x-4"
-                            >
-                              <div className="flex items-center space-x-2">
-                                <RadioGroupItem value="dealer" id="dealer" />
-                                <label htmlFor="dealer" className="cursor-pointer">Dealer</label>
-                              </div>
-                              <div className="flex items-center space-x-2">
-                                <RadioGroupItem value="trader" id="trader" />
-                                <label htmlFor="trader" className="cursor-pointer">Trader</label>
-                              </div>
-                            </RadioGroup>
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                    {/* All users are dealers in the unified model */}
 
                     <FormField
                       control={registerForm.control}
