@@ -218,7 +218,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Bids
-  app.post("/api/bids", isAuthenticated, hasRole("trader"), async (req, res, next) => {
+  app.post("/api/bids", isAuthenticated, async (req, res, next) => {
     try {
       const validationResult = insertBidSchema.safeParse(req.body);
       if (!validationResult.success) {
@@ -251,7 +251,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Create bid
       const bid = await storage.createBid({
         auctionId,
-        traderId: req.user.id,
+        dealerId: req.user.id,
         amount
       });
       

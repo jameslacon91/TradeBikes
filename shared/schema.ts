@@ -2,13 +2,13 @@ import { pgTable, text, serial, integer, timestamp, boolean, jsonb } from "drizz
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
-// User schema (dealers and traders)
+// User schema (all users are dealers who can both sell and buy)
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
   username: text("username").notNull().unique(),
   password: text("password").notNull(),
   email: text("email").notNull(),
-  role: text("role").notNull(), // "dealer" or "trader"
+  role: text("role").notNull().default("dealer"), // All users are dealers
   companyName: text("company_name").notNull(),
   phone: text("phone"),
   address: text("address"),
@@ -44,17 +44,17 @@ export const motorcycles = pgTable("motorcycles", {
 export const auctions = pgTable("auctions", {
   id: serial("id").primaryKey(),
   motorcycleId: integer("motorcycle_id").notNull(), // foreign key to motorcycles
-  dealerId: integer("dealer_id").notNull(), // foreign key to users
+  dealerId: integer("dealer_id").notNull(), // foreign key to users (seller)
   startTime: timestamp("start_time").notNull().defaultNow(),
   endTime: timestamp("end_time").notNull(),
   status: text("status").notNull().default("pending"), // pending, active, completed, cancelled
   winningBidId: integer("winning_bid_id"), // foreign key to bids
-  winningTraderId: integer("winning_trader_id"), // foreign key to users
-  bidAccepted: boolean("bid_accepted").default(false), // dealer has accepted the winning bid
+  winningBidderId: integer("winning_bidder_id"), // foreign key to users (winning dealer/buyer)
+  bidAccepted: boolean("bid_accepted").default(false), // seller has accepted the winning bid
   dealConfirmed: boolean("deal_confirmed").default(false), // both parties confirmed the deal
-  collectionConfirmed: boolean("collection_confirmed").default(false), // trader has confirmed collection
+  collectionConfirmed: boolean("collection_confirmed").default(false), // buyer has confirmed collection
   collectionDate: timestamp("collection_date"), // scheduled collection date
-  highestBidderId: integer("highest_bidder_id"), // current highest bidder (trader)
+  highestBidderId: integer("highest_bidder_id"), // current highest bidder
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -62,7 +62,7 @@ export const auctions = pgTable("auctions", {
 export const bids = pgTable("bids", {
   id: serial("id").primaryKey(),
   auctionId: integer("auction_id").notNull(), // foreign key to auctions
-  traderId: integer("trader_id").notNull(), // foreign key to users
+  dealerId: integer("dealer_id").notNull(), // foreign key to users (the bidder)
   amount: integer("amount").notNull(),
   createdAt: timestamp("created_at").defaultNow(),
 });
@@ -107,7 +107,11 @@ export const insertAuctionSchema = createInsertSchema(auctions).omit({
   createdAt: true,
   status: true,
   winningBidId: true,
-  winningTraderId: true 
+  winningBidderId: true,
+  bidAccepted: true,
+  dealConfirmed: true,
+  collectionConfirmed: true,
+  highestBidderId: true
 });
 
 export const insertBidSchema = createInsertSchema(bids).omit({ 
