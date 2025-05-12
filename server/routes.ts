@@ -758,6 +758,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get all dealers (for favorites selection)
+  app.get("/api/dealers", isAuthenticated, async (req, res, next) => {
+    try {
+      // Get all users with dealer role
+      const allUsers = Array.from(storage.getAllUsers().values());
+      const dealers = allUsers.filter(user => user.role === 'dealer');
+      
+      // Return only safe dealer info (no passwords)
+      const safeUsers = dealers.map(dealer => ({
+        id: dealer.id,
+        username: dealer.username,
+        companyName: dealer.companyName,
+        rating: dealer.rating,
+        totalRatings: dealer.totalRatings
+      }));
+
+      // Don't include the current user in the list
+      const filteredUsers = safeUsers.filter(user => user.id !== req.user.id);
+      
+      res.json(filteredUsers);
+    } catch (error) {
+      next(error);
+    }
+  });
+
   // Recent activity
   app.get("/api/activity", isAuthenticated, async (req, res, next) => {
     try {

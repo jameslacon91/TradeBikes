@@ -65,6 +65,7 @@ export default function DealerDashboard() {
           <TabsList className="mb-6">
             <TabsTrigger value="selling">Selling</TabsTrigger>
             <TabsTrigger value="buying">Buying</TabsTrigger>
+            <TabsTrigger value="favorites">Favorite Dealers</TabsTrigger>
             <TabsTrigger value="activity">Activity</TabsTrigger>
           </TabsList>
           
@@ -298,6 +299,20 @@ export default function DealerDashboard() {
                     ))}
                   </ul>
                 )}
+              </div>
+            </div>
+          </TabsContent>
+
+          {/* FAVORITE DEALERS TAB CONTENT */}
+          <TabsContent value="favorites">
+            <div className="mt-4">
+              <h2 className="text-xl font-semibold text-gray-900 mb-6">Favorite Dealers</h2>
+              
+              {/* Import and use the FavoriteDealers component */}
+              <div className="bg-white shadow overflow-hidden sm:rounded-md p-6">
+                <React.Suspense fallback={<div className="text-center py-10">Loading favorite dealers...</div>}>
+                  <FavoriteDealers />
+                </React.Suspense>
               </div>
             </div>
           </TabsContent>

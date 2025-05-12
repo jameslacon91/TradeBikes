@@ -33,6 +33,7 @@ export interface IStorage {
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   updateUser(id: number, user: Partial<User>): Promise<User | undefined>;
+  getAllUsers(): Map<number, User>;
   
   // Motorcycle methods
   createMotorcycle(motorcycle: InsertMotorcycle): Promise<Motorcycle>;
@@ -684,6 +685,10 @@ export class MemStorage implements IStorage {
   // User methods
   async getUser(id: number): Promise<User | undefined> {
     return this.users.get(id);
+  }
+  
+  getAllUsers(): Map<number, User> {
+    return this.users;
   }
   
   async getUserByUsername(username: string): Promise<User | undefined> {
