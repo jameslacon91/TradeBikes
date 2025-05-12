@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation } from '@tanstack/react-query';
 import { useRoute } from 'wouter';
 import { useAuth } from '@/hooks/use-auth';
 import Layout from '@/components/layout/Layout';
@@ -12,7 +12,9 @@ import { formatTimeDifference, isEndingSoon } from '@/lib/countdownTimer';
 import { AuctionWithDetails } from '@shared/types';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { MessageSquare, Bookmark } from 'lucide-react';
+import { MessageSquare, Bookmark, Timer, CheckCircle } from 'lucide-react';
+import { apiRequest, queryClient } from '@/lib/queryClient';
+import { useToast } from '@/hooks/use-toast';
 
 export default function AuctionDetail() {
   const [auctionsMatch, auctionsParams] = useRoute<{ id: string }>('/auctions/:id');
@@ -22,7 +24,57 @@ export default function AuctionDetail() {
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [timeLeft, setTimeLeft] = useState<string>('');
   const [endingSoon, setEndingSoon] = useState(false);
+  const [showBidSelection, setShowBidSelection] = useState(false);
   const { user } = useAuth();
+  const { toast } = useToast();
+  
+  // Mutation to end underwrite early
+  const endUnderwriteMutation = useMutation({
+    mutationFn: async (auctionId: number) => {
+      const res = await apiRequest('PATCH', `/api/auctions/${auctionId}/end`, {});
+      return await res.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Underwrite ended",
+        description: "You can now select a winning bid.",
+        variant: "default",
+      });
+      queryClient.invalidateQueries({ queryKey: [`/api/auctions/${auctionId}`] });
+      setShowBidSelection(true);
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: `Failed to end underwrite: ${error.message}`,
+        variant: "destructive",
+      });
+    },
+  });
+  
+  // Mutation to accept a bid
+  const acceptBidMutation = useMutation({
+    mutationFn: async ({ auctionId, bidId }: { auctionId: number; bidId: number }) => {
+      const res = await apiRequest('POST', `/api/auctions/${auctionId}/accept-bid`, { bidId });
+      return await res.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Bid accepted",
+        description: "The bidder has been notified.",
+        variant: "default",
+      });
+      queryClient.invalidateQueries({ queryKey: [`/api/auctions/${auctionId}`] });
+      setShowBidSelection(false);
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: `Failed to accept bid: ${error.message}`,
+        variant: "destructive",
+      });
+    },
+  });
   
   // These variables will be set after auction data is loaded
 
