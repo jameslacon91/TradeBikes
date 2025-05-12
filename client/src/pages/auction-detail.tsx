@@ -151,16 +151,20 @@ export default function AuctionDetail() {
                       <p className="mt-1 text-sm text-gray-900">{motorcycle.engineSize}</p>
                     </div>
                     <div>
-                      <h4 className="text-sm font-medium text-gray-500">Power</h4>
-                      <p className="mt-1 text-sm text-gray-900">{motorcycle.power}</p>
-                    </div>
-                    <div>
                       <h4 className="text-sm font-medium text-gray-500">Condition</h4>
                       <p className="mt-1 text-sm text-gray-900">{motorcycle.condition}</p>
                     </div>
                     <div>
                       <h4 className="text-sm font-medium text-gray-500">Color</h4>
                       <p className="mt-1 text-sm text-gray-900">{motorcycle.color}</p>
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-medium text-gray-500">Service History</h4>
+                      <p className="mt-1 text-sm text-gray-900">{motorcycle.serviceHistory || 'Not specified'}</p>
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-medium text-gray-500">Tyre Condition</h4>
+                      <p className="mt-1 text-sm text-gray-900">{motorcycle.tyreCondition || 'Not specified'}</p>
                     </div>
                     <div>
                       <h4 className="text-sm font-medium text-gray-500">Year</h4>

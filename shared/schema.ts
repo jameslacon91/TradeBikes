@@ -30,8 +30,12 @@ export const motorcycles = pgTable("motorcycles", {
   color: text("color").notNull(),
   condition: text("condition").notNull(), // e.g. Excellent, Good, Fair, Poor
   engineSize: text("engine_size"), // e.g. 650cc
-  power: text("power"), // e.g. 100bhp
   description: text("description"),
+  serviceHistory: text("service_history"),
+  tyreCondition: text("tyre_condition"),
+  dateAvailable: text("date_available"),
+  regNumber: text("reg_number"),
+  auctionDuration: text("auction_duration"), // "1day", "1week", "2weeks", "1month"
   images: text("images").array(), // URLs of uploaded images
   createdAt: timestamp("created_at").defaultNow(),
 });
@@ -41,8 +45,6 @@ export const auctions = pgTable("auctions", {
   id: serial("id").primaryKey(),
   motorcycleId: integer("motorcycle_id").notNull(), // foreign key to motorcycles
   dealerId: integer("dealer_id").notNull(), // foreign key to users
-  startingPrice: integer("starting_price").notNull(),
-  reservePrice: integer("reserve_price"),
   startTime: timestamp("start_time").notNull().defaultNow(),
   endTime: timestamp("end_time").notNull(),
   status: text("status").notNull().default("pending"), // pending, active, completed, cancelled

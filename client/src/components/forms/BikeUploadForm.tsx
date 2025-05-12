@@ -653,32 +653,6 @@ export default function BikeUploadForm() {
         {/* Auction Details Section */}
         <div>
           <h2 className="text-lg font-semibold text-gray-900 mb-4">Auction Details</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <FormField
-              control={form.control}
-              name="auctionDuration"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Auction Duration</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select auction duration" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {durationOptions.map((option) => (
-                        <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormDescription>How long should your auction run for?</FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-          
           <div className="mt-4">
             <FormField
               control={form.control}
