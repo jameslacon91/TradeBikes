@@ -5,6 +5,7 @@ import { useAuth } from '@/hooks/use-auth';
 import Layout from '@/components/layout/Layout';
 import BidForm from '@/components/forms/BidForm';
 import BidHistory from '@/components/auctions/BidHistory';
+import AuctionReviews from '@/components/reviews/AuctionReviews';
 import { formatTimeDifference, isEndingSoon } from '@/lib/countdownTimer';
 import { AuctionWithDetails } from '@shared/types';
 import { Button } from '@/components/ui/button';
@@ -236,6 +237,21 @@ export default function AuctionDetail() {
             </div>
           </div>
         </div>
+        
+        {/* Reviews section - only show for completed auctions */}
+        {timeLeft === 'Ended' && (user?.id === auction.dealerId || user?.id === auction.highestBidderId) && (
+          <div className="mt-8 px-4 sm:px-6 lg:px-8">
+            <AuctionReviews
+              auctionId={auction.id}
+              motorcycleId={motorcycle.id}
+              dealerId={auction.dealerId}
+              dealerName="Dealer Name" // In a real implementation, this would be fetched from the dealer data
+              traderId={auction.highestBidderId || 0}
+              traderName="Trader Name" // In a real implementation, this would be fetched from the trader data
+              isCompleted={timeLeft === 'Ended'}
+            />
+          </div>
+        )}
       </div>
     </Layout>
   );
