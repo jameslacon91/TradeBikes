@@ -1,7 +1,6 @@
 import { useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
-import NotificationTest from "@/components/notifications/NotificationTest";
 import { Button } from "@/components/ui/button";
 import { TradeBikesLogo } from "@/components/logo";
 
@@ -22,8 +21,10 @@ export default function HomePage() {
     <div className="bg-gray-50">
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto mb-12">
-          <h2 className="text-2xl font-bold mb-4">Notifications Test Panel</h2>
-          <NotificationTest />
+          <h2 className="text-2xl font-bold mb-4">Welcome to TradeBikes</h2>
+          <p className="text-lg text-gray-600 mb-4">
+            The B2B platform for trading used motorcycles
+          </p>
         </div>
 
         {/* Hero Section */}
