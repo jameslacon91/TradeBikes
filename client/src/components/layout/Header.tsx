@@ -46,7 +46,7 @@ export default function Header() {
 
   const navLinks = [
     { name: 'Home', href: '/', icon: <Home className="h-5 w-5 mr-2" /> },
-    { name: 'Underwrites', href: '/auctions', icon: <Gavel className="h-5 w-5 mr-2" /> },
+    { name: 'Bikes for Sale', href: '/auctions', icon: <Gavel className="h-5 w-5 mr-2" /> },
     { name: 'Search', href: '/search', icon: <Search className="h-5 w-5 mr-2" /> },
     { name: 'Map', href: '/map', icon: <Map className="h-5 w-5 mr-2" /> },
     { name: 'Events', href: '/events', icon: <Calendar className="h-5 w-5 mr-2" /> },
@@ -104,9 +104,33 @@ export default function Header() {
                 <p className="text-sm text-gray-500">Signed in as:</p>
                 <p className="font-medium">{user.companyName}</p>
               </div>
+              
+              {/* Prominent action buttons for mobile */}
+              <div className="px-4 space-y-2 mb-4">
+                <Link href="/create-underwrite">
+                  <Button 
+                    className="w-full flex items-center justify-center"
+                    onClick={closeMenu}
+                  >
+                    <Gavel className="mr-2 h-4 w-4" />
+                    List a Bike
+                  </Button>
+                </Link>
+                <Link href="/auctions">
+                  <Button 
+                    variant="outline" 
+                    className="w-full flex items-center justify-center"
+                    onClick={closeMenu}
+                  >
+                    <Search className="mr-2 h-4 w-4" />
+                    View Bikes
+                  </Button>
+                </Link>
+              </div>
+              
               <Button 
                 variant="outline" 
-                className="w-full flex items-center justify-center"
+                className="w-full flex items-center justify-center mx-4"
                 onClick={() => {
                   handleLogout();
                   closeMenu();
@@ -197,7 +221,25 @@ export default function Header() {
           {desktopNav}
         </div>
         
-        <div className="flex items-center space-x-1">
+        <div className="flex items-center space-x-2">
+          {/* Prominent buttons for primary actions */}
+          {user && (
+            <>
+              <Link href="/create-underwrite">
+                <Button className="hidden sm:flex bg-primary hover:bg-primary/90">
+                  <Gavel className="mr-2 h-4 w-4" />
+                  List a Bike
+                </Button>
+              </Link>
+              <Link href="/auctions">
+                <Button className="hidden sm:flex" variant="outline">
+                  <Search className="mr-2 h-4 w-4" />
+                  View Bikes
+                </Button>
+              </Link>
+            </>
+          )}
+          
           {user && <NotificationsPopover />}
           {!isMobile && userMenu}
           {user && isMobile && (
@@ -211,6 +253,23 @@ export default function Header() {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                  <Link href="/create-underwrite">
+                    <a className="flex w-full items-center">
+                      <Gavel className="mr-2 h-4 w-4" />
+                      List a Bike
+                    </a>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/auctions">
+                    <a className="flex w-full items-center">
+                      <Search className="mr-2 h-4 w-4" />
+                      View Bikes
+                    </a>
+                  </Link>
+                </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleLogout}>
                   <LogOut className="mr-2 h-4 w-4" />

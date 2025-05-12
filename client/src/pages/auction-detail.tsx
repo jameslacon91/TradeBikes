@@ -271,10 +271,10 @@ export default function AuctionDetail() {
                       disabled={endUnderwriteMutation.isPending}
                     >
                       <Timer className="mr-2 h-4 w-4" />
-                      {endUnderwriteMutation.isPending ? 'Ending...' : 'End Underwrite Early'}
+                      {endUnderwriteMutation.isPending ? 'Ending...' : 'End Underwrite'}
                     </Button>
                     <p className="text-xs text-gray-500 mt-1 text-center">
-                      End this underwrite early to select your preferred bid from all current offers
+                      End this underwrite to select your preferred bid from all current offers
                     </p>
                   </div>
                 )}
