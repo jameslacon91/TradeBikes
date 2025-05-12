@@ -261,6 +261,24 @@ export default function AuctionDetail() {
                   </div>
                 </div>
                 
+                {/* End underwrite early button - only for seller of active underwrite */}
+                {isSeller && isActive && (
+                  <div className="mb-4 border-t border-gray-200 pt-4">
+                    <Button 
+                      variant="outline" 
+                      className="w-full flex items-center justify-center"
+                      onClick={() => endUnderwriteMutation.mutate(auction.id)}
+                      disabled={endUnderwriteMutation.isPending}
+                    >
+                      <Timer className="mr-2 h-4 w-4" />
+                      {endUnderwriteMutation.isPending ? 'Ending...' : 'End Underwrite Early'}
+                    </Button>
+                    <p className="text-xs text-gray-500 mt-1 text-center">
+                      End this underwrite early to select your preferred bid from all current offers
+                    </p>
+                  </div>
+                )}
+                
                 {/* Show bid form for traders on active auctions */}
                 {isBuyer && isActive && (
                   <div className="border-t border-gray-200 pt-4">
@@ -271,13 +289,13 @@ export default function AuctionDetail() {
                   </div>
                 )}
                 
-                {/* Blind auction notice for traders */}
+                {/* Blind underwrite notice for bidders */}
                 {isBuyer && (
                   <div className="mt-4 bg-blue-50 text-blue-800 p-4 rounded-md">
-                    <h4 className="font-medium">Blind Auction Information</h4>
+                    <h4 className="font-medium">Blind Underwrite Information</h4>
                     <p className="text-sm mt-1">
-                      This is a blind auction. Your bid is only visible to the selling dealer.
-                      Other traders cannot see any bid information, ensuring a fair and competitive bidding process.
+                      This is a blind underwrite. Your bid is only visible to the selling dealer.
+                      Other dealers cannot see any bid information, ensuring a fair and competitive bidding process.
                     </p>
                   </div>
                 )}
@@ -286,6 +304,45 @@ export default function AuctionDetail() {
                 {dealerOwnsAuction && (
                   <div className="mt-4">
                     <BidHistory auctionId={auction.id} currentBid={auction.currentBid} />
+                  </div>
+                )}
+                
+                {/* Bid selection - only visible when underwrite ended early by seller */}
+                {dealerOwnsAuction && showBidSelection && auction.bids && auction.bids.length > 0 && (
+                  <div className="mt-4 border-t pt-4 border-gray-200">
+                    <div className="bg-yellow-50 border border-yellow-200 rounded-md p-4 mb-4">
+                      <h4 className="font-medium text-yellow-800 flex items-center">
+                        <CheckCircle className="mr-2 h-4 w-4" /> Select Winning Bid
+                      </h4>
+                      <p className="text-sm text-yellow-700 mt-1">
+                        You have ended this underwrite early. Please select your preferred bid from the list below.
+                        The winning bidder will be notified immediately.
+                      </p>
+                    </div>
+                    
+                    <div className="space-y-3 max-h-64 overflow-y-auto pr-2">
+                      {auction.bids.sort((a, b) => b.amount - a.amount).map(bid => (
+                        <div 
+                          key={bid.id} 
+                          className="flex items-center justify-between bg-white p-3 rounded-md border border-gray-200 hover:border-primary transition-colors"
+                        >
+                          <div>
+                            <p className="font-medium">£{bid.amount.toLocaleString()}</p>
+                            <p className="text-xs text-gray-500">
+                              Bid by Dealer #{bid.dealerId} • {(new Date(bid.createdAt as Date)).toLocaleString()}
+                            </p>
+                          </div>
+                          <Button 
+                            variant="default" 
+                            size="sm"
+                            onClick={() => acceptBidMutation.mutate({ auctionId: auction.id, bidId: bid.id })}
+                            disabled={acceptBidMutation.isPending}
+                          >
+                            {acceptBidMutation.isPending ? 'Accepting...' : 'Accept Bid'}
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 )}
                 

@@ -16,6 +16,7 @@ export const users = pgTable("users", {
   postcode: text("postcode"),
   rating: integer("rating").default(0), // 0-5 rating
   totalRatings: integer("total_ratings").default(0),
+  favoriteDealers: integer("favorite_dealers").array(), // Array of dealer IDs marked as favorites
   createdAt: timestamp("created_at").defaultNow(),
 });
 
