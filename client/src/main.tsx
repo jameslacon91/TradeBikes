@@ -6,12 +6,15 @@ import { queryClient } from "./lib/queryClient";
 import { AuthProvider } from "./hooks/use-auth";
 import { WebSocketProvider } from "./hooks/use-websocket";
 
-createRoot(document.getElementById("root")!).render(
+// Create a simple app structure with providers
+const RootApp = () => (
   <QueryClientProvider client={queryClient}>
-    <WebSocketProvider>
-      <AuthProvider>
+    <AuthProvider>
+      <WebSocketProvider>
         <App />
-      </AuthProvider>
-    </WebSocketProvider>
+      </WebSocketProvider>
+    </AuthProvider>
   </QueryClientProvider>
 );
+
+createRoot(document.getElementById("root")!).render(<RootApp />);

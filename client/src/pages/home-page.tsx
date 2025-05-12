@@ -6,15 +6,17 @@ import { Button } from "@/components/ui/button";
 import { TradeBikesLogo } from "@/components/logo";
 
 export default function HomePage() {
-  const { user } = useAuth();
   const [_, navigate] = useLocation();
 
-  // Redirect to dashboard if already logged in
+  // Temporarily disable redirection
+  /*
+  const { user } = useAuth();
   useEffect(() => {
     if (user) {
       navigate("/dashboard");
     }
   }, [user, navigate]);
+  */
 
   return (
     <Layout>

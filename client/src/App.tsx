@@ -13,16 +13,15 @@ import { ProtectedRoute } from "./lib/protected-route";
 import { useAuth } from "./hooks/use-auth";
 
 function Router() {
-  const { user } = useAuth();
-  
   return (
     <Switch>
       <Route path="/" component={HomePage} />
       <Route path="/auth" component={AuthPage} />
       
-      <ProtectedRoute path="/dashboard" component={
-        user?.role === 'dealer' ? DealerDashboard : TraderDashboard
-      } />
+      <ProtectedRoute path="/dashboard" component={() => {
+        const { user } = useAuth();
+        return user?.role === 'dealer' ? <DealerDashboard /> : <TraderDashboard />;
+      }} />
       
       <ProtectedRoute path="/auctions" component={AuctionsPage} />
       <ProtectedRoute path="/auctions/:id" component={AuctionDetail} />
