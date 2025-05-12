@@ -16,7 +16,7 @@ import { MessageSquare, Bookmark, Timer, CheckCircle } from 'lucide-react';
 import { apiRequest, queryClient } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
 
-export default function AuctionDetail() {
+export default function AuctionDetail() { // Component name kept as-is for compatibility
   const [auctionsMatch, auctionsParams] = useRoute<{ id: string }>('/auctions/:id');
   const [stockMatch, stockParams] = useRoute<{ id: string }>('/stock/:id');
   const [underwritesMatch, underwritesParams] = useRoute<{ id: string }>('/underwrites/:id');

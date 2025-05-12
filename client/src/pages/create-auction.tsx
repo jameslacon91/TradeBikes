@@ -4,7 +4,7 @@ import { useLocation } from 'wouter';
 import Layout from '@/components/layout/Layout';
 import BikeUploadForm from '@/components/forms/BikeUploadForm';
 
-export default function CreateAuction() {
+export default function CreateAuction() { // Component name kept as-is for compatibility
   const { user } = useAuth();
   const [_, navigate] = useLocation();
 
@@ -22,7 +22,7 @@ export default function CreateAuction() {
           <div className="mb-8">
             <h1 className="text-2xl font-semibold text-gray-900">List a New Motorcycle</h1>
             <p className="mt-1 text-sm text-gray-500">
-              Fill in the details below to create a new auction listing for your motorcycle.
+              Fill in the details below to create a new underwrite listing for your motorcycle.
             </p>
           </div>
 
