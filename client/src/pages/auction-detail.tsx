@@ -118,6 +118,11 @@ export default function AuctionDetail() { // Component name kept as-is for compa
     queryKey: [`/api/auctions/${auctionId}`],
     enabled: !!auctionId,
   });
+  
+  // Fetch dealer information
+  const { data: dealers = [] } = useQuery<any[]>({
+    queryKey: ['/api/dealers'],
+  });
 
   // Update countdown timer
   useEffect(() => {
@@ -360,8 +365,8 @@ export default function AuctionDetail() { // Component name kept as-is for compa
                     <div className="space-y-3 max-h-64 overflow-y-auto pr-2">
                       {auction.bids.sort((a, b) => b.amount - a.amount).map(bid => {
                         // Get dealer info for display
-                        const bidder = auction.bidders?.find(d => d.id === bid.dealerId);
-                        const dealerName = bidder ? bidder.companyName : `Dealer #${bid.dealerId}`;
+                        const bidder = dealers.find(d => d.id === bid.dealerId);
+                        const dealerName = bidder ? bidder.companyName : `Buyer #${bid.dealerId}`;
                         
                         return (
                           <div 
