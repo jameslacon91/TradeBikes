@@ -222,7 +222,7 @@ export default function DealerDashboard() {
                       </div>
                     ) : (
                       <div className="space-y-4">
-                        {activityItems?.map((item) => (
+                        {activityItems?.map((item: ActivityItemType) => (
                           <ActivityItem key={item.id} item={item} />
                         ))}
                       </div>
@@ -250,16 +250,39 @@ export default function DealerDashboard() {
                 <h2 className="text-xl font-semibold">Ongoing Underwrites</h2>
                 <p className="text-muted-foreground">Manage your active auctions and bids.</p>
                 
-                <AuctionFilter 
-                  totalCount={activeListings.length}
-                  title="Active Listings"
-                  emptyMessage="You don't have any active underwrites."
-                  emptyIcon={<Package className="h-12 w-12" />}
-                  emptyActionText="List your first bike"
-                  emptyActionHref="/create-auction"
-                  auctions={activeListings}
-                  isLoading={auctionsLoading}
-                />
+                {auctionsLoading ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {[...Array(3)].map((_, i) => (
+                      <div key={i} className="border rounded-lg p-4">
+                        <Skeleton className="h-40 w-full mb-3" />
+                        <Skeleton className="h-5 w-2/3 mb-2" />
+                        <Skeleton className="h-4 w-1/2 mb-4" />
+                        <div className="flex justify-between">
+                          <Skeleton className="h-8 w-20" />
+                          <Skeleton className="h-8 w-20" />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : activeListings.length === 0 ? (
+                  <div className="text-center py-12 border rounded-lg">
+                    <Package className="h-12 w-12 mx-auto text-muted-foreground/50 mb-4" />
+                    <h3 className="text-lg font-medium mb-2">You don't have any active underwrites.</h3>
+                    <Link href="/create-auction">
+                      <Button>List your first bike</Button>
+                    </Link>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {activeListings.map(auction => (
+                      <AuctionCard 
+                        key={auction.id}
+                        auction={auction}
+                        showDealerInfo={false}
+                      />
+                    ))}
+                  </div>
+                )}
                 
                 {/* Bid Acceptance Section (dealers only) */}
                 {user?.role === 'dealer' && (
@@ -276,14 +299,36 @@ export default function DealerDashboard() {
                 <h2 className="text-xl font-semibold">Past Listings</h2>
                 <p className="text-muted-foreground">View your completed underwrites.</p>
                 
-                <AuctionFilter 
-                  totalCount={pastListings.length}
-                  title="Completed Listings"
-                  emptyMessage="You don't have any completed underwrites."
-                  emptyIcon={<Clock className="h-12 w-12" />}
-                  auctions={pastListings}
-                  isLoading={auctionsLoading}
-                />
+                {auctionsLoading ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {[...Array(3)].map((_, i) => (
+                      <div key={i} className="border rounded-lg p-4">
+                        <Skeleton className="h-40 w-full mb-3" />
+                        <Skeleton className="h-5 w-2/3 mb-2" />
+                        <Skeleton className="h-4 w-1/2 mb-4" />
+                        <div className="flex justify-between">
+                          <Skeleton className="h-8 w-20" />
+                          <Skeleton className="h-8 w-20" />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : pastListings.length === 0 ? (
+                  <div className="text-center py-12 border rounded-lg">
+                    <Clock className="h-12 w-12 mx-auto text-muted-foreground/50 mb-4" />
+                    <h3 className="text-lg font-medium mb-2">You don't have any completed underwrites.</h3>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {pastListings.map(auction => (
+                      <AuctionCard 
+                        key={auction.id}
+                        auction={auction}
+                        showDealerInfo={false}
+                      />
+                    ))}
+                  </div>
+                )}
               </div>
             </TabsContent>
             
@@ -293,14 +338,36 @@ export default function DealerDashboard() {
                 <h2 className="text-xl font-semibold">Pending Completion</h2>
                 <p className="text-muted-foreground">Manage your deals in process.</p>
                 
-                <AuctionFilter 
-                  totalCount={pendingCollection.length}
-                  title="Pending Collection"
-                  emptyMessage="You don't have any underwrites pending collection."
-                  emptyIcon={<Home className="h-12 w-12" />}
-                  auctions={pendingCollection}
-                  isLoading={auctionsLoading}
-                />
+                {auctionsLoading ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {[...Array(3)].map((_, i) => (
+                      <div key={i} className="border rounded-lg p-4">
+                        <Skeleton className="h-40 w-full mb-3" />
+                        <Skeleton className="h-5 w-2/3 mb-2" />
+                        <Skeleton className="h-4 w-1/2 mb-4" />
+                        <div className="flex justify-between">
+                          <Skeleton className="h-8 w-20" />
+                          <Skeleton className="h-8 w-20" />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : pendingCollection.length === 0 ? (
+                  <div className="text-center py-12 border rounded-lg">
+                    <Home className="h-12 w-12 mx-auto text-muted-foreground/50 mb-4" />
+                    <h3 className="text-lg font-medium mb-2">You don't have any underwrites pending collection.</h3>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {pendingCollection.map(auction => (
+                      <AuctionCard 
+                        key={auction.id}
+                        auction={auction}
+                        showDealerInfo={false}
+                      />
+                    ))}
+                  </div>
+                )}
               </div>
             </TabsContent>
           </Tabs>
