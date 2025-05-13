@@ -80,7 +80,7 @@ export default function DealerDashboard() {
             {/* Stats for Selling */}
             <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
               {/* Active Listings */}
-              <div onClick={() => setActiveTab("current-listings")}>
+              <Link href="/listing/active">
                 <StatCard 
                   title="Active Listings" 
                   value={statsLoading ? "Loading..." : stats?.activeListings || 0}
@@ -89,10 +89,10 @@ export default function DealerDashboard() {
                   trend={stats?.trendUp ? { up: true, value: stats.trendValue || 0 } : undefined}
                   className="cursor-pointer transition-transform hover:translate-y-[-5px]"
                 />
-              </div>
+              </Link>
 
               {/* Total Bids */}
-              <div onClick={() => setActiveTab("ongoing-underwrites")}>
+              <Link href="/bids/received">
                 <StatCard 
                   title="Total Bids Received" 
                   value={statsLoading ? "Loading..." : stats?.totalBids || 0}
@@ -101,10 +101,10 @@ export default function DealerDashboard() {
                   trend={stats?.trendUp ? { up: true, value: stats.trendValue || 0 } : undefined}
                   className="cursor-pointer transition-transform hover:translate-y-[-5px]"
                 />
-              </div>
+              </Link>
 
               {/* Pending Completion */}
-              <div onClick={() => setActiveTab("ongoing-underwrites")}>
+              <Link href="/auctions/pending">
                 <StatCard 
                   title="Pending Completion" 
                   value={statsLoading ? "Loading..." : stats?.pendingCompletion || 0}
@@ -112,10 +112,10 @@ export default function DealerDashboard() {
                   bgColor="bg-yellow-500"
                   className="cursor-pointer transition-transform hover:translate-y-[-5px]"
                 />
-              </div>
+              </Link>
 
               {/* Total Revenue */}
-              <div onClick={() => setActiveTab("past-listings")}>
+              <Link href="/revenue">
                 <StatCard 
                   title="Revenue (MTD)" 
                   value={statsLoading ? "Loading..." : `£${stats?.revenue?.toLocaleString() || 0}`}
@@ -123,7 +123,7 @@ export default function DealerDashboard() {
                   bgColor="bg-green-500"
                   className="cursor-pointer transition-transform hover:translate-y-[-5px]"
                 />
-              </div>
+              </Link>
             </div>
 
             {/* My Active Underwrites Section */}
