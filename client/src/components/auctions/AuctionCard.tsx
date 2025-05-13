@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { formatDistanceToNow } from 'date-fns';
 import { Clock, Users } from 'lucide-react';
 import { AuctionWithDetails } from '@shared/types';
+import { useAuth } from '@/hooks/use-auth';
 
 interface AuctionCardProps {
   auction: AuctionWithDetails;
@@ -18,6 +19,7 @@ export default function AuctionCard({
   hideEndingSoon = false
 }: AuctionCardProps) {
   const { id, motorcycle, currentBid, totalBids, endTime, status, dealerId } = auction;
+  const { user } = useAuth();
   
   const [timeLeft, setTimeLeft] = useState<string>("");
   const [endingSoon, setEndingSoon] = useState<boolean>(false);
@@ -140,7 +142,12 @@ export default function AuctionCard({
         
         <Link href={`/auctions/${id}`}>
           <Button className="w-full mt-4" variant={isActive ? "default" : "outline"}>
-            {isActive ? "View & Bid" : "View Details"}
+            {isActive 
+              ? (dealerId === user?.id 
+                ? "View" 
+                : "View & Bid") 
+              : "View Details"
+            }
           </Button>
         </Link>
       </div>

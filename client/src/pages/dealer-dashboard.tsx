@@ -123,10 +123,10 @@ export default function DealerDashboard() {
                 </div>
 
                 {/* Pending Completion */}
-                <div onClick={() => setActiveTab("ongoing-underwrites")}>
+                <div onClick={() => setActiveTab("pending-collection")}>
                   <StatCard 
                     title="Pending Completion" 
-                    value={statsLoading ? "Loading..." : stats?.pendingCompletion || 0}
+                    value={statsLoading || auctionsLoading ? "Loading..." : pendingCollection.length}
                     icon={<AlertCircle className="h-6 w-6 text-white" />}
                     bgColor="bg-yellow-500"
                     className="cursor-pointer transition-transform hover:translate-y-[-5px]"
