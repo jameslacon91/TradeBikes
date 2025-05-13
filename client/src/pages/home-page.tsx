@@ -10,7 +10,7 @@ import {
   TrendingUp
 } from "lucide-react";
 import Layout from "@/components/layout/Layout";
-import motorcycleBg from "@/assets/images/motorcycle-bg.jpeg";
+import logoBg from "@/assets/images/logo-background.png";
 
 export default function HomePage() {
   return (
@@ -20,9 +20,9 @@ export default function HomePage() {
         {/* Motorcycle Background Image */}
         <div className="absolute inset-0 z-0">
           <img 
-            src={motorcycleBg} 
+            src={logoBg} 
             alt="Motorcycle background" 
-            className="w-full h-full object-cover object-center brightness-50"
+            className="w-full h-full object-contain opacity-10"
           />
         </div>
         {/* Dark overlay */}
