@@ -66,98 +66,204 @@ function Router() {
 function MainNavigation() {
   const { user, logoutMutation } = useAuth();
   const [location, navigate] = useLocation();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const handleLogout = () => {
     logoutMutation.mutate();
     navigate('/');
+    setMobileMenuOpen(false);
+  };
+
+  const closeMobileMenu = () => {
+    setMobileMenuOpen(false);
   };
 
   return (
-    <header className="border-b bg-white shadow-sm">
-      <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-        <Link href="/">
-          <div className="text-2xl font-bold text-primary cursor-pointer">TradeBikes</div>
-        </Link>
-        <nav>
-          <ul className="flex space-x-4 items-center">
-            <li>
-              <Link href="/" className="text-gray-600 hover:text-primary">Home</Link>
-            </li>
-            <li>
-              <Link href="/about" className="text-gray-600 hover:text-primary">About</Link>
-            </li>
-            <li>
-              <Link href="/stock" className="text-gray-600 hover:text-primary">View Stock</Link>
-            </li>
-            
-            {user ? (
-              // Navigation for logged in users
-              <>
+    <header className="border-b shadow-sm bg-white dark:bg-gray-900 dark:border-gray-800">
+      <div className="container mx-auto px-4 py-4">
+        <div className="flex justify-between items-center">
+          <Link href="/">
+            <div className="text-2xl font-bold text-primary cursor-pointer">TradeBikes</div>
+          </Link>
+          
+          {/* Mobile menu button */}
+          <button 
+            className="md:hidden flex items-center text-gray-600 dark:text-gray-300 hover:text-primary" 
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            aria-label="Toggle menu"
+          >
+            {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          </button>
+          
+          {/* Desktop Navigation */}
+          <nav className="hidden md:block">
+            <ul className="flex space-x-4 items-center">
+              <li>
+                <Link href="/" className="text-gray-600 dark:text-gray-300 hover:text-primary">Home</Link>
+              </li>
+              <li>
+                <Link href="/about" className="text-gray-600 dark:text-gray-300 hover:text-primary">About</Link>
+              </li>
+              <li>
+                <Link href="/stock" className="text-gray-600 dark:text-gray-300 hover:text-primary">View Stock</Link>
+              </li>
+              
+              {user ? (
+                // Navigation for logged in users
+                <>
+                  <li>
+                    <Link href="/dashboard" className="text-gray-600 dark:text-gray-300 hover:text-primary flex items-center">
+                      <UserCircle className="w-4 h-4 mr-1" />
+                      Dashboard
+                    </Link>
+                  </li>
+                  
+                  <li>
+                    <Link href="/search-map" className="text-gray-600 dark:text-gray-300 hover:text-primary flex items-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 mr-1" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <circle cx="12" cy="10" r="3"/>
+                        <path d="M12 2a8 8 0 0 0-8 8c0 1.892.402 3.13 1.5 4.5L12 22l6.5-7.5c1.098-1.37 1.5-2.608 1.5-4.5a8 8 0 0 0-8-8z"/>
+                      </svg>
+                      Map Search
+                    </Link>
+                  </li>
+                  
+                  {/* All dealers can both list and bid */}
+                  <li>
+                    <Link 
+                      href="/create-auction" 
+                      className="text-white bg-primary hover:bg-primary-dark rounded-md px-3 py-2 flex items-center"
+                    >
+                      <Plus className="w-4 h-4 mr-1" />
+                      List Motorcycle
+                    </Link>
+                  </li>
+                  
+                  <li>
+                    <Link 
+                      href="/auctions" 
+                      className="text-white bg-primary hover:bg-primary-dark rounded-md px-3 py-2 flex items-center ml-2"
+                    >
+                      <TrendingUp className="w-4 h-4 mr-1" />
+                      Bid On Underwrites
+                    </Link>
+                  </li>
+                  
+                  <li>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="text-gray-600 dark:text-gray-300 hover:text-primary flex items-center" 
+                      onClick={handleLogout}
+                    >
+                      <LogOut className="w-4 h-4 mr-1" />
+                      Logout
+                    </Button>
+                  </li>
+                </>
+              ) : (
+                // Navigation for guests
+                <>
+                  <li>
+                    <Link 
+                      href="/auth" 
+                      className="text-white bg-primary hover:bg-primary-dark rounded-md px-3 py-2"
+                    >
+                      Login
+                    </Link>
+                  </li>
+                </>
+              )}
+            </ul>
+          </nav>
+        </div>
+        
+        {/* Mobile Menu */}
+        {mobileMenuOpen && (
+          <div className="md:hidden pt-4 pb-2 border-t dark:border-gray-800 mt-4">
+            <nav>
+              <ul className="space-y-3">
                 <li>
-                  <Link href="/dashboard" className="text-gray-600 hover:text-primary flex items-center">
-                    <UserCircle className="w-4 h-4 mr-1" />
-                    Dashboard
-                  </Link>
+                  <Link onClick={closeMobileMenu} href="/" className="block py-2 text-gray-600 dark:text-gray-300 hover:text-primary">Home</Link>
+                </li>
+                <li>
+                  <Link onClick={closeMobileMenu} href="/about" className="block py-2 text-gray-600 dark:text-gray-300 hover:text-primary">About</Link>
+                </li>
+                <li>
+                  <Link onClick={closeMobileMenu} href="/stock" className="block py-2 text-gray-600 dark:text-gray-300 hover:text-primary">View Stock</Link>
                 </li>
                 
-                <li>
-                  <Link href="/search-map" className="text-gray-600 hover:text-primary flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 mr-1" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <circle cx="12" cy="10" r="3"/>
-                      <path d="M12 2a8 8 0 0 0-8 8c0 1.892.402 3.13 1.5 4.5L12 22l6.5-7.5c1.098-1.37 1.5-2.608 1.5-4.5a8 8 0 0 0-8-8z"/>
-                    </svg>
-                    Map Search
-                  </Link>
-                </li>
-                
-                {/* All dealers can both list and bid */}
-                <li>
-                  <Link 
-                    href="/create-auction" 
-                    className="text-white bg-primary hover:bg-primary-dark rounded-md px-3 py-2 flex items-center"
-                  >
-                    <Plus className="w-4 h-4 mr-1" />
-                    List Motorcycle
-                  </Link>
-                </li>
-                
-                <li>
-                  <Link 
-                    href="/auctions" 
-                    className="text-white bg-primary hover:bg-primary-dark rounded-md px-3 py-2 flex items-center ml-2"
-                  >
-                    <TrendingUp className="w-4 h-4 mr-1" />
-                    Bid On Underwrites
-                  </Link>
-                </li>
-                
-                <li>
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    className="text-gray-600 hover:text-primary flex items-center" 
-                    onClick={handleLogout}
-                  >
-                    <LogOut className="w-4 h-4 mr-1" />
-                    Logout
-                  </Button>
-                </li>
-              </>
-            ) : (
-              // Navigation for guests
-              <>
-                <li>
-                  <Link 
-                    href="/auth" 
-                    className="text-white bg-primary hover:bg-primary-dark rounded-md px-3 py-2"
-                  >
-                    Login
-                  </Link>
-                </li>
-              </>
-            )}
-          </ul>
-        </nav>
+                {user ? (
+                  // Mobile Navigation for logged in users
+                  <>
+                    {/* Highlight the List Motorcycle option */}
+                    <li className="py-2">
+                      <Link 
+                        onClick={closeMobileMenu}
+                        href="/create-auction" 
+                        className="flex items-center justify-center py-3 text-white bg-primary hover:bg-primary-dark rounded-md"
+                      >
+                        <Plus className="w-5 h-5 mr-2" />
+                        List Motorcycle
+                      </Link>
+                    </li>
+                    
+                    <li className="py-2">
+                      <Link 
+                        onClick={closeMobileMenu}
+                        href="/auctions" 
+                        className="flex items-center justify-center py-3 text-white bg-primary hover:bg-primary-dark rounded-md"
+                      >
+                        <TrendingUp className="w-5 h-5 mr-2" />
+                        Bid On Underwrites
+                      </Link>
+                    </li>
+                    
+                    <li>
+                      <Link onClick={closeMobileMenu} href="/dashboard" className="block py-2 text-gray-600 dark:text-gray-300 hover:text-primary flex items-center">
+                        <UserCircle className="w-5 h-5 mr-2" />
+                        Dashboard
+                      </Link>
+                    </li>
+                    
+                    <li>
+                      <Link onClick={closeMobileMenu} href="/search-map" className="block py-2 text-gray-600 dark:text-gray-300 hover:text-primary flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 mr-2" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <circle cx="12" cy="10" r="3"/>
+                          <path d="M12 2a8 8 0 0 0-8 8c0 1.892.402 3.13 1.5 4.5L12 22l6.5-7.5c1.098-1.37 1.5-2.608 1.5-4.5a8 8 0 0 0-8-8z"/>
+                        </svg>
+                        Map Search
+                      </Link>
+                    </li>
+                    
+                    <li>
+                      <button 
+                        className="w-full flex items-center py-2 text-gray-600 dark:text-gray-300 hover:text-primary" 
+                        onClick={handleLogout}
+                      >
+                        <LogOut className="w-5 h-5 mr-2" />
+                        Logout
+                      </button>
+                    </li>
+                  </>
+                ) : (
+                  // Mobile Navigation for not logged in users
+                  <>
+                    <li>
+                      <Link 
+                        onClick={closeMobileMenu}
+                        href="/auth" 
+                        className="block py-3 text-center text-white bg-primary hover:bg-primary-dark rounded-md"
+                      >
+                        Login
+                      </Link>
+                    </li>
+                  </>
+                )}
+              </ul>
+            </nav>
+          </div>
+        )}
       </div>
     </header>
   );

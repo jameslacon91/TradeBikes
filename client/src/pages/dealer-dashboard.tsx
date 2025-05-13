@@ -23,7 +23,7 @@ interface ExtendedDashboardStats extends DashboardStats {
 
 export default function DealerDashboard() {
   const { user } = useAuth();
-  const [activeTab, setActiveTab] = useState("selling");
+  const [activeTab, setActiveTab] = useState("current-listings");
 
   // Fetch dashboard stats
   const { data: stats, isLoading: statsLoading } = useQuery<ExtendedDashboardStats>({
@@ -62,16 +62,19 @@ export default function DealerDashboard() {
           <p className="mt-1 text-sm text-gray-500">Welcome back to TradeBikes. Buy and sell motorcycles with ease.</p>
         </div>
 
-        <Tabs defaultValue="selling" className="w-full" onValueChange={setActiveTab}>
-          <TabsList className="mb-6">
-            <TabsTrigger value="selling">Selling</TabsTrigger>
-            <TabsTrigger value="buying">Buying</TabsTrigger>
-            <TabsTrigger value="favorites">Favorite Dealers</TabsTrigger>
-            <TabsTrigger value="activity">Activity</TabsTrigger>
+        <Tabs defaultValue="current-listings" className="w-full" onValueChange={setActiveTab}>
+          <TabsList className="mb-6 flex flex-wrap">
+            <TabsTrigger value="current-listings">Current Listings</TabsTrigger>
+            <TabsTrigger value="past-listings">Past Listings</TabsTrigger>
+            <TabsTrigger value="ongoing-underwrites">Ongoing Underwrites</TabsTrigger>
+            <TabsTrigger value="past-purchases">Past Purchases</TabsTrigger>
+            <TabsTrigger value="messages">Messages</TabsTrigger>
+            <TabsTrigger value="reviews">Reviews</TabsTrigger>
+            <TabsTrigger value="favorites">Favorites</TabsTrigger>
           </TabsList>
           
-          {/* SELLING TAB CONTENT */}
-          <TabsContent value="selling">
+          {/* CURRENT LISTINGS TAB CONTENT */}
+          <TabsContent value="current-listings">
             {/* Stats for Selling */}
             <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
               {/* Active Listings */}
@@ -186,8 +189,8 @@ export default function DealerDashboard() {
             </div>
           </TabsContent>
           
-          {/* BUYING TAB CONTENT */}
-          <TabsContent value="buying">
+          {/* ONGOING UNDERWRITES TAB CONTENT */}
+          <TabsContent value="ongoing-underwrites">
             {/* Stats for Buying */}
             <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
               {/* Active Bids */}
@@ -297,8 +300,38 @@ export default function DealerDashboard() {
             </div>
           </TabsContent>
 
-          {/* ACTIVITY TAB CONTENT */}
-          <TabsContent value="activity">
+          {/* PAST LISTINGS TAB CONTENT */}
+          <TabsContent value="past-listings">
+            <div className="mt-4">
+              <h2 className="text-xl font-semibold text-gray-900 mb-6">Your Past Listings</h2>
+              <div className="bg-white shadow overflow-hidden sm:rounded-md p-6">
+                <p className="text-gray-500 text-center py-4">
+                  Your completed listings will appear here.
+                </p>
+                <Button className="mt-4 mx-auto block" asChild>
+                  <Link href="/auctions/dealer?filter=completed">View All Past Listings</Link>
+                </Button>
+              </div>
+            </div>
+          </TabsContent>
+          
+          {/* PAST PURCHASES TAB CONTENT */}
+          <TabsContent value="past-purchases">
+            <div className="mt-4">
+              <h2 className="text-xl font-semibold text-gray-900 mb-6">Your Past Purchases</h2>
+              <div className="bg-white shadow overflow-hidden sm:rounded-md p-6">
+                <p className="text-gray-500 text-center py-4">
+                  Your completed purchases will appear here.
+                </p>
+                <Button className="mt-4 mx-auto block" asChild>
+                  <Link href="/auctions?filter=purchased">View All Purchases</Link>
+                </Button>
+              </div>
+            </div>
+          </TabsContent>
+          
+          {/* MESSAGES TAB CONTENT */}
+          <TabsContent value="messages">
             <div className="mt-4">
               <h2 className="text-xl font-semibold text-gray-900 mb-6">Recent Activity</h2>
               <div className="bg-white shadow overflow-hidden sm:rounded-md">
