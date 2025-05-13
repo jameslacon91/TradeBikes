@@ -240,6 +240,43 @@ export class MemStorage implements IStorage {
     };
     this.users.set(trader3.id, trader3);
     
+    // Additional test users
+    const trader4: User = {
+      id: this.userId++,
+      username: 'samdealer',
+      password: bidderPassword,
+      email: 'sam@example.com',
+      role: 'dealer',
+      companyName: 'Sam\'s Superbikes',
+      phone: '07866554433',
+      address: '45 Motorway Lane',
+      city: 'Leeds',
+      postcode: 'LS1 5TY',
+      rating: 5,
+      totalRatings: 22,
+      favoriteDealers: [1, 2],
+      createdAt: new Date()
+    };
+    this.users.set(trader4.id, trader4);
+    
+    const trader5: User = {
+      id: this.userId++,
+      username: 'lucydealer',
+      password: bidderPassword,
+      email: 'lucy@example.com',
+      role: 'dealer',
+      companyName: 'Lucy\'s Luxury Bikes',
+      phone: '07988776655',
+      address: '12 Premium Drive',
+      city: 'Bristol',
+      postcode: 'BS8 4RQ',
+      rating: 4.5,
+      totalRatings: 18,
+      favoriteDealers: [3, 5],
+      createdAt: new Date()
+    };
+    this.users.set(trader5.id, trader5);
+    
     // Create sample motorcycles for dealers
     const motorcycle1: Motorcycle = {
       id: this.motorcycleId++,
@@ -356,6 +393,76 @@ export class MemStorage implements IStorage {
       createdAt: new Date()
     };
     this.motorcycles.set(motorcycle5.id, motorcycle5);
+    
+    // Additional motorcycles for new users
+    const motorcycle6: Motorcycle = {
+      id: this.motorcycleId++,
+      dealerId: trader4.id, // Sam's Superbikes
+      make: 'Triumph',
+      model: 'Speed Triple 1200 RS',
+      year: 2023,
+      mileage: 3450,
+      color: 'Sapphire Black',
+      condition: 'Excellent',
+      engineSize: '1160cc',
+      serviceHistory: 'Full Triumph service history',
+      tyreCondition: 'Excellent - under 2,000 miles',
+      description: 'Nearly new Speed Triple with all the extras. Heated grips, quickshifter, and Arrow exhaust. Stunning condition throughout with full service history. First MOT not due until March next year.',
+      dateAvailable: 'Immediate',
+      regNumber: 'WK23 TRS',
+      auctionDuration: '1week',
+      images: [
+        'https://images.unsplash.com/photo-1580341124464-8c6fb68d9664'
+      ],
+      createdAt: new Date()
+    };
+    this.motorcycles.set(motorcycle6.id, motorcycle6);
+    
+    const motorcycle7: Motorcycle = {
+      id: this.motorcycleId++,
+      dealerId: trader5.id, // Lucy's Luxury Bikes
+      make: 'BMW',
+      model: 'R 1250 GS Adventure',
+      year: 2022,
+      mileage: 8790,
+      color: 'Triple Black',
+      condition: 'Very Good',
+      engineSize: '1254cc',
+      serviceHistory: 'Full BMW dealer history',
+      tyreCondition: 'Good - 50% remaining',
+      description: 'Stunning R 1250 GS Adventure with full luggage and touring pack. Includes heated seats, heated grips, dynamic ESA, riding modes pro, and much more. Minor scuff on left pannier from previous owner.',
+      dateAvailable: 'Immediate',
+      regNumber: 'BY22 BMW',
+      auctionDuration: '3days',
+      images: [
+        'https://images.unsplash.com/photo-1558555808-d053245e175c'
+      ],
+      createdAt: new Date()
+    };
+    this.motorcycles.set(motorcycle7.id, motorcycle7);
+    
+    const motorcycle8: Motorcycle = {
+      id: this.motorcycleId++,
+      dealerId: dealer3.id, // Scott Motors
+      make: 'Harley-Davidson',
+      model: 'Fat Boy 114',
+      year: 2021,
+      mileage: 5230,
+      color: 'Vivid Black',
+      condition: 'Excellent',
+      engineSize: '1868cc',
+      serviceHistory: 'Full H-D dealer history',
+      tyreCondition: 'Excellent',
+      description: 'Beautiful Fat Boy with Screamin\' Eagle stage 1 tune and Vance & Hines exhaust. Meticulously maintained and stored in heated garage. Includes sissy bar, luggage rack, and windshield.',
+      dateAvailable: 'Immediate',
+      regNumber: 'HD21 FAT',
+      auctionDuration: '1week',
+      images: [
+        'https://images.unsplash.com/photo-1572116469696-31de0f17cc34'
+      ],
+      createdAt: new Date()
+    };
+    this.motorcycles.set(motorcycle8.id, motorcycle8);
     
     // Generate sample auctions
     const oneHour = 60 * 60 * 1000;
