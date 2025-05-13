@@ -101,7 +101,7 @@ export default function DealerDashboard() {
                   trend={stats?.trendUp ? { up: true, value: stats.trendValue || 0 } : undefined}
                   className="cursor-pointer transition-transform hover:translate-y-[-5px]"
                 />
-              </Link>
+              </div>
 
               {/* Pending Completion */}
               <div onClick={() => setActiveTab("ongoing-underwrites")}>
