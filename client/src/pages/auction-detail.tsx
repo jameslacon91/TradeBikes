@@ -12,7 +12,13 @@ import { formatTimeDifference, isEndingSoon } from '@/lib/countdownTimer';
 import { AuctionWithDetails } from '@shared/types';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { MessageSquare, Bookmark, Timer, CheckCircle } from 'lucide-react';
+import { MessageSquare, Bookmark, Timer, CheckCircle, Calendar } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { CalendarIcon } from '@radix-ui/react-icons';
+import { Calendar as CalendarComponent } from '@/components/ui/calendar';
+import { format } from 'date-fns';
 import { apiRequest, queryClient } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
 
@@ -26,6 +32,9 @@ export default function AuctionDetail() { // Component name kept as-is for compa
   const [timeLeft, setTimeLeft] = useState<string>('');
   const [endingSoon, setEndingSoon] = useState(false);
   const [showBidSelection, setShowBidSelection] = useState(false);
+  const [selectedBid, setSelectedBid] = useState<number | null>(null);
+  const [availabilityDate, setAvailabilityDate] = useState<Date | null>(null);
+  const [showAvailabilityDialog, setShowAvailabilityDialog] = useState(false);
   const { user } = useAuth();
   const { toast } = useToast();
   
@@ -55,18 +64,24 @@ export default function AuctionDetail() { // Component name kept as-is for compa
   
   // Mutation to accept a bid
   const acceptBidMutation = useMutation({
-    mutationFn: async ({ auctionId, bidId }: { auctionId: number; bidId: number }) => {
-      const res = await apiRequest('POST', `/api/auctions/${auctionId}/accept-bid`, { bidId });
+    mutationFn: async ({ auctionId, bidId, availabilityDate }: { auctionId: number; bidId: number; availabilityDate: Date | null }) => {
+      const res = await apiRequest('POST', `/api/auctions/${auctionId}/accept-bid`, { 
+        bidId, 
+        availabilityDate: availabilityDate ? availabilityDate.toISOString() : null 
+      });
       return await res.json();
     },
     onSuccess: () => {
       toast({
         title: "Bid accepted",
-        description: "The bidder has been notified.",
+        description: "The bidder has been notified and estimated availability date has been set.",
         variant: "default",
       });
       queryClient.invalidateQueries({ queryKey: [`/api/auctions/${auctionId}`] });
       setShowBidSelection(false);
+      setShowAvailabilityDialog(false);
+      setSelectedBid(null);
+      setAvailabilityDate(null);
     },
     onError: (error: Error) => {
       toast({
@@ -76,6 +91,23 @@ export default function AuctionDetail() { // Component name kept as-is for compa
       });
     },
   });
+  
+  // Function to handle bid selection
+  const handleBidSelection = (bidId: number) => {
+    setSelectedBid(bidId);
+    setShowAvailabilityDialog(true);
+  }
+  
+  // Function to finalize bid acceptance with availability date
+  const handleAcceptBidWithAvailability = () => {
+    if (selectedBid === null) return;
+    
+    acceptBidMutation.mutate({ 
+      auctionId: auctionId, 
+      bidId: selectedBid,
+      availabilityDate: availabilityDate
+    });
+  };
   
   // These variables will be set after auction data is loaded
 
@@ -321,35 +353,94 @@ export default function AuctionDetail() { // Component name kept as-is for compa
                       </h4>
                       <p className="text-sm text-yellow-700 mt-1">
                         You have ended this underwrite early. Please select your preferred bid from the list below.
-                        The winning bidder will be notified immediately.
+                        You'll be asked to set an estimated availability date for the motorcycle.
                       </p>
                     </div>
                     
                     <div className="space-y-3 max-h-64 overflow-y-auto pr-2">
-                      {auction.bids.sort((a, b) => b.amount - a.amount).map(bid => (
-                        <div 
-                          key={bid.id} 
-                          className="flex items-center justify-between bg-white p-3 rounded-md border border-gray-200 hover:border-primary transition-colors"
-                        >
-                          <div>
-                            <p className="font-medium">£{bid.amount.toLocaleString()}</p>
-                            <p className="text-xs text-gray-500">
-                              Bid by Dealer #{bid.dealerId} • {(new Date(bid.createdAt as Date)).toLocaleString()}
-                            </p>
-                          </div>
-                          <Button 
-                            variant="default" 
-                            size="sm"
-                            onClick={() => acceptBidMutation.mutate({ auctionId: auction.id, bidId: bid.id })}
-                            disabled={acceptBidMutation.isPending}
+                      {auction.bids.sort((a, b) => b.amount - a.amount).map(bid => {
+                        // Get dealer info for display
+                        const bidder = auction.bidders?.find(d => d.id === bid.dealerId);
+                        const dealerName = bidder ? bidder.companyName : `Dealer #${bid.dealerId}`;
+                        
+                        return (
+                          <div 
+                            key={bid.id} 
+                            className="flex items-center justify-between bg-white p-3 rounded-md border border-gray-200 hover:border-primary transition-colors"
                           >
-                            {acceptBidMutation.isPending ? 'Accepting...' : 'Accept Bid'}
-                          </Button>
-                        </div>
-                      ))}
+                            <div>
+                              <p className="font-medium">£{bid.amount.toLocaleString()}</p>
+                              <p className="text-xs text-gray-500">
+                                {dealerName} • {new Date(bid.createdAt).toLocaleString()}
+                              </p>
+                            </div>
+                            <Button 
+                              variant="default" 
+                              size="sm"
+                              onClick={() => handleBidSelection(bid.id)}
+                              disabled={acceptBidMutation.isPending}
+                            >
+                              {acceptBidMutation.isPending && selectedBid === bid.id 
+                                ? 'Accepting...' 
+                                : 'Accept Bid'
+                              }
+                            </Button>
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
                 )}
+                
+                {/* Availability Date Dialog */}
+                <Dialog open={showAvailabilityDialog} onOpenChange={setShowAvailabilityDialog}>
+                  <DialogContent className="sm:max-w-[425px]">
+                    <DialogHeader>
+                      <DialogTitle>Set Estimated Availability Date</DialogTitle>
+                      <DialogDescription>
+                        Please select when this motorcycle will be available for collection by the winning bidder.
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="grid gap-4 py-4">
+                      <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="availability" className="text-right">
+                          Date
+                        </Label>
+                        <div className="col-span-3">
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <Button
+                                variant="outline"
+                                className={`w-full justify-start text-left font-normal ${!availabilityDate && "text-muted-foreground"}`}
+                              >
+                                <CalendarIcon className="mr-2 h-4 w-4" />
+                                {availabilityDate ? format(availabilityDate, "PPP") : "Select a date"}
+                              </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto p-0">
+                              <CalendarComponent
+                                mode="single"
+                                selected={availabilityDate}
+                                onSelect={setAvailabilityDate}
+                                initialFocus
+                                disabled={(date) => date < new Date()}
+                              />
+                            </PopoverContent>
+                          </Popover>
+                        </div>
+                      </div>
+                    </div>
+                    <DialogFooter>
+                      <Button 
+                        type="submit" 
+                        onClick={handleAcceptBidWithAvailability}
+                        disabled={!availabilityDate || acceptBidMutation.isPending}
+                      >
+                        {acceptBidMutation.isPending ? "Accepting..." : "Accept Bid"}
+                      </Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
                 
                 {/* Bid confirmation widget - show for ended auctions */}
                 {timeLeft === 'Ended' && (dealerOwnsAuction || (isBuyer && user?.id === auction.winningBidderId)) && auction.currentBid && (
