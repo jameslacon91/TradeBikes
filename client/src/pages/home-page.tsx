@@ -86,11 +86,11 @@ export default function HomePage() {
       </div>
 
       {/* Key Features */}
-      <div className="py-24 bg-gray-50">
+      <div className="py-24 bg-card">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold mb-6">Why Choose TradeBikes?</h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            <h2 className="text-3xl md:text-4xl font-bold mb-6 text-foreground">Why Choose TradeBikes?</h2>
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
               Our platform offers a streamlined approach to motorcycle trading with powerful features designed for dealers and traders.
             </p>
           </div>
@@ -166,8 +166,8 @@ export default function HomePage() {
       
         <div className="container mx-auto px-4 relative z-10">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold mb-6">How It Works</h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            <h2 className="text-3xl md:text-4xl font-bold mb-6 text-foreground">How It Works</h2>
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
               Getting started with TradeBikes is simple. Follow these steps to begin trading motorcycles efficiently.
             </p>
           </div>
@@ -247,11 +247,11 @@ export default function HomePage() {
       </div>
 
       {/* User Types */}
-      <div className="py-24 bg-gradient-to-b from-gray-50 to-white">
+      <div className="py-24 bg-background">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold mb-6">Built For Both Buyers & Sellers</h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            <h2 className="text-3xl md:text-4xl font-bold mb-6 text-foreground">Built For Both Buyers & Sellers</h2>
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
               Our platform offers tailored features for both sides of the motorcycle trading ecosystem.
             </p>
           </div>
