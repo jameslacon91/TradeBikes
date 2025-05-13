@@ -111,14 +111,14 @@ export default function AuthPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
+    <div className="min-h-screen bg-primary-dark flex">
       {/* Left column (forms) */}
       <div className="w-full md:w-1/2 flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8">
         <div className="mx-auto w-full max-w-md">
           <div className="flex justify-center mb-6">
             <div className="flex items-center">
-              <TradeBikesLogo className="h-10 w-auto" />
-              <span className="ml-2 text-2xl font-bold text-foreground">TradeBikes</span>
+              <TradeBikesLogo className="h-12 w-auto text-white" />
+              <span className="ml-2 text-3xl font-bold text-white tracking-tight">TradeBikes</span>
             </div>
           </div>
 
@@ -129,8 +129,8 @@ export default function AuthPage() {
             </TabsList>
 
             <TabsContent value="login" className="mt-0">
-              <div className="bg-card py-8 px-4 shadow sm:rounded-lg sm:px-10">
-                <h2 className="text-2xl font-bold text-card-foreground mb-6 text-center">
+              <div className="bg-primary-dark border border-border/30 py-8 px-4 shadow-md sm:rounded-lg sm:px-10">
+                <h2 className="text-2xl font-bold text-white mb-6 text-center">
                   Welcome Back
                 </h2>
                 <Form {...loginForm}>
@@ -140,7 +140,7 @@ export default function AuthPage() {
                       name="username"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Username</FormLabel>
+                          <FormLabel className="text-white">Username</FormLabel>
                           <FormControl>
                             <Input 
                               placeholder="Enter your username" 
@@ -160,7 +160,7 @@ export default function AuthPage() {
                       name="password"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Password</FormLabel>
+                          <FormLabel className="text-white">Password</FormLabel>
                           <FormControl>
                             <Input 
                               type="password" 
@@ -213,8 +213,8 @@ export default function AuthPage() {
             </TabsContent>
 
             <TabsContent value="register" className="mt-0">
-              <div className="bg-card py-8 px-4 shadow sm:rounded-lg sm:px-10">
-                <h2 className="text-2xl font-bold text-card-foreground mb-6 text-center">
+              <div className="bg-primary-dark border border-border/30 py-8 px-4 shadow-md sm:rounded-lg sm:px-10">
+                <h2 className="text-2xl font-bold text-white mb-6 text-center">
                   Create Your Account
                 </h2>
                 <Form {...registerForm}>
@@ -226,7 +226,7 @@ export default function AuthPage() {
                       name="companyName"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Company Name</FormLabel>
+                          <FormLabel className="text-white">Company Name</FormLabel>
                           <FormControl>
                             <Input placeholder="Your company name" {...field} />
                           </FormControl>
@@ -241,7 +241,7 @@ export default function AuthPage() {
                         name="username"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Username</FormLabel>
+                            <FormLabel className="text-white">Username</FormLabel>
                             <FormControl>
                               <Input 
                               placeholder="Choose a username" 
@@ -261,7 +261,7 @@ export default function AuthPage() {
                         name="email"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Email</FormLabel>
+                            <FormLabel className="text-white">Email</FormLabel>
                             <FormControl>
                               <Input type="email" placeholder="Your email address" {...field} />
                             </FormControl>
@@ -276,7 +276,7 @@ export default function AuthPage() {
                       name="password"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Password</FormLabel>
+                          <FormLabel className="text-white">Password</FormLabel>
                           <FormControl>
                             <Input 
                               type="password" 
@@ -297,7 +297,7 @@ export default function AuthPage() {
                       name="phone"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Phone (Optional)</FormLabel>
+                          <FormLabel className="text-white">Phone (Optional)</FormLabel>
                           <FormControl>
                             <Input placeholder="Your phone number" {...field} />
                           </FormControl>
@@ -312,7 +312,7 @@ export default function AuthPage() {
                         name="city"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>City (Optional)</FormLabel>
+                            <FormLabel className="text-white">City (Optional)</FormLabel>
                             <FormControl>
                               <Input placeholder="Your city" {...field} />
                             </FormControl>
@@ -326,7 +326,7 @@ export default function AuthPage() {
                         name="postcode"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Postcode (Optional)</FormLabel>
+                            <FormLabel className="text-white">Postcode (Optional)</FormLabel>
                             <FormControl>
                               <Input placeholder="Your postcode" {...field} />
                             </FormControl>
@@ -341,7 +341,7 @@ export default function AuthPage() {
                       name="address"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Address (Optional)</FormLabel>
+                          <FormLabel className="text-white">Address (Optional)</FormLabel>
                           <FormControl>
                             <Input placeholder="Your address" {...field} />
                           </FormControl>
