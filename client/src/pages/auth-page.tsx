@@ -196,6 +196,16 @@ export default function AuthPage() {
                       <p className="text-center text-sm text-muted-foreground">
                         Test account: <code>johndealer</code> / <code>password123</code>
                       </p>
+                      <div className="mt-4 text-center">
+                        <Button
+                          type="button"
+                          variant="outline" 
+                          className="w-full"
+                          onClick={() => setActiveTab("register")}
+                        >
+                          Register New Account
+                        </Button>
+                      </div>
                     </div>
                   </form>
                 </Form>
