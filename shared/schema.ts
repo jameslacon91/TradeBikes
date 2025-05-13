@@ -101,10 +101,27 @@ export const insertUserSchema = createInsertSchema(users).omit({
   totalRatings: true 
 });
 
-export const insertMotorcycleSchema = createInsertSchema(motorcycles).omit({ 
-  id: true, 
-  createdAt: true 
-});
+export const insertMotorcycleSchema = createInsertSchema(motorcycles)
+  .omit({ 
+    id: true, 
+    createdAt: true 
+  })
+  .extend({
+    // Make these fields optional
+    model: z.string().optional(),
+    year: z.number().optional(),
+    mileage: z.number().optional(),
+    color: z.string().optional(),
+    condition: z.string().optional(),
+    engineSize: z.string().optional(),
+    description: z.string().optional(),
+    serviceHistory: z.string().optional(),
+    tyreCondition: z.string().optional(),
+    dateAvailable: z.string().optional(),
+    regNumber: z.string().optional(),
+    auctionDuration: z.string().optional(),
+    images: z.array(z.string()).optional()
+  });
 
 export const insertAuctionSchema = createInsertSchema(auctions).omit({ 
   id: true,

@@ -904,9 +904,28 @@ export class MemStorage implements IStorage {
   async createMotorcycle(insertMotorcycle: InsertMotorcycle): Promise<Motorcycle> {
     const id = this.motorcycleId++;
     
+    // Set default values for optional fields
+    const defaults = {
+      model: insertMotorcycle.model || '',
+      year: insertMotorcycle.year || new Date().getFullYear(),
+      mileage: insertMotorcycle.mileage || 0,
+      color: insertMotorcycle.color || 'Unknown',
+      condition: insertMotorcycle.condition || 'Good',
+      engineSize: insertMotorcycle.engineSize || '',
+      description: insertMotorcycle.description || '',
+      serviceHistory: insertMotorcycle.serviceHistory || '',
+      tyreCondition: insertMotorcycle.tyreCondition || '',
+      dateAvailable: insertMotorcycle.dateAvailable || '',
+      regNumber: insertMotorcycle.regNumber || '',
+      auctionDuration: insertMotorcycle.auctionDuration || '1week',
+      images: insertMotorcycle.images || []
+    };
+    
     const motorcycle: Motorcycle = { 
       id,
-      ...insertMotorcycle,
+      dealerId: insertMotorcycle.dealerId,
+      make: insertMotorcycle.make || 'Unknown',
+      ...defaults,
       createdAt: new Date()
     };
     
