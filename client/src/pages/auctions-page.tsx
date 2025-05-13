@@ -16,9 +16,9 @@ export default function AuctionsPage() {
         <div className="px-4 py-6 sm:px-0">
           <div className="flex justify-between items-center mb-8">
             <div>
-              <h1 className="text-2xl font-semibold text-gray-900">Underwrites</h1>
+              <h1 className="text-2xl font-semibold text-gray-900">My Bids</h1>
               <p className="mt-1 text-sm text-gray-500">
-                Browse and bid on motorcycles currently available for underwriting.
+                View all the bids you've placed on motorcycles.
               </p>
             </div>
             

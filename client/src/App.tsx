@@ -145,7 +145,7 @@ function MainNavigation() {
                       className="text-white bg-primary hover:bg-primary/80 rounded-md px-3 py-2 flex items-center ml-2"
                     >
                       <TrendingUp className="w-4 h-4 mr-1" />
-                      Bid On Underwrites
+                      Browse Listings
                     </Link>
                   </li>
                   
@@ -215,7 +215,7 @@ function MainNavigation() {
                         className="flex items-center justify-center py-3 text-white bg-primary hover:bg-primary-dark rounded-md"
                       >
                         <TrendingUp className="w-5 h-5 mr-2" />
-                        Bid On Underwrites
+                        Browse Listings
                       </Link>
                     </li>
                     

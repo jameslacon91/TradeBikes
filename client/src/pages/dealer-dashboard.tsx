@@ -71,15 +71,9 @@ export default function DealerDashboard() {
             </div>
             <div className="flex space-x-2">
               <Link href="/create-auction">
-                <Button className="bg-primary hover:bg-primary/90">
+                <Button className="bg-amber-500 hover:bg-amber-600">
                   <Gavel className="mr-2 h-5 w-5" />
                   List Motorcycle
-                </Button>
-              </Link>
-              <Link href="/auctions">
-                <Button variant="outline">
-                  <Search className="mr-2 h-5 w-5" />
-                  View Underwrites
                 </Button>
               </Link>
             </div>
