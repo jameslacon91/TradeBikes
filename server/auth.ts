@@ -16,6 +16,20 @@ declare global {
   }
 }
 
+// Function to help debug session issues
+const debugSession = (req: any) => {
+  try {
+    console.log('DEBUG SESSION:', {
+      id: req.sessionID,
+      cookie: JSON.stringify(req.session.cookie),
+      passport: req.session.passport ? 'Exists' : 'Missing',
+      user: req.user ? 'Authenticated' : 'Unauthenticated',
+    });
+  } catch (e) {
+    console.log('Error debugging session:', e);
+  }
+};
+
 export function setupAuth(app: Express) {
   const sessionStore = new MemoryStore({
     checkPeriod: 86400000 // prune expired entries every 24h
@@ -52,12 +66,13 @@ export function setupAuth(app: Express) {
 
   const sessionSettings: session.SessionOptions = {
     secret: sessionSecret,
-    resave: false,
-    saveUninitialized: true, // Changed to true for better compatibility
+    resave: true, // Changed to true to ensure session is saved on every request
+    saveUninitialized: false, // Set to false for login sessions
     store: sessionStore,
     cookie: cookieSettings,
     // For Replit deployment, allow sessions without full security in dev
-    proxy: true
+    proxy: true,
+    name: 'tradebikes.sid' // Custom session name to avoid conflicts
   };
 
   // Trust proxy is required for secure cookies over HTTPS connections on Replit
@@ -175,6 +190,16 @@ export function setupAuth(app: Express) {
           return next(err);
         }
         console.log(`New user logged in: ${username}`);
+        debugSession(req);
+        
+        // Set a cookie header to help with cross-domain issues
+        res.cookie('loggedIn', 'true', {
+          httpOnly: false, // Readable by browser
+          maxAge: 24 * 60 * 60 * 1000, // 24 hours
+          sameSite: 'none',
+          secure: false, // Will be true in production
+        });
+        
         res.status(201).json(userWithoutPassword);
       });
     } catch (error) {
@@ -206,9 +231,19 @@ export function setupAuth(app: Express) {
         }
         
         console.log(`Login session created for: ${user.username}`);
+        debugSession(req);
         
         // Remove password from response
         const { password, ...userWithoutPassword } = user;
+        
+        // Set a cookie header to help with cross-domain issues
+        res.cookie('loggedIn', 'true', {
+          httpOnly: false, // Readable by browser
+          maxAge: 24 * 60 * 60 * 1000, // 24 hours
+          sameSite: 'none',
+          secure: false, // Will be true in production
+        });
+        
         return res.status(200).json(userWithoutPassword);
       });
     })(req, res, next);
@@ -223,14 +258,14 @@ export function setupAuth(app: Express) {
 
   app.get("/api/user", (req, res) => {
     console.log("GET /api/user - Auth status:", req.isAuthenticated());
-    console.log("Session data:", req.session);
+    debugSession(req);
     
     if (!req.isAuthenticated()) {
       console.log("User not authenticated");
       return res.status(401).json({ message: "Not authenticated" });
     }
     
-    console.log("User authenticated:", req.user.username);
+    console.log("User authenticated:", req.user?.username);
     
     // Remove password from response
     const { password, ...userWithoutPassword } = req.user;
