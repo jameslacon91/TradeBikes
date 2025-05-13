@@ -10,33 +10,17 @@ import {
   TrendingUp
 } from "lucide-react";
 import Layout from "@/components/layout/Layout";
-import { heroBg, motorcycleAuction, motorcycleDarkBlue } from "@/assets/images";
+import { motorcycleAuction } from "@/assets/images";
 
 export default function HomePage() {
   return (
     <Layout>
       {/* Hero Section */}
-      <div className="relative overflow-hidden">
-        {/* Motorcycle Background Image */}
-        <div className="absolute inset-0 z-0">
-          <img 
-            src={heroBg} 
-            alt="Motorcycle background" 
-            className="w-full h-full object-cover"
-          />
-        </div>
-        {/* Dark overlay with motorcycle logo */}
-        <div className="absolute inset-0 z-0 bg-gradient-to-r from-black/75 to-primary-dark/85 flex items-center justify-center">
-          <img 
-            src={motorcycleDarkBlue} 
-            alt="Motorcycle logo" 
-            className="w-full max-w-md opacity-30"
-          />
-        </div>
-        
-        <div className="container relative z-10 mx-auto px-4 py-12 md:py-16">
+      <div className="relative overflow-hidden bg-primary-dark">
+        {/* Simple solid background color */}
+        <div className="container relative z-10 mx-auto px-4 py-10 md:py-14">
           <div className="flex flex-col items-center text-center mb-6">
-            {/* No logo here anymore, using the background image */}
+            {/* No logo or background images */}
           </div>
           
           <div className="max-w-3xl mx-auto text-center">
