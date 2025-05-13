@@ -140,6 +140,10 @@ export default function AuctionDetail() { // Component name kept as-is for compa
   // Update countdown timer
   useEffect(() => {
     if (!auction) return;
+    
+    // Debug log
+    console.log('Auction loaded:', auction);
+    console.log('Bids available:', auction.bids);
 
     const updateTimer = () => {
       setTimeLeft(formatTimeDifference(new Date(auction.endTime)));
