@@ -118,7 +118,7 @@ export default function AuthPage() {
           <div className="flex justify-center mb-6">
             <div className="flex items-center">
               <TradeBikesLogo className="h-10 w-auto" />
-              <span className="ml-2 text-2xl font-bold text-gray-900">TradeBikes</span>
+              <span className="ml-2 text-2xl font-bold text-foreground">TradeBikes</span>
             </div>
           </div>
 
@@ -193,7 +193,7 @@ export default function AuthPage() {
                         ) : "Sign In"}
                       </Button>
                       
-                      <p className="text-center text-sm text-gray-500">
+                      <p className="text-center text-sm text-muted-foreground">
                         Test account: <code>johndealer</code> / <code>password123</code>
                       </p>
                     </div>
@@ -203,8 +203,8 @@ export default function AuthPage() {
             </TabsContent>
 
             <TabsContent value="register" className="mt-0">
-              <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
-                <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">
+              <div className="bg-card py-8 px-4 shadow sm:rounded-lg sm:px-10">
+                <h2 className="text-2xl font-bold text-card-foreground mb-6 text-center">
                   Create Your Account
                 </h2>
                 <Form {...registerForm}>

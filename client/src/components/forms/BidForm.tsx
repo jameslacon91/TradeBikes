@@ -32,10 +32,7 @@ export default function BidForm({ auctionId, currentBid, isStock = false }: BidF
 
   // Create zod schema for bid validation
   const bidSchema = z.object({
-    amount: z.preprocess(
-      (a) => parseInt(z.string().parse(a), 10),
-      z.number().int("Bid must be a whole number").positive("Bid must be a positive number")
-    ),
+    amount: z.string().min(1, "Bid amount is required"),
     comments: z.string().optional(),
   });
 
@@ -54,7 +51,7 @@ export default function BidForm({ auctionId, currentBid, isStock = false }: BidF
     mutationFn: async (data: BidFormValues) => {
       const res = await apiRequest("POST", "/api/bids", {
         auctionId,
-        amount: data.amount,
+        amount: parseInt(data.amount, 10),
         comments: data.comments,
       });
       return await res.json();
@@ -90,12 +87,23 @@ export default function BidForm({ auctionId, currentBid, isStock = false }: BidF
       return;
     }
     
+    // Validate amount is a number before submitting
+    const amount = parseInt(data.amount, 10);
+    if (isNaN(amount) || amount <= 0) {
+      toast({
+        title: "Invalid amount",
+        description: "Please enter a valid positive number for your bid.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     bidMutation.mutate(data);
   }
 
   return (
     <div>
-      <h4 className="text-sm font-medium text-gray-500 mb-2">
+      <h4 className="text-sm font-medium text-muted-foreground mb-2">
         {isStock ? 'Make Offer on Stock' : 'Place Your Bid'}
       </h4>
       <Form {...form}>
