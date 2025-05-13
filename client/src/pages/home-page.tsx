@@ -10,7 +10,7 @@ import {
   TrendingUp
 } from "lucide-react";
 import Layout from "@/components/layout/Layout";
-import { motorcycleAuction } from "@/assets/images";
+
 
 export default function HomePage() {
   return (
@@ -34,7 +34,7 @@ export default function HomePage() {
               TradeBikes is the modern way to trade used motorcycles between dealerships and traders with real-time auctions.
             </p>
             <div className="flex flex-wrap gap-4 justify-center">
-              <Link href="/register">
+              <Link href="/auth">
                 <Button size="lg" className="bg-white text-primary hover:bg-gray-100 shadow-lg hover:shadow-xl transition-all duration-300">
                   Register Now
                 </Button>
@@ -185,18 +185,14 @@ export default function HomePage() {
             </div>
             
             <div className="md:flex-1">
-              <div className="bg-white rounded-2xl shadow-xl overflow-hidden relative h-[500px]">
-                <div className="absolute inset-0 bg-gradient-to-br from-gray-800 to-gray-900 z-0"></div>
-                <img 
-                  src={motorcycleAuction}
-                  alt="Motorcycle auction process" 
-                  className="absolute inset-0 w-full h-full object-cover z-0 opacity-80"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent z-10"></div>
+              <div className="bg-primary-dark rounded-2xl shadow-xl overflow-hidden relative h-[500px]">
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <Bike className="h-32 w-32 text-primary-foreground/10" strokeWidth={1} />
+                </div>
                 <div className="absolute bottom-0 left-0 right-0 p-8 z-20">
                   <p className="text-sm text-amber-300 font-medium mb-2">READY TO GET STARTED?</p>
                   <h3 className="text-2xl font-bold text-white mb-4">Join hundreds of dealers and traders on TradeBikes</h3>
-                  <Link href="/register">
+                  <Link href="/auth">
                     <Button className="bg-white text-primary hover:bg-gray-100">
                       Register Now
                     </Button>
@@ -281,7 +277,7 @@ export default function HomePage() {
                     </li>
                   </ul>
                   
-                  <Link href="/register">
+                  <Link href="/auth">
                     <Button className="bg-primary hover:bg-primary-dark text-white w-full md:w-auto transition-all duration-300 shadow-md hover:shadow-lg">
                       Register Now
                     </Button>
@@ -350,7 +346,7 @@ export default function HomePage() {
                     </li>
                   </ul>
                   
-                  <Link href="/register">
+                  <Link href="/auth">
                     <Button className="bg-amber-500 hover:bg-amber-600 text-white w-full md:w-auto transition-all duration-300 shadow-md hover:shadow-lg">
                       Register Now
                     </Button>
