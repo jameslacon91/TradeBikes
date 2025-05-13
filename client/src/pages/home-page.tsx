@@ -10,7 +10,7 @@ import {
   TrendingUp
 } from "lucide-react";
 import Layout from "@/components/layout/Layout";
-import { heroBg, motorcycleAuction } from "@/assets/images";
+import { heroBg, motorcycleAuction, motorcycleLogoBg } from "@/assets/images";
 import tradeBikesLogo from "@/assets/logos/logo-color.pdf";
 
 export default function HomePage() {
@@ -29,31 +29,26 @@ export default function HomePage() {
         {/* Dark overlay */}
         <div className="absolute inset-0 z-0 bg-gradient-to-r from-black/70 to-primary-dark/80"></div>
         
-        <div className="container relative z-10 mx-auto px-4 py-20 md:py-28">
-          <div className="flex flex-col items-center text-center mb-12">
+        <div className="container relative z-10 mx-auto px-4 py-12 md:py-16">
+          <div className="flex flex-col items-center text-center mb-6">
             {/* Logo */}
-            <div className="w-48 h-48 mb-8 relative">
-              <object 
-                data={tradeBikesLogo} 
-                type="application/pdf"
-                className="w-full h-full" 
-                aria-label="TradeBikes logo"
-              >
-                <div className="bg-white rounded-full p-4">
-                  <Bike className="w-full h-full text-primary" />
-                </div>
-              </object>
+            <div className="w-32 h-32 mb-4 relative">
+              <img 
+                src={motorcycleLogoBg} 
+                alt="TradeBikes logo" 
+                className="w-full h-full"
+              />
             </div>
           </div>
           
           <div className="max-w-3xl mx-auto text-center">
-            <div className="inline-block mb-4 bg-white/20 backdrop-blur-sm px-4 py-1 rounded-full">
+            <div className="inline-block mb-2 bg-white/20 backdrop-blur-sm px-4 py-1 rounded-full">
               <p className="text-white text-sm font-medium">B2B Motorcycle Trading Platform</p>
             </div>
-            <h1 className="text-4xl md:text-5xl font-bold text-white mb-6 leading-tight">
+            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3 leading-tight">
               Revolutionizing <span className="text-amber-200">Motorcycle Trading</span>
             </h1>
-            <p className="text-xl text-white/90 mb-8 leading-relaxed">
+            <p className="text-lg text-white/90 mb-5 leading-relaxed">
               TradeBikes is the modern way to trade used motorcycles between dealerships and traders with real-time auctions.
             </p>
             <div className="flex flex-wrap gap-4 justify-center">
@@ -63,7 +58,7 @@ export default function HomePage() {
                 </Button>
               </Link>
             </div>
-            <p className="mt-6 text-white/70 text-sm">
+            <p className="mt-4 text-white/70 text-sm">
               Free 1-month trial • £125/month + VAT thereafter • No credit card required
             </p>
           </div>
