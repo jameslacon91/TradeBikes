@@ -3,7 +3,7 @@ import { Link, useLocation } from 'wouter';
 import { useAuth } from '@/hooks/use-auth';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import NotificationsPopover from '@/components/notifications/NotificationsPopover';
+import NotificationCenter from '@/components/notifications/NotificationCenter';
 import { TradeBikesLogo } from '@/components/logo';
 import {
   DropdownMenu,
