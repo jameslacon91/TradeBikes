@@ -102,11 +102,24 @@ export default function AuctionDetail() { // Component name kept as-is for compa
   const handleAcceptBidWithAvailability = () => {
     if (selectedBid === null) return;
     
+    // Ensure we have a valid date before submitting
+    if (!availabilityDate) {
+      toast({
+        title: "Error",
+        description: "Please select an availability date",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     acceptBidMutation.mutate({ 
       auctionId: auctionId, 
       bidId: selectedBid,
       availabilityDate: availabilityDate
     });
+    
+    // Close the dialog
+    setShowAvailabilityDialog(false);
   };
   
   // These variables will be set after auction data is loaded
@@ -419,14 +432,14 @@ export default function AuctionDetail() { // Component name kept as-is for compa
                                 className={`w-full justify-start text-left font-normal ${!availabilityDate && "text-muted-foreground"}`}
                               >
                                 <CalendarIcon className="mr-2 h-4 w-4" />
-                                {availabilityDate ? format(availabilityDate, "PPP") : "Select a date"}
+                                {availabilityDate instanceof Date ? format(availabilityDate, "PPP") : "Select a date"}
                               </Button>
                             </PopoverTrigger>
                             <PopoverContent className="w-auto p-0">
                               <CalendarComponent
                                 mode="single"
                                 selected={availabilityDate}
-                                onSelect={setAvailabilityDate}
+                                onSelect={(date) => setAvailabilityDate(date)}
                                 initialFocus
                                 disabled={(date) => date < new Date()}
                               />
