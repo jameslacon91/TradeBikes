@@ -51,6 +51,7 @@ export interface IStorage {
   
   // Bid methods
   createBid(bid: InsertBid): Promise<Bid>;
+  getBid(id: number): Promise<Bid | undefined>;
   getBidsByAuctionId(auctionId: number): Promise<Bid[]>;
   getHighestBidForAuction(auctionId: number): Promise<Bid | undefined>;
   

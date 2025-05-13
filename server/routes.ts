@@ -388,7 +388,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/auctions/:id/accept-bid", isAuthenticated, hasRole("dealer"), async (req, res, next) => {
     try {
       const auctionId = parseInt(req.params.id);
-      const { bidId, bidderId } = req.body;
+      const { bidId, availabilityDate } = req.body;
       
       const auction = await storage.getAuction(auctionId);
       
@@ -400,13 +400,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Not authorized to accept bids for this auction" });
       }
       
+      // Fetch the bid to get bidder ID
+      const bid = await storage.getBid(bidId);
+      if (!bid) {
+        return res.status(404).json({ message: "Bid not found" });
+      }
+      
+      // Update the motorcycle availability date if provided
+      if (availabilityDate) {
+        await storage.updateMotorcycle(auction.motorcycleId, {
+          dateAvailable: new Date(availabilityDate)
+        });
+      }
+      
       const updatedAuction = await storage.updateAuction(auctionId, {
         bidAccepted: true,
         winningBidId: bidId,
-        winningBidderId: bidderId,
+        winningBidderId: bid.dealerId,
         status: "completed"
       });
 
+      // Fetch updated motorcycle with potential availability date
+      const motorcycle = await storage.getMotorcycle(auction.motorcycleId);
+      
       // Send notification via WebSocket to the winning bidder
       const wsMessage: WSMessage = {
         type: "bid_accepted",
@@ -414,18 +430,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
           auctionId: auctionId,
           motorcycleId: auction.motorcycleId,
           sellerId: auction.dealerId,
-          bidderId: bidderId
+          bidderId: bid.dealerId,
+          availabilityDate: motorcycle?.dateAvailable || null
         },
         timestamp: Date.now()
       };
       
-      sendToUser(bidderId, wsMessage);
+      sendToUser(bid.dealerId, wsMessage);
       
-      // Create a notification record
+      // Create a notification record with availability info
+      const availabilityInfo = motorcycle?.dateAvailable 
+        ? ` It will be available for collection on ${new Date(motorcycle.dateAvailable).toLocaleDateString()}.`
+        : '';
+        
       await storage.createNotification({
-        userId: bidderId,
+        userId: bid.dealerId,
         type: "bid_accepted",
-        content: `Your bid on auction #${auctionId} has been accepted.`,
+        content: `Your bid on ${motorcycle?.make} ${motorcycle?.model} has been accepted.${availabilityInfo}`,
         relatedId: auctionId
       });
       
