@@ -1,19 +1,47 @@
-import { Bid } from '@shared/schema';
+import { Bid, User } from '@shared/schema';
 import { useQuery } from '@tanstack/react-query';
 import { timeAgo } from '@/lib/countdownTimer';
+import { useAuth } from '@/hooks/use-auth';
 
 interface BidHistoryProps {
   auctionId: number;
   currentBid?: number;
 }
 
+interface DealerInfo {
+  id: number;
+  username: string;
+  companyName: string;
+  rating: number | null;
+  totalRatings: number | null;
+}
+
 export default function BidHistory({ auctionId, currentBid }: BidHistoryProps) {
-  const { data: bids = [], isLoading } = useQuery<Bid[]>({
+  const { user } = useAuth();
+  const { data: bids = [], isLoading: bidsLoading } = useQuery<Bid[]>({
     queryKey: [`/api/bids/auction/${auctionId}`],
+  });
+
+  // Fetch dealer information
+  const { data: dealers = [], isLoading: dealersLoading } = useQuery<DealerInfo[]>({
+    queryKey: ['/api/dealers'],
   });
 
   // Sort bids by amount (highest first)
   const sortedBids = [...bids].sort((a, b) => b.amount - a.amount);
+  const isLoading = bidsLoading || dealersLoading;
+
+  // Function to get dealer name from its ID
+  const getDealerName = (dealerId: number): string => {
+    // Check if it's the current user
+    if (user && user.id === dealerId) {
+      return user.companyName || `${user.username}'s Company`;
+    }
+    
+    // Check other dealers
+    const dealer = dealers.find(d => d.id === dealerId);
+    return dealer ? dealer.companyName : `Dealer #${dealerId}`;
+  };
 
   if (isLoading) {
     return (
@@ -52,7 +80,7 @@ export default function BidHistory({ auctionId, currentBid }: BidHistoryProps) {
           <tbody className="bg-white divide-y divide-gray-200">
             {sortedBids.map((bid) => (
               <tr key={bid.id} className={bid.amount === currentBid ? "bg-green-50" : ""}>
-                <td className="px-3 py-2 whitespace-nowrap text-xs font-medium text-gray-900">Trader #{bid.traderId}</td>
+                <td className="px-3 py-2 whitespace-nowrap text-xs font-medium text-gray-900">{getDealerName(bid.dealerId)}</td>
                 <td className="px-3 py-2 whitespace-nowrap text-xs text-gray-900 text-right">£{bid.amount.toLocaleString()}</td>
                 <td className="px-3 py-2 whitespace-nowrap text-xs text-gray-500 text-right">{bid.createdAt ? timeAgo(new Date(bid.createdAt)) : ''}</td>
               </tr>
