@@ -10,7 +10,8 @@ import {
   TrendingUp
 } from "lucide-react";
 import Layout from "@/components/layout/Layout";
-import logoBg from "@/assets/images/logo-background.png";
+import heroBg from "@/assets/images/bike-hero-bg.png";
+import tradeBikesLogo from "@/assets/logos/logo-color.pdf";
 
 export default function HomePage() {
   return (
@@ -20,67 +21,51 @@ export default function HomePage() {
         {/* Motorcycle Background Image */}
         <div className="absolute inset-0 z-0">
           <img 
-            src={logoBg} 
+            src={heroBg} 
             alt="Motorcycle background" 
-            className="w-full h-full object-contain opacity-10"
+            className="w-full h-full object-cover"
           />
         </div>
         {/* Dark overlay */}
-        <div className="absolute inset-0 z-0 bg-gradient-to-r from-primary/80 to-primary-dark/80"></div>
+        <div className="absolute inset-0 z-0 bg-gradient-to-r from-primary/60 to-primary-dark/70"></div>
         
         <div className="container relative z-10 mx-auto px-4 py-20 md:py-28">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-            <div>
-              <div className="inline-block mb-4 bg-white/20 backdrop-blur-sm px-4 py-1 rounded-full">
-                <p className="text-white text-sm font-medium">B2B Motorcycle Trading Platform</p>
-              </div>
-              <h1 className="text-4xl md:text-5xl font-bold text-white mb-6 leading-tight">
-                Revolutionizing <span className="text-amber-200">Motorcycle Trading</span>
-              </h1>
-              <p className="text-xl text-white/90 mb-8 leading-relaxed">
-                TradeBikes is the modern way to trade used motorcycles between dealerships and traders with real-time auctions.
-              </p>
-              <div className="flex flex-wrap gap-4">
-                <Link href="/register">
-                  <Button size="lg" className="bg-white text-primary hover:bg-gray-100 shadow-lg hover:shadow-xl transition-all duration-300">
-                    Register Now
-                  </Button>
-                </Link>
-              </div>
-              <p className="mt-6 text-white/70 text-sm">
-                Free 1-month trial • £125/month + VAT thereafter • No credit card required
-              </p>
-            </div>
-            <div className="hidden md:block">
-              <div className="bg-white/10 backdrop-blur-md p-6 rounded-2xl shadow-xl border border-white/20">
-                <div className="aspect-video bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl mb-4 flex items-center justify-center overflow-hidden relative">
-                  <div className="absolute inset-0 bg-black/20"></div>
-                  <img 
-                    src="https://images.unsplash.com/photo-1571646750134-f19967f97042"
-                    alt="Motorcycle auction preview"
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-1 rounded-md">
-                    LIVE
-                  </div>
+          <div className="flex flex-col items-center text-center mb-12">
+            {/* Logo */}
+            <div className="w-48 h-48 mb-8 relative">
+              <object 
+                data={tradeBikesLogo} 
+                type="application/pdf"
+                className="w-full h-full" 
+                aria-label="TradeBikes logo"
+              >
+                <div className="bg-white rounded-full p-4">
+                  <Bike className="w-full h-full text-primary" />
                 </div>
-                <div className="flex justify-between mb-4">
-                  <div>
-                    <p className="text-sm text-white/70">Current Bid</p>
-                    <p className="text-xl font-bold text-white">£5,850</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-white/70">Time Left</p>
-                    <p className="text-xl font-bold text-amber-300">01:23:45</p>
-                  </div>
-                </div>
-                <Link href="/register" className="w-full">
-                  <Button className="w-full bg-amber-500 hover:bg-amber-600 text-white" size="lg">
-                    Join Now
-                  </Button>
-                </Link>
-              </div>
+              </object>
             </div>
+          </div>
+          
+          <div className="max-w-3xl mx-auto text-center">
+            <div className="inline-block mb-4 bg-white/20 backdrop-blur-sm px-4 py-1 rounded-full">
+              <p className="text-white text-sm font-medium">B2B Motorcycle Trading Platform</p>
+            </div>
+            <h1 className="text-4xl md:text-5xl font-bold text-white mb-6 leading-tight">
+              Revolutionizing <span className="text-amber-200">Motorcycle Trading</span>
+            </h1>
+            <p className="text-xl text-white/90 mb-8 leading-relaxed">
+              TradeBikes is the modern way to trade used motorcycles between dealerships and traders with real-time auctions.
+            </p>
+            <div className="flex flex-wrap gap-4 justify-center">
+              <Link href="/register">
+                <Button size="lg" className="bg-white text-primary hover:bg-gray-100 shadow-lg hover:shadow-xl transition-all duration-300">
+                  Register Now
+                </Button>
+              </Link>
+            </div>
+            <p className="mt-6 text-white/70 text-sm">
+              Free 1-month trial • £125/month + VAT thereafter • No credit card required
+            </p>
           </div>
         </div>
       </div>
