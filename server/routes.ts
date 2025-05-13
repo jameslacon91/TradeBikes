@@ -408,9 +408,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Update the motorcycle availability date if provided
       if (availabilityDate) {
-        const dateAvailable = new Date(availabilityDate);
+        const dateObj = new Date(availabilityDate);
         await storage.updateMotorcycle(auction.motorcycleId, {
-          dateAvailable
+          dateAvailable: dateObj.toISOString()
         });
       }
       
@@ -432,7 +432,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
           motorcycleId: auction.motorcycleId,
           sellerId: auction.dealerId,
           bidderId: bid.dealerId,
-          availabilityDate: motorcycle?.dateAvailable || null
+          availabilityDate: motorcycle?.dateAvailable || null,
+          make: motorcycle?.make || '',
+          model: motorcycle?.model || '',
+          year: motorcycle?.year || 0
         },
         timestamp: Date.now()
       };
