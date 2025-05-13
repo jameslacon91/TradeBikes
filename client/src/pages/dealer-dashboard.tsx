@@ -80,7 +80,7 @@ export default function DealerDashboard() {
             {/* Stats for Selling */}
             <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
               {/* Active Listings */}
-              <Link href="/listing/active">
+              <div onClick={() => setActiveTab("current-listings")}>
                 <StatCard 
                   title="Active Listings" 
                   value={statsLoading ? "Loading..." : stats?.activeListings || 0}
@@ -89,7 +89,7 @@ export default function DealerDashboard() {
                   trend={stats?.trendUp ? { up: true, value: stats.trendValue || 0 } : undefined}
                   className="cursor-pointer transition-transform hover:translate-y-[-5px]"
                 />
-              </Link>
+              </div>
 
               {/* Total Bids */}
               <Link href="/bids/received">

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useLocation } from "wouter";
+import { useLocation, Link } from "wouter";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -201,9 +201,9 @@ export default function AuthPage() {
                           type="button"
                           variant="outline" 
                           className="w-full"
-                          onClick={() => setActiveTab("register")}
+                          asChild
                         >
-                          Register New Account
+                          <Link href="/register">Register New Account</Link>
                         </Button>
                       </div>
                     </div>
