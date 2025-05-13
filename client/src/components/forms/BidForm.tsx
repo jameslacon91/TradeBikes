@@ -20,9 +20,10 @@ import { Button } from '@/components/ui/button';
 interface BidFormProps {
   auctionId: number;
   currentBid?: number;
+  isStock?: boolean; // Flag to determine if this is a stock listing
 }
 
-export default function BidForm({ auctionId, currentBid }: BidFormProps) {
+export default function BidForm({ auctionId, currentBid, isStock = false }: BidFormProps) {
   const { user } = useAuth();
   const { sendMessage } = useWebSocket();
   const { toast } = useToast();
@@ -108,7 +109,9 @@ export default function BidForm({ auctionId, currentBid }: BidFormProps) {
 
   return (
     <div>
-      <h4 className="text-sm font-medium text-gray-500 mb-2">Place Your Bid</h4>
+      <h4 className="text-sm font-medium text-gray-500 mb-2">
+        {isStock ? 'Make Offer on Stock' : 'Place Your Bid'}
+      </h4>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
           <div className="flex flex-col sm:flex-row items-center gap-2">
@@ -160,7 +163,9 @@ export default function BidForm({ auctionId, currentBid }: BidFormProps) {
               className="bg-accent hover:bg-accent-dark"
               disabled={bidMutation.isPending}
             >
-              {bidMutation.isPending ? "Placing Bid..." : "Place Bid"}
+              {bidMutation.isPending 
+                ? (isStock ? "Submitting Offer..." : "Placing Bid...") 
+                : (isStock ? "Submit Offer" : "Place Bid")}
             </Button>
           </div>
         </form>

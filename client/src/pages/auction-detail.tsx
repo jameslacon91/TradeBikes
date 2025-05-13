@@ -142,6 +142,9 @@ export default function AuctionDetail() { // Component name kept as-is for compa
   // Check if auction is active
   const isActive = auction.status === 'active' && timeLeft !== 'Ended';
 
+  // Check if we're on the stock page
+  const isStockPage = stockMatch || window.location.pathname.includes('/stock');
+  
   return (
     <Layout>
       <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
@@ -151,7 +154,7 @@ export default function AuctionDetail() { // Component name kept as-is for compa
               {motorcycle.make} {motorcycle.model}
             </h3>
             <span className={`inline-flex items-center px-2.5 py-0.5 rounded-md text-sm font-medium ${isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
-              {isActive ? 'Active Underwrite' : 'Underwriting Ended'}
+              {isActive ? (isStockPage ? 'Available Stock' : 'Active Underwrite') : 'Underwriting Ended'}
             </span>
           </div>
           <p className="mt-1 max-w-2xl text-sm text-gray-500">
@@ -286,6 +289,7 @@ export default function AuctionDetail() { // Component name kept as-is for compa
                     <BidForm
                       auctionId={auction.id}
                       currentBid={auction.currentBid}
+                      isStock={isStockPage}
                     />
                   </div>
                 )}
