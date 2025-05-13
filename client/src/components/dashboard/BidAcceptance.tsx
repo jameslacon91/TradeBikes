@@ -152,7 +152,8 @@ const BidAcceptance: React.FC<BidAcceptanceProps> = ({ auctions }) => {
     setCollectionNotes('');
   };
 
-  const formatDate = (date: Date) => {
+  const formatDate = (date: Date | null) => {
+    if (!date) return 'N/A';
     return format(new Date(date), 'dd MMM yyyy');
   };
   
@@ -296,6 +297,22 @@ const BidAcceptance: React.FC<BidAcceptanceProps> = ({ auctions }) => {
             </DialogDescription>
           </DialogHeader>
           
+          {selectedAuction && selectedBid && (
+            <div className="py-4">
+              <div className="flex justify-between mb-4">
+                <div className="text-sm">
+                  <p className="font-medium">{selectedAuction.motorcycle.make} {selectedAuction.motorcycle.model}</p>
+                  <p className="text-muted-foreground">{selectedAuction.motorcycle.year} • {selectedAuction.motorcycle.mileage} miles</p>
+                  <p className="text-xs text-muted-foreground mt-2">Buyer: {getDealerName(selectedBid.dealerId)}</p>
+                </div>
+                <div className="text-right">
+                  <p className="font-bold">£{selectedBid.amount.toLocaleString()}</p>
+                  <p className="text-xs text-muted-foreground">Accepted bid</p>
+                </div>
+              </div>
+            </div>
+          )}
+          
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">
               <Label htmlFor="collection-date">Collection Date</Label>
@@ -313,7 +330,7 @@ const BidAcceptance: React.FC<BidAcceptanceProps> = ({ auctions }) => {
                   <CalendarComponent
                     mode="single"
                     selected={collectionDate}
-                    onSelect={setCollectionDate}
+                    onSelect={(date) => setCollectionDate(date)}
                     initialFocus
                   />
                 </PopoverContent>
