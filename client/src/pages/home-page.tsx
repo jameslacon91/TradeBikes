@@ -10,8 +10,7 @@ import {
   TrendingUp
 } from "lucide-react";
 import Layout from "@/components/layout/Layout";
-import { heroBg, motorcycleAuction, motorcycleLogoBg } from "@/assets/images";
-import tradeBikesLogo from "@/assets/logos/logo-color.pdf";
+import { heroBg, motorcycleAuction, motorcycleDarkBlue } from "@/assets/images";
 
 export default function HomePage() {
   return (
@@ -26,19 +25,18 @@ export default function HomePage() {
             className="w-full h-full object-cover"
           />
         </div>
-        {/* Dark overlay */}
-        <div className="absolute inset-0 z-0 bg-gradient-to-r from-black/70 to-primary-dark/80"></div>
+        {/* Dark overlay with motorcycle logo */}
+        <div className="absolute inset-0 z-0 bg-gradient-to-r from-black/75 to-primary-dark/85 flex items-center justify-center">
+          <img 
+            src={motorcycleDarkBlue} 
+            alt="Motorcycle logo" 
+            className="w-full max-w-md opacity-30"
+          />
+        </div>
         
         <div className="container relative z-10 mx-auto px-4 py-12 md:py-16">
           <div className="flex flex-col items-center text-center mb-6">
-            {/* Logo */}
-            <div className="w-32 h-32 mb-4 relative">
-              <img 
-                src={motorcycleLogoBg} 
-                alt="TradeBikes logo" 
-                className="w-full h-full"
-              />
-            </div>
+            {/* No logo here anymore, using the background image */}
           </div>
           
           <div className="max-w-3xl mx-auto text-center">
