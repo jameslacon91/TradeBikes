@@ -520,8 +520,8 @@ export default function AuctionDetail() { // Component name kept as-is for compa
           </div>
         </div>
         
-        {/* Reviews section - only show for completed auctions */}
-        {timeLeft === 'Ended' && (user?.id === auction.dealerId || user?.id === auction.winningBidderId) && (
+        {/* Reviews section - only show for fully completed transactions */}
+        {auction.collectionConfirmed && (user?.id === auction.dealerId || user?.id === auction.winningBidderId) && (
           <div className="mt-8 px-4 sm:px-6 lg:px-8">
             <AuctionReviews
               auctionId={auction.id}
@@ -530,7 +530,7 @@ export default function AuctionDetail() { // Component name kept as-is for compa
               dealerName="Dealer Name" // In a real implementation, this would be fetched from the dealer data
               bidderId={auction.winningBidderId || 0}
               bidderName="Winning Bidder" // In a real implementation, this would be fetched from the dealer data
-              isCompleted={timeLeft === 'Ended'}
+              isCompleted={auction.collectionConfirmed === true}
             />
           </div>
         )}
