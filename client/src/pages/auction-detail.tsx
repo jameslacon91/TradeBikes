@@ -380,10 +380,10 @@ export default function AuctionDetail() { // Component name kept as-is for compa
                     </div>
                     
                     <div className="space-y-3 max-h-64 overflow-y-auto pr-2">
-                      {auction.bids.sort((a, b) => b.amount - a.amount).map(bid => {
+                      {auction.bids && Array.isArray(auction.bids) && auction.bids.sort((a, b) => b.amount - a.amount).map(bid => {
                         // Get dealer info for display
-                        const bidder = dealers.find(d => d.id === bid.dealerId);
-                        const dealerName = bidder ? bidder.companyName : `Buyer #${bid.dealerId}`;
+                        const bidder = dealers && dealers.find ? dealers.find(d => d && d.id === bid.dealerId) : null;
+                        const dealerName = bidder && bidder.companyName ? bidder.companyName : `Buyer #${bid.dealerId}`;
                         
                         return (
                           <div 
@@ -436,14 +436,14 @@ export default function AuctionDetail() { // Component name kept as-is for compa
                                 className={`w-full justify-start text-left font-normal ${!availabilityDate && "text-muted-foreground"}`}
                               >
                                 <CalendarIcon className="mr-2 h-4 w-4" />
-                                {availabilityDate instanceof Date ? format(availabilityDate, "PPP") : "Select a date"}
+                                {availabilityDate && isValid(availabilityDate) ? format(availabilityDate, "PPP") : "Select a date"}
                               </Button>
                             </PopoverTrigger>
                             <PopoverContent className="w-auto p-0">
                               <CalendarComponent
                                 mode="single"
                                 selected={availabilityDate}
-                                onSelect={(date) => setAvailabilityDate(date)}
+                                onSelect={(date) => setAvailabilityDate(date && isValid(date) ? date : null)}
                                 initialFocus
                                 disabled={(date) => date < new Date()}
                               />
