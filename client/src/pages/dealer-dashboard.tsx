@@ -101,8 +101,8 @@ export default function DealerDashboard() {
                 {/* Active Listings */}
                 <div onClick={() => setActiveTab("ongoing-underwrites")}>
                   <StatCard 
-                    title="Active Listings" 
-                    value={statsLoading ? "Loading..." : stats?.activeListings || 0}
+                    title="Ongoing Underwrites" 
+                    value={statsLoading || auctionsLoading ? "Loading..." : activeListings.length}
                     icon={<Package className="h-6 w-6 text-white" />}
                     bgColor="bg-primary"
                     trend={stats?.trendUp ? { up: true, value: stats.trendValue || 0 } : undefined}
