@@ -39,9 +39,13 @@ export default function AuctionFilter({
     )
     .sort((a, b) => {
       if (sortOption === 'newest') {
-        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+        const bDate = b.createdAt ? new Date(b.createdAt) : new Date();
+        const aDate = a.createdAt ? new Date(a.createdAt) : new Date();
+        return bDate.getTime() - aDate.getTime();
       } else if (sortOption === 'ending-soon') {
-        return new Date(a.endTime).getTime() - new Date(b.endTime).getTime();
+        const aDate = a.endTime ? new Date(a.endTime) : new Date();
+        const bDate = b.endTime ? new Date(b.endTime) : new Date()
+        return aDate.getTime() - bDate.getTime();
       } else if (sortOption === 'highest-bid') {
         return (b.currentBid || 0) - (a.currentBid || 0);
       } else {

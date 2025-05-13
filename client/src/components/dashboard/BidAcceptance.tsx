@@ -323,7 +323,7 @@ const BidAcceptance: React.FC<BidAcceptanceProps> = ({ auctions }) => {
                     className={`w-full justify-start text-left ${!collectionDate && "text-muted-foreground"}`}
                   >
                     <Calendar className="mr-2 h-4 w-4" />
-                    {collectionDate ? format(collectionDate, "PPP") : "Select a date"}
+                    {collectionDate && isValid(collectionDate) ? format(collectionDate, "PPP") : "Select a date"}
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0">
