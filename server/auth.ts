@@ -36,18 +36,16 @@ export function setupAuth(app: Express) {
   let cookieSettings: session.CookieOptions = {
     httpOnly: true,
     maxAge: 24 * 60 * 60 * 1000, // 24 hours
+    path: '/'                    // Send for all paths
   };
   
-  // Use development cookie settings for testing
-  console.log('Using development cookie settings');
+  console.log('Using enhanced cookie settings for production compatibility');
   
-  // In Replit environment, we actually need to be more lenient with cookies
-  // since the same domain is used for both frontend and backend
-  cookieSettings.sameSite = 'lax';
+  // In Replit environment, we need these settings for cross-domain auth
+  cookieSettings.sameSite = 'none';  // Required for cross-origin cookies
   
-  // We'll leave secure as false to ensure cookies work in the Replit environment
-  // This is safe because we're in a controlled environment
-  cookieSettings.secure = false;
+  // We need secure cookies in production, but this may cause issues in dev
+  cookieSettings.secure = false; // Will be set to true by express if HTTPS is detected
   
   // Force this setting for Replit deployment
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';

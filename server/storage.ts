@@ -696,11 +696,17 @@ export class MemStorage implements IStorage {
   }
   
   async getUserByUsername(username: string): Promise<User | undefined> {
+    // Case-insensitive username matching
+    const lowercaseUsername = username.toLowerCase();
+    console.log(`Looking for user with case-insensitive username: ${username}`);
+    
     for (const user of this.users.values()) {
-      if (user.username === username) {
+      if (user.username.toLowerCase() === lowercaseUsername) {
+        console.log(`Found user with case-insensitive match: ${username} -> ${user.username}`);
         return user;
       }
     }
+    console.log(`No user found with username: ${username}`);
     return undefined;
   }
   
