@@ -1,60 +1,53 @@
-import { timeAgo } from '@/lib/countdownTimer';
+import { formatDistanceToNow } from 'date-fns';
+import { 
+  Clock, 
+  Tag, 
+  Bell, 
+  MessageSquare, 
+  CheckCircle, 
+  ShoppingCart, 
+  Truck
+} from 'lucide-react';
+import { ActivityItem as ActivityItemType } from '@shared/types';
 
 interface ActivityItemProps {
-  icon: string;
-  iconColor: string;
-  title: string;
-  description: string;
-  timestamp: Date;
+  item: ActivityItemType;
 }
 
-export default function ActivityItem({ icon, iconColor, title, description, timestamp }: ActivityItemProps) {
-  // Function to render the appropriate icon
-  const renderIcon = (iconName: string) => {
-    switch (iconName) {
+export default function ActivityItem({ item }: ActivityItemProps) {
+  const getIcon = () => {
+    switch (item.icon) {
       case 'check-circle':
-        return (
-          <svg className="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-        );
+        return <CheckCircle className={`h-8 w-8 text-${item.color}`} />;
       case 'clock':
-        return (
-          <svg className="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-        );
+        return <Clock className={`h-8 w-8 text-${item.color}`} />;
+      case 'tag':
+        return <Tag className={`h-8 w-8 text-${item.color}`} />;
       case 'bell':
-        return (
-          <svg className="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-          </svg>
-        );
+        return <Bell className={`h-8 w-8 text-${item.color}`} />;
+      case 'message-square':
+        return <MessageSquare className={`h-8 w-8 text-${item.color}`} />;
+      case 'shopping-cart':
+        return <ShoppingCart className={`h-8 w-8 text-${item.color}`} />;
+      case 'truck':
+        return <Truck className={`h-8 w-8 text-${item.color}`} />;
       default:
-        return (
-          <svg className="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-        );
+        return <Bell className={`h-8 w-8 text-${item.color}`} />;
     }
   };
 
   return (
-    <li>
-      <div className="px-4 py-4 sm:px-6">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center">
-            <div className={`flex-shrink-0 h-10 w-10 rounded-full bg-${iconColor} flex items-center justify-center text-white`}>
-              {renderIcon(icon)}
-            </div>
-            <div className="ml-4">
-              <div className="text-sm font-medium text-primary">{title}</div>
-              <div className="text-sm text-gray-500">{description}</div>
-            </div>
-          </div>
-          <div className="text-sm text-gray-500">{timeAgo(timestamp)}</div>
-        </div>
+    <div className="flex items-start gap-4">
+      <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-${item.color}/10`}>
+        {getIcon()}
       </div>
-    </li>
+      <div>
+        <p className="text-sm font-medium leading-none">{item.title}</p>
+        <p className="text-sm text-muted-foreground mt-1">{item.description}</p>
+        <p className="text-xs text-muted-foreground mt-1">
+          {formatDistanceToNow(new Date(item.timestamp), { addSuffix: true })}
+        </p>
+      </div>
+    </div>
   );
 }

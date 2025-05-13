@@ -5,10 +5,10 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { StatCard } from '@/components/dashboard/StatCard';
-import { ActivityItem } from '@/components/dashboard/ActivityItem';
-import { AuctionCard } from '@/components/auctions/AuctionCard';
-import { AuctionFilter } from '@/components/auctions/AuctionFilter';
+import StatCard from '@/components/dashboard/StatCard';
+import ActivityItem from '@/components/dashboard/ActivityItem';
+import AuctionCard from '@/components/auctions/AuctionCard';
+import AuctionFilter from '@/components/auctions/AuctionFilter';
 import { 
   Package, AlertCircle, Clock, DollarSign, BarChart4, Users,
   Gavel, PlusCircle, Link as LinkIcon, Home, Search

@@ -1,97 +1,144 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'wouter';
 import { Button } from '@/components/ui/button';
-import { formatTimeDifference, isEndingSoon } from '@/lib/countdownTimer';
-import { Auction, Motorcycle } from '@shared/schema';
+import { Badge } from '@/components/ui/badge';
+import { formatDistanceToNow } from 'date-fns';
+import { Clock, Users, Motorcycle as MotorcycleIcon } from 'lucide-react';
+import { AuctionWithDetails } from '@shared/types';
 
 interface AuctionCardProps {
-  id: number;
-  motorcycle: Motorcycle;
-  currentBid?: number;
-  totalBids: number;
-  endTime: Date;
-  status: string;
+  auction: AuctionWithDetails;
+  showDealerInfo?: boolean;
+  hideEndingSoon?: boolean;
 }
 
 export default function AuctionCard({
-  id,
-  motorcycle,
-  currentBid,
-  totalBids,
-  endTime,
-  status
+  auction,
+  showDealerInfo = false,
+  hideEndingSoon = false
 }: AuctionCardProps) {
-  const [timeLeft, setTimeLeft] = useState<string>(formatTimeDifference(endTime));
-  const [endingSoon, setEndingSoon] = useState<boolean>(isEndingSoon(endTime));
-
-  // Update countdown timer
+  const { id, motorcycle, currentBid, totalBids, endTime, status, dealerId } = auction;
+  
+  const [timeLeft, setTimeLeft] = useState<string>("");
+  const [endingSoon, setEndingSoon] = useState<boolean>(false);
+  
+  // Format time difference between now and end time
+  const formatTimeDifference = (endTime: Date) => {
+    try {
+      const now = new Date();
+      const end = new Date(endTime);
+      
+      if (now > end) return "Ended";
+      
+      return formatDistanceToNow(end, { addSuffix: true });
+    } catch (error) {
+      console.error("Error formatting time difference:", error);
+      return "Unknown";
+    }
+  };
+  
+  // Check if auction is ending soon (less than 30 minutes)
+  const isEndingSoon = (endTime: Date) => {
+    try {
+      const now = new Date();
+      const end = new Date(endTime);
+      const diffMs = end.getTime() - now.getTime();
+      const diffMinutes = diffMs / (1000 * 60);
+      
+      return diffMinutes > 0 && diffMinutes < 30;
+    } catch (error) {
+      return false;
+    }
+  };
+  
+  // Update time remaining
   useEffect(() => {
-    const timer = setInterval(() => {
+    if (!endTime) return;
+    
+    // Initial update
+    setTimeLeft(formatTimeDifference(endTime));
+    setEndingSoon(isEndingSoon(endTime));
+    
+    // Set up interval to update time
+    const interval = setInterval(() => {
       setTimeLeft(formatTimeDifference(endTime));
       setEndingSoon(isEndingSoon(endTime));
-    }, 1000);
-
-    return () => clearInterval(timer);
+    }, 60000); // Update every minute
+    
+    return () => clearInterval(interval);
   }, [endTime]);
-
-  const isActive = status === 'active' && timeLeft !== 'Ended';
-
+  
+  const isActive = status === 'active' && timeLeft !== "Ended";
+  
   return (
-    <div className="bg-white shadow rounded-lg overflow-hidden border border-gray-200">
+    <div className="border rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">
       <div className="relative">
-        {motorcycle.images && motorcycle.images.length > 0 ? (
-          <img 
-            src={motorcycle.images[0]} 
-            alt={`${motorcycle.make} ${motorcycle.model}`} 
-            className="w-full h-48 object-cover"
-          />
-        ) : (
-          <div className="w-full h-48 bg-gray-200 flex items-center justify-center">
-            <p className="text-gray-500">No image available</p>
+        <img 
+          src={motorcycle.imageUrl || "/placeholder-bike.jpg"} 
+          alt={`${motorcycle.make} ${motorcycle.model}`}
+          className="h-48 w-full object-cover"
+        />
+        
+        {/* Status badge */}
+        <div className="absolute top-2 right-2">
+          <Badge className={
+            status === 'active' ? 'bg-green-500' : 
+            status === 'completed' ? 'bg-blue-500' : 
+            status === 'pending_collection' ? 'bg-amber-500' : 'bg-gray-500'
+          }>
+            {status === 'active' ? 'Active' : 
+             status === 'completed' ? 'Completed' : 
+             status === 'pending_collection' ? 'Pending Collection' : 'Expired'}
+          </Badge>
+        </div>
+        
+        {/* Ending soon alert */}
+        {!hideEndingSoon && endingSoon && isActive && (
+          <div className="absolute bottom-0 left-0 right-0 bg-red-500 text-white py-1 px-2 text-xs text-center">
+            Ending soon!
           </div>
         )}
-        <div className="absolute top-0 right-0 m-2">
-          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-md text-sm font-medium ${isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
-            {isActive ? 'Live' : 'Ended'}
-          </span>
-        </div>
-        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-4">
-          <div className="text-white font-semibold text-lg">{motorcycle.make} {motorcycle.model}</div>
-          <div className="text-gray-200 text-sm">{motorcycle.year} • {motorcycle.mileage.toLocaleString()} miles</div>
-        </div>
       </div>
       
-      <div className="p-4 border-b border-gray-200">
-        <div className="flex justify-between items-center">
-          <div>
-            <span className="text-sm text-gray-500">Current Bid</span>
-            <p className="text-xl font-bold text-gray-900">
-              {currentBid ? `£${currentBid.toLocaleString()}` : 'No bids'}
-            </p>
+      <div className="p-4">
+        <h3 className="font-semibold text-lg">
+          {motorcycle.year} {motorcycle.make} {motorcycle.model}
+        </h3>
+        
+        <div className="mt-1 text-sm text-muted-foreground">
+          {motorcycle.mileage.toLocaleString()} miles | {motorcycle.condition}
+        </div>
+        
+        {showDealerInfo && (
+          <div className="text-xs text-muted-foreground mt-1">
+            By: {auction.dealerName || `Dealer #${dealerId}`}
           </div>
+        )}
+        
+        <div className="mt-3 flex justify-between items-center">
           <div>
-            <span className="text-sm text-gray-500">Bids</span>
-            <p className="text-xl font-bold text-gray-900">{totalBids}</p>
+            <div className="font-medium">
+              {currentBid ? `£${currentBid.toLocaleString()}` : 'No bids yet'}
+            </div>
+            <div className="flex items-center text-xs text-muted-foreground">
+              <Users className="h-3 w-3 mr-1" />
+              {totalBids} bid{totalBids !== 1 ? 's' : ''}
+            </div>
           </div>
-          <div>
-            <span className="text-sm text-gray-500">Time Left</span>
-            <p className={`text-xl font-bold ${timeLeft === 'Ended' ? 'text-gray-500' : endingSoon ? 'text-accent countdown animate-pulse' : 'text-accent countdown'}`}>
-              {timeLeft}
-            </p>
+          
+          <div className="text-right">
+            <div className="text-sm font-medium">{timeLeft}</div>
+            <div className="flex items-center text-xs text-muted-foreground">
+              <Clock className="h-3 w-3 mr-1" />
+              {isActive ? 'Remaining' : 'Ended'}
+            </div>
           </div>
         </div>
-      </div>
-      
-      <div className="bg-gray-50 px-4 py-3 text-right">
-        {/* Determine the link based on the current location */}
-        <Link href={
-          window.location.pathname.includes('/stock') 
-            ? `/stock/${id}` 
-            : window.location.pathname.includes('/underwrites') 
-              ? `/underwrites/${id}` 
-              : `/auctions/${id}`
-        }>
-          <Button>View Details</Button>
+        
+        <Link href={`/auctions/${id}`}>
+          <Button className="w-full mt-4" variant={isActive ? "default" : "outline"}>
+            {isActive ? "View & Bid" : "View Details"}
+          </Button>
         </Link>
       </div>
     </div>
