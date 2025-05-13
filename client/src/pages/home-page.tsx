@@ -10,7 +10,7 @@ import {
   TrendingUp
 } from "lucide-react";
 import Layout from "@/components/layout/Layout";
-import heroBg from "@/assets/images/bike-hero-bg.png";
+import { heroBg, motorcycleAuction } from "@/assets/images";
 import tradeBikesLogo from "@/assets/logos/logo-color.pdf";
 
 export default function HomePage() {
@@ -27,7 +27,7 @@ export default function HomePage() {
           />
         </div>
         {/* Dark overlay */}
-        <div className="absolute inset-0 z-0 bg-gradient-to-r from-primary/60 to-primary-dark/70"></div>
+        <div className="absolute inset-0 z-0 bg-gradient-to-r from-black/70 to-primary-dark/80"></div>
         
         <div className="container relative z-10 mx-auto px-4 py-20 md:py-28">
           <div className="flex flex-col items-center text-center mb-12">
@@ -211,7 +211,7 @@ export default function HomePage() {
               <div className="bg-white rounded-2xl shadow-xl overflow-hidden relative h-[500px]">
                 <div className="absolute inset-0 bg-gradient-to-br from-gray-800 to-gray-900 z-0"></div>
                 <img 
-                  src="https://images.unsplash.com/photo-1558979159-2b18a4070a87" 
+                  src={motorcycleAuction}
                   alt="Motorcycle auction process" 
                   className="absolute inset-0 w-full h-full object-cover z-0 opacity-80"
                 />
