@@ -74,12 +74,8 @@ export default function AuctionGrid() { // Component name kept as-is for compati
         {filteredAuctions.map((auction) => (
           <AuctionCard
             key={auction.id}
-            id={auction.id}
-            motorcycle={auction.motorcycle}
-            currentBid={auction.currentBid}
-            totalBids={auction.totalBids}
-            endTime={new Date(auction.endTime)}
-            status={auction.status}
+            auction={auction}
+            showDealerInfo={true}
           />
         ))}
       </div>
