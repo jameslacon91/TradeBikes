@@ -120,7 +120,7 @@ export default function Header() {
               <div className="px-4 space-y-2 mb-4">
                 <Link href="/create-underwrite">
                   <Button 
-                    className="w-full flex items-center justify-center"
+                    className="w-full flex items-center justify-center bg-amber-600 hover:bg-amber-700 text-white shadow-md"
                     onClick={closeMenu}
                   >
                     <Gavel className="mr-2 h-4 w-4" />
@@ -237,7 +237,7 @@ export default function Header() {
           {user && (
             <>
               <Link href="/create-underwrite">
-                <Button className="hidden sm:flex bg-primary hover:bg-primary/90">
+                <Button className="hidden sm:flex bg-amber-600 hover:bg-amber-700 text-white shadow-md">
                   <Gavel className="mr-2 h-4 w-4" />
                   List a Bike
                 </Button>
@@ -267,8 +267,8 @@ export default function Header() {
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
                   <Link href="/create-underwrite">
-                    <a className="flex w-full items-center">
-                      <Gavel className="mr-2 h-4 w-4" />
+                    <a className="flex w-full items-center text-amber-600 font-medium">
+                      <Gavel className="mr-2 h-4 w-4 text-amber-600" />
                       List a Bike
                     </a>
                   </Link>
