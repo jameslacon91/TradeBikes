@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ActivityItem as ActivityItemType, AuctionWithDetails, DashboardStats } from '@shared/types';
-import { Clipboard, Clock, AlertCircle, DollarSign, Filter, TrendingUp, Truck, Archive } from 'lucide-react';
+import { Clipboard, Clock, AlertCircle, DollarSign, Filter, TrendingUp, Truck, Archive, Star } from 'lucide-react';
 
 // Extended dashboard stats interface to include buyer-specific metrics
 interface ExtendedDashboardStats extends DashboardStats {
@@ -357,6 +357,30 @@ export default function DealerDashboard() {
                     ))}
                   </ul>
                 )}
+              </div>
+            </div>
+          </TabsContent>
+
+          {/* REVIEWS TAB CONTENT */}
+          <TabsContent value="reviews">
+            <div className="mt-4">
+              <h2 className="text-xl font-semibold text-gray-900 mb-6">Your Reviews</h2>
+              <div className="bg-white shadow overflow-hidden sm:rounded-md p-6">
+                <p className="text-gray-500 text-center py-4">
+                  Ratings and reviews from other dealers will appear here.
+                </p>
+                <div className="flex justify-center items-center mt-4">
+                  <div className="flex items-center">
+                    <div className="flex items-center">
+                      {Array(5).fill(0).map((_, i) => (
+                        <Star key={i} className={`h-6 w-6 ${i < (user?.rating ?? 0) ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`} />
+                      ))}
+                    </div>
+                    <span className="ml-2 text-gray-600">
+                      {user?.rating?.toFixed(1) || "No"} rating ({user?.totalRatings || 0} reviews)
+                    </span>
+                  </div>
+                </div>
               </div>
             </div>
           </TabsContent>
