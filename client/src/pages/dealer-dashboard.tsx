@@ -63,34 +63,36 @@ export default function DealerDashboard() {
         </div>
 
         <Tabs defaultValue="current-listings" className="w-full" onValueChange={setActiveTab}>
-          <TabsList className="mb-6 flex flex-wrap">
-            <TabsTrigger value="current-listings">Current Listings</TabsTrigger>
-            <TabsTrigger value="past-listings">Past Listings</TabsTrigger>
-            <TabsTrigger value="ongoing-underwrites">Ongoing Underwrites</TabsTrigger>
-            <TabsTrigger value="past-purchases">Past Purchases</TabsTrigger>
-            <TabsTrigger value="messages">Messages</TabsTrigger>
-            <TabsTrigger value="reviews">Reviews</TabsTrigger>
-            <TabsTrigger value="favorites">Favorites</TabsTrigger>
-          </TabsList>
+          <div className="overflow-x-auto">
+            <TabsList className="mb-6 inline-flex w-auto min-w-full">
+              <TabsTrigger value="current-listings">Current Listings</TabsTrigger>
+              <TabsTrigger value="past-listings">Past Listings</TabsTrigger>
+              <TabsTrigger value="ongoing-underwrites">Ongoing Underwrites</TabsTrigger>
+              <TabsTrigger value="past-purchases">Past Purchases</TabsTrigger>
+              <TabsTrigger value="messages">Messages</TabsTrigger>
+              <TabsTrigger value="reviews">Reviews</TabsTrigger>
+              <TabsTrigger value="favorites">Favorites</TabsTrigger>
+            </TabsList>
+          </div>
           
           {/* CURRENT LISTINGS TAB CONTENT */}
           <TabsContent value="current-listings">
             {/* Stats for Selling */}
             <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
               {/* Active Listings */}
-              <Link href="/auctions/dealer">
+              <div onClick={() => setActiveTab("current-listings")}>
                 <StatCard 
                   title="Active Listings" 
                   value={statsLoading ? "Loading..." : stats?.activeListings || 0}
                   icon={<Clipboard className="h-6 w-6 text-white" />}
-                  bgColor="bg-primary-light"
+                  bgColor="bg-primary"
                   trend={stats?.trendUp ? { up: true, value: stats.trendValue || 0 } : undefined}
                   className="cursor-pointer transition-transform hover:translate-y-[-5px]"
                 />
-              </Link>
+              </div>
 
               {/* Total Bids */}
-              <Link href="/auctions/dealer">
+              <div onClick={() => setActiveTab("ongoing-underwrites")}>
                 <StatCard 
                   title="Total Bids Received" 
                   value={statsLoading ? "Loading..." : stats?.totalBids || 0}
@@ -99,10 +101,10 @@ export default function DealerDashboard() {
                   trend={stats?.trendUp ? { up: true, value: stats.trendValue || 0 } : undefined}
                   className="cursor-pointer transition-transform hover:translate-y-[-5px]"
                 />
-              </Link>
+              </div>
 
               {/* Pending Completion */}
-              <Link href="/auctions/dealer?filter=pending">
+              <div onClick={() => setActiveTab("ongoing-underwrites")}>
                 <StatCard 
                   title="Pending Completion" 
                   value={statsLoading ? "Loading..." : stats?.pendingCompletion || 0}
@@ -110,10 +112,10 @@ export default function DealerDashboard() {
                   bgColor="bg-yellow-500"
                   className="cursor-pointer transition-transform hover:translate-y-[-5px]"
                 />
-              </Link>
+              </div>
 
               {/* Total Revenue */}
-              <Link href="/auctions/dealer?filter=completed">
+              <div onClick={() => setActiveTab("past-listings")}>
                 <StatCard 
                   title="Revenue (MTD)" 
                   value={statsLoading ? "Loading..." : `£${stats?.revenue?.toLocaleString() || 0}`}
@@ -121,7 +123,7 @@ export default function DealerDashboard() {
                   bgColor="bg-green-500"
                   className="cursor-pointer transition-transform hover:translate-y-[-5px]"
                 />
-              </Link>
+              </div>
             </div>
 
             {/* My Active Underwrites Section */}

@@ -132,7 +132,7 @@ function MainNavigation() {
                   <li>
                     <Link 
                       href="/create-auction" 
-                      className="text-white bg-primary hover:bg-primary-dark rounded-md px-3 py-2 flex items-center"
+                      className="text-white bg-accent-foreground hover:bg-accent-foreground/90 rounded-md px-3 py-2 flex items-center"
                     >
                       <Plus className="w-4 h-4 mr-1" />
                       List Motorcycle
@@ -142,7 +142,7 @@ function MainNavigation() {
                   <li>
                     <Link 
                       href="/auctions" 
-                      className="text-white bg-primary hover:bg-primary-dark rounded-md px-3 py-2 flex items-center ml-2"
+                      className="text-white bg-primary hover:bg-primary/80 rounded-md px-3 py-2 flex items-center ml-2"
                     >
                       <TrendingUp className="w-4 h-4 mr-1" />
                       Bid On Underwrites
