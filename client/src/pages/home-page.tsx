@@ -96,14 +96,14 @@ export default function HomePage() {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
-            <div className="group relative bg-white p-8 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 overflow-hidden">
+            <div className="group relative bg-card p-8 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-border overflow-hidden">
               <div className="absolute top-0 right-0 w-24 h-24 bg-primary/5 -mr-8 -mt-8 rounded-full group-hover:scale-150 transition-transform duration-500 ease-out"></div>
               <div className="relative">
                 <div className="bg-gradient-to-br from-primary to-primary-dark p-4 rounded-2xl w-16 h-16 flex items-center justify-center mb-6 shadow-md group-hover:-translate-y-1 transition-transform duration-300">
                   <Clock className="h-8 w-8 text-white" />
                 </div>
-                <h3 className="text-xl font-bold mb-4 group-hover:text-primary transition-colors duration-300">Real-time Auctions</h3>
-                <p className="text-gray-600 mb-4">
+                <h3 className="text-xl font-bold mb-4 text-foreground group-hover:text-primary transition-colors duration-300">Real-time Auctions</h3>
+                <p className="text-muted-foreground mb-4">
                   Bid in real-time on available motorcycles with live updates and instant notifications when you're outbid.
                 </p>
                 <Link href="/auctions" className="text-primary font-medium inline-flex items-center group-hover:translate-x-2 transition-transform duration-300">
@@ -115,14 +115,14 @@ export default function HomePage() {
               </div>
             </div>
             
-            <div className="group relative bg-white p-8 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 overflow-hidden">
+            <div className="group relative bg-card p-8 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-border overflow-hidden">
               <div className="absolute top-0 right-0 w-24 h-24 bg-primary/5 -mr-8 -mt-8 rounded-full group-hover:scale-150 transition-transform duration-500 ease-out"></div>
               <div className="relative">
                 <div className="bg-gradient-to-br from-primary to-primary-dark p-4 rounded-2xl w-16 h-16 flex items-center justify-center mb-6 shadow-md group-hover:-translate-y-1 transition-transform duration-300">
                   <MapPin className="h-8 w-8 text-white" />
                 </div>
-                <h3 className="text-xl font-bold mb-4 group-hover:text-primary transition-colors duration-300">Map Search</h3>
-                <p className="text-gray-600 mb-4">
+                <h3 className="text-xl font-bold mb-4 text-foreground group-hover:text-primary transition-colors duration-300">Map Search</h3>
+                <p className="text-muted-foreground mb-4">
                   Find available motorcycles based on your location and preferred radius for convenient trading and logistics.
                 </p>
                 <Link href="/map" className="text-primary font-medium inline-flex items-center group-hover:translate-x-2 transition-transform duration-300">
@@ -134,14 +134,14 @@ export default function HomePage() {
               </div>
             </div>
             
-            <div className="group relative bg-white p-8 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 overflow-hidden">
+            <div className="group relative bg-card p-8 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-border overflow-hidden">
               <div className="absolute top-0 right-0 w-24 h-24 bg-primary/5 -mr-8 -mt-8 rounded-full group-hover:scale-150 transition-transform duration-500 ease-out"></div>
               <div className="relative">
                 <div className="bg-gradient-to-br from-primary to-primary-dark p-4 rounded-2xl w-16 h-16 flex items-center justify-center mb-6 shadow-md group-hover:-translate-y-1 transition-transform duration-300">
                   <Shield className="h-8 w-8 text-white" />
                 </div>
-                <h3 className="text-xl font-bold mb-4 group-hover:text-primary transition-colors duration-300">Verified Listings</h3>
-                <p className="text-gray-600 mb-4">
+                <h3 className="text-xl font-bold mb-4 text-foreground group-hover:text-primary transition-colors duration-300">Verified Listings</h3>
+                <p className="text-muted-foreground mb-4">
                   All motorcycles undergo verification checks to ensure quality and accurate information for confident bidding.
                 </p>
                 <Link href="/about" className="text-primary font-medium inline-flex items-center group-hover:translate-x-2 transition-transform duration-300">
@@ -184,8 +184,8 @@ export default function HomePage() {
                   </div>
                 </div>
                 <div className="pt-2">
-                  <h3 className="text-xl font-bold mb-3">Register Your Company</h3>
-                  <p className="text-gray-600">
+                  <h3 className="text-xl font-bold mb-3 text-foreground">Register Your Company</h3>
+                  <p className="text-muted-foreground">
                     Create your account and specify your role as a dealer or trader. We'll verify your business details to ensure platform security.
                   </p>
                 </div>
@@ -201,8 +201,8 @@ export default function HomePage() {
                   </div>
                 </div>
                 <div className="pt-2">
-                  <h3 className="text-xl font-bold mb-3">List or Bid on Motorcycles</h3>
-                  <p className="text-gray-600">
+                  <h3 className="text-xl font-bold mb-3 text-foreground">List or Bid on Motorcycles</h3>
+                  <p className="text-muted-foreground">
                     Dealers can list motorcycles with detailed information and up to 20 high-quality photos. Traders can browse auctions and place bids in real-time.
                   </p>
                 </div>
@@ -214,8 +214,8 @@ export default function HomePage() {
                   <div className="w-20 h-20 bg-gradient-to-br from-primary to-primary-dark text-white rounded-2xl shadow-lg flex items-center justify-center text-2xl font-bold">3</div>
                 </div>
                 <div className="pt-2">
-                  <h3 className="text-xl font-bold mb-3">Complete Transactions</h3>
-                  <p className="text-gray-600">
+                  <h3 className="text-xl font-bold mb-3 text-foreground">Complete Transactions</h3>
+                  <p className="text-muted-foreground">
                     Once an auction ends, both parties are notified and can securely exchange payment and arrange delivery through our platform's messaging system.
                   </p>
                 </div>
@@ -259,7 +259,7 @@ export default function HomePage() {
           <div className="max-w-6xl mx-auto">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
               {/* For Dealers */}
-              <div className="bg-white p-10 rounded-3xl shadow-xl border border-gray-100 relative overflow-hidden group hover:shadow-2xl transition-all duration-300">
+              <div className="bg-card p-10 rounded-3xl shadow-xl border border-border relative overflow-hidden group hover:shadow-2xl transition-all duration-300">
                 {/* Background accent */}
                 <div className="absolute top-0 right-0 w-40 h-40 bg-primary/5 -mr-20 -mt-20 rounded-full group-hover:scale-150 transition-transform duration-500 ease-out"></div>
                 <div className="absolute bottom-0 left-0 w-24 h-24 bg-primary/5 -ml-12 -mb-12 rounded-full group-hover:scale-150 transition-transform duration-500 ease-out"></div>
@@ -283,7 +283,7 @@ export default function HomePage() {
                           <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                         </svg>
                       </div>
-                      <span className="text-gray-700">Easy motorcycle listing with up to 20 images per listing</span>
+                      <span className="text-foreground">Easy motorcycle listing with up to 20 images per listing</span>
                     </li>
                     <li className="flex items-start">
                       <div className="flex-shrink-0 w-6 h-6 bg-green-100 rounded-full flex items-center justify-center mr-3 mt-0.5">
@@ -328,7 +328,7 @@ export default function HomePage() {
               </div>
               
               {/* For Traders */}
-              <div className="bg-white p-10 rounded-3xl shadow-xl border border-gray-100 relative overflow-hidden group hover:shadow-2xl transition-all duration-300">
+              <div className="bg-card p-10 rounded-3xl shadow-xl border border-border relative overflow-hidden group hover:shadow-2xl transition-all duration-300">
                 {/* Background accent */}
                 <div className="absolute top-0 right-0 w-40 h-40 bg-amber-500/5 -mr-20 -mt-20 rounded-full group-hover:scale-150 transition-transform duration-500 ease-out"></div>
                 <div className="absolute bottom-0 left-0 w-24 h-24 bg-amber-500/5 -ml-12 -mb-12 rounded-full group-hover:scale-150 transition-transform duration-500 ease-out"></div>
