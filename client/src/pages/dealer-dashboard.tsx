@@ -76,6 +76,12 @@ export default function DealerDashboard() {
                   List Motorcycle
                 </Button>
               </Link>
+              <Link href="/auctions">
+                <Button variant="outline">
+                  <LinkIcon className="mr-2 h-5 w-5" />
+                  View Underwrites
+                </Button>
+              </Link>
             </div>
           </div>
           
