@@ -162,20 +162,27 @@ function MainNavigation() {
   );
 }
 
+// Import the theme provider
+import { ThemeProvider } from "next-themes";
+
 // App component with providers
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <WebSocketProvider>
-        <AuthProvider>
-          <TooltipProvider>
-            <Toaster />
-            <Router />
-            <InstallPrompt />
-          </TooltipProvider>
-        </AuthProvider>
-      </WebSocketProvider>
-    </QueryClientProvider>
+    <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
+      <QueryClientProvider client={queryClient}>
+        <WebSocketProvider>
+          <AuthProvider>
+            <TooltipProvider>
+              <Toaster />
+              <div className="min-h-screen bg-background text-foreground">
+                <Router />
+                <InstallPrompt />
+              </div>
+            </TooltipProvider>
+          </AuthProvider>
+        </WebSocketProvider>
+      </QueryClientProvider>
+    </ThemeProvider>
   );
 }
 
