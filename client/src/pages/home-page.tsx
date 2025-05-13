@@ -10,23 +10,23 @@ import {
   TrendingUp
 } from "lucide-react";
 import Layout from "@/components/layout/Layout";
+import motorcycleBg from "@/assets/images/motorcycle-bg.jpeg";
 
 export default function HomePage() {
   return (
     <Layout>
       {/* Hero Section */}
-      <div className="relative overflow-hidden bg-gradient-to-r from-primary to-primary-dark">
-        {/* Background pattern */}
-        <div className="absolute inset-0 z-0 opacity-10">
-          <svg className="h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="none">
-            <defs>
-              <pattern id="motorcycle-pattern" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
-                <path d="M10,0 L20,10 L10,20 L0,10 Z" fill="currentColor" />
-              </pattern>
-            </defs>
-            <rect width="100%" height="100%" fill="url(#motorcycle-pattern)" />
-          </svg>
+      <div className="relative overflow-hidden">
+        {/* Motorcycle Background Image */}
+        <div className="absolute inset-0 z-0">
+          <img 
+            src={motorcycleBg} 
+            alt="Motorcycle background" 
+            className="w-full h-full object-cover object-center brightness-50"
+          />
         </div>
+        {/* Dark overlay */}
+        <div className="absolute inset-0 z-0 bg-gradient-to-r from-primary/80 to-primary-dark/80"></div>
         
         <div className="container relative z-10 mx-auto px-4 py-20 md:py-28">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">

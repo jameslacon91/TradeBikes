@@ -1,4 +1,5 @@
 import { Switch, Route, Link, useLocation } from "wouter";
+import { useState } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
@@ -21,7 +22,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "./lib/queryClient";
 import { AuthProvider } from "./hooks/use-auth";
 import { WebSocketProvider } from "./hooks/use-websocket";
-import { LogOut, UserCircle, Plus, TrendingUp } from "lucide-react";
+import { LogOut, UserCircle, Plus, TrendingUp, Menu, X } from "lucide-react";
 import InstallPrompt from "./components/mobile/InstallPrompt";
 
 // Main router component
