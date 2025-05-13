@@ -408,8 +408,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Update the motorcycle availability date if provided
       if (availabilityDate) {
+        const dateAvailable = new Date(availabilityDate);
         await storage.updateMotorcycle(auction.motorcycleId, {
-          dateAvailable: new Date(availabilityDate)
+          dateAvailable
         });
       }
       

@@ -1122,11 +1122,15 @@ export class MemStorage implements IStorage {
     if (auction) {
       const highestBid = await this.getHighestBidForAuction(insertBid.auctionId);
       if (highestBid) {
-        await this.updateAuction(auction.id, { highestBidderId: highestBid.traderId });
+        await this.updateAuction(auction.id, { highestBidderId: highestBid.dealerId });
       }
     }
     
     return bid;
+  }
+  
+  async getBid(id: number): Promise<Bid | undefined> {
+    return this.bids.get(id);
   }
   
   async getBidsByAuctionId(auctionId: number): Promise<Bid[]> {
