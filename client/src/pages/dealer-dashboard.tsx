@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { isValid, parseISO } from 'date-fns';
 import StatCard from '@/components/dashboard/StatCard';
 import ActivityItem from '@/components/dashboard/ActivityItem';
 import AuctionCard from '@/components/auctions/AuctionCard';
@@ -54,7 +55,69 @@ export default function DealerDashboard() {
   // Filter auctions by status
   const activeListings = userAuctions.filter(a => a.status === 'active');
   const pastListings = userAuctions.filter(a => a.status === 'completed');
-  const pendingCollection = userAuctions.filter(a => a.status === 'pending_collection');
+  
+  // Get pending collection auctions and sort them by motorcycle availability date
+  const pendingCollection = userAuctions
+    .filter(a => a.status === 'pending_collection')
+    .sort((a, b) => {
+      try {
+        // Try to get and parse dates - if dateAvailable is a string date format
+        let aDate, bDate;
+        
+        if (a.motorcycle?.dateAvailable && typeof a.motorcycle.dateAvailable === 'string') {
+          // First try to parse as ISO date if it looks like one
+          if (a.motorcycle.dateAvailable.includes('-') || a.motorcycle.dateAvailable.includes('T')) {
+            aDate = parseISO(a.motorcycle.dateAvailable);
+          } else {
+            // Handle text dates like "Immediate" or "End of the month" by giving them relative priority
+            if (a.motorcycle.dateAvailable.toLowerCase().includes('immediate')) {
+              aDate = new Date(); // Today
+            } else if (a.motorcycle.dateAvailable.toLowerCase().includes('week')) {
+              aDate = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // Roughly a week from now
+            } else {
+              aDate = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // Default to roughly a month
+            }
+          }
+        } else {
+          aDate = new Date(Date.now() + 90 * 24 * 60 * 60 * 1000); // Far future if no date
+        }
+        
+        if (b.motorcycle?.dateAvailable && typeof b.motorcycle.dateAvailable === 'string') {
+          if (b.motorcycle.dateAvailable.includes('-') || b.motorcycle.dateAvailable.includes('T')) {
+            bDate = parseISO(b.motorcycle.dateAvailable);
+          } else {
+            if (b.motorcycle.dateAvailable.toLowerCase().includes('immediate')) {
+              bDate = new Date(); 
+            } else if (b.motorcycle.dateAvailable.toLowerCase().includes('week')) {
+              bDate = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+            } else {
+              bDate = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+            }
+          }
+        } else {
+          bDate = new Date(Date.now() + 90 * 24 * 60 * 60 * 1000);
+        }
+        
+        // Check if dates are valid and sort
+        const aValid = isValid(aDate);
+        const bValid = isValid(bDate);
+        
+        // Sort by date if both are valid
+        if (aValid && bValid) {
+          return aDate.getTime() - bDate.getTime();
+        }
+        
+        // Handle case where only one is valid
+        if (aValid) return -1;
+        if (bValid) return 1;
+        
+        return 0;
+      } catch (error) {
+        console.log("Error sorting by date availability:", error);
+        return 0; // Keep original order if there's an error
+      }
+    });
+    
   const completedDeals = userAuctions.filter(a => a.status === 'completed');
   
   return (
