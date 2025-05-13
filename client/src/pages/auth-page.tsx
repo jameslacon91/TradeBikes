@@ -129,8 +129,8 @@ export default function AuthPage() {
             </TabsList>
 
             <TabsContent value="login" className="mt-0">
-              <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
-                <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">
+              <div className="bg-card py-8 px-4 shadow sm:rounded-lg sm:px-10">
+                <h2 className="text-2xl font-bold text-card-foreground mb-6 text-center">
                   Welcome Back
                 </h2>
                 <Form {...loginForm}>
