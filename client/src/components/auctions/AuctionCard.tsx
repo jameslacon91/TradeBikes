@@ -3,7 +3,7 @@ import { Link } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { formatDistanceToNow } from 'date-fns';
-import { Clock, Users, Motorcycle as MotorcycleIcon } from 'lucide-react';
+import { Clock, Users } from 'lucide-react';
 import { AuctionWithDetails } from '@shared/types';
 
 interface AuctionCardProps {
@@ -74,7 +74,10 @@ export default function AuctionCard({
     <div className="border rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">
       <div className="relative">
         <img 
-          src={motorcycle.imageUrl || "/placeholder-bike.jpg"} 
+          src={motorcycle.images && motorcycle.images.length > 0 
+            ? motorcycle.images[0] 
+            : "/placeholder-bike.jpg"
+          } 
           alt={`${motorcycle.make} ${motorcycle.model}`}
           className="h-48 w-full object-cover"
         />
@@ -111,7 +114,7 @@ export default function AuctionCard({
         
         {showDealerInfo && (
           <div className="text-xs text-muted-foreground mt-1">
-            By: {auction.dealerName || `Dealer #${dealerId}`}
+            By: Dealer #{dealerId}
           </div>
         )}
         

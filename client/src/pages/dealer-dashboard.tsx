@@ -8,14 +8,13 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import StatCard from '@/components/dashboard/StatCard';
 import ActivityItem from '@/components/dashboard/ActivityItem';
 import AuctionCard from '@/components/auctions/AuctionCard';
-import AuctionFilter from '@/components/auctions/AuctionFilter';
 import { 
   Package, AlertCircle, Clock, DollarSign, BarChart4, Users,
   Gavel, PlusCircle, Link as LinkIcon, Home, Search
 } from 'lucide-react';
 import { Link } from 'wouter';
 import Layout from '@/components/layout/Layout';
-import { DashboardStats, AuctionWithDetails } from '@shared/types';
+import { DashboardStats, AuctionWithDetails, ActivityItem as ActivityItemType } from '@shared/types';
 
 // Lazy-loaded components
 const FavoriteDealers = lazy(() => import('@/components/dashboard/FavoriteDealers'));
@@ -56,7 +55,7 @@ export default function DealerDashboard() {
   const activeListings = userAuctions.filter(a => a.status === 'active');
   const pastListings = userAuctions.filter(a => a.status === 'completed');
   const pendingCollection = userAuctions.filter(a => a.status === 'pending_collection');
-  const completedDeals = userAuctions.filter(a => a.status === 'completed' && a.paymentStatus === 'paid');
+  const completedDeals = userAuctions.filter(a => a.status === 'completed');
   
   return (
     <Layout>

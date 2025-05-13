@@ -251,7 +251,7 @@ export default function Header() {
             </>
           )}
           
-          {user && <NotificationsPopover />}
+          {user && <NotificationCenter />}
           {!isMobile && userMenu}
           {user && isMobile && (
             <DropdownMenu>

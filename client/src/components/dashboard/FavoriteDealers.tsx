@@ -57,7 +57,7 @@ export default function FavoriteDealers() {
               <p className="font-medium text-sm">{dealer.companyName || dealer.username}</p>
               <Star className="h-4 w-4 text-yellow-400 ml-1" />
             </div>
-            <p className="text-xs text-muted-foreground">{dealer.location || 'London, UK'}</p>
+            <p className="text-xs text-muted-foreground">{dealer.city || 'London, UK'}</p>
           </div>
         </div>
       ))}
