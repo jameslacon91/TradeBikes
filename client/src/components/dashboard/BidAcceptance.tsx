@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { User, Motorcycle, Bid } from '@shared/schema';
@@ -21,6 +21,15 @@ import { Calendar as CalendarComponent } from '@/components/ui/calendar';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { useAuth } from '@/hooks/use-auth';
+
+interface DealerInfo {
+  id: number;
+  username: string;
+  companyName: string;
+  rating: number | null;
+  totalRatings: number | null;
+}
 
 interface BidAcceptanceProps {
   auctions: AuctionWithDetails[];
@@ -29,12 +38,18 @@ interface BidAcceptanceProps {
 const BidAcceptance: React.FC<BidAcceptanceProps> = ({ auctions }) => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { user } = useAuth();
   const [selectedAuction, setSelectedAuction] = useState<AuctionWithDetails | null>(null);
   const [selectedBid, setSelectedBid] = useState<Bid | null>(null);
   const [isAcceptDialogOpen, setIsAcceptDialogOpen] = useState(false);
   const [isCollectionDialogOpen, setIsCollectionDialogOpen] = useState(false);
   const [collectionDate, setCollectionDate] = useState<Date | null>(null);
   const [collectionNotes, setCollectionNotes] = useState('');
+  
+  // Fetch dealer information
+  const { data: dealers = [] } = useQuery<DealerInfo[]>({
+    queryKey: ['/api/dealers'],
+  });
   
   // Get auctions with bids
   const auctionsWithBids = auctions.filter(auction => auction.bids && auction.bids.length > 0);
@@ -140,6 +155,18 @@ const BidAcceptance: React.FC<BidAcceptanceProps> = ({ auctions }) => {
   const formatDate = (date: Date) => {
     return format(new Date(date), 'dd MMM yyyy');
   };
+  
+  // Function to get dealer name from its ID
+  const getDealerName = (dealerId: number): string => {
+    // Check if it's the current user
+    if (user && user.id === dealerId) {
+      return user.companyName || `${user.username}'s Company`;
+    }
+    
+    // Check other dealers
+    const dealer = dealers.find(d => d.id === dealerId);
+    return dealer ? dealer.companyName : `Dealer #${dealerId}`;
+  };
 
   return (
     <>
@@ -181,6 +208,7 @@ const BidAcceptance: React.FC<BidAcceptanceProps> = ({ auctions }) => {
                       <div key={bid.id} className="flex justify-between items-center p-3 bg-muted/30 rounded">
                         <div>
                           <p className="font-semibold">£{bid.amount.toLocaleString()}</p>
+                          <p className="text-xs text-muted-foreground">{getDealerName(bid.dealerId)}</p>
                           <p className="text-xs text-muted-foreground">{formatDate(bid.createdAt)}</p>
                         </div>
                         <div className="flex gap-2">
@@ -235,10 +263,12 @@ const BidAcceptance: React.FC<BidAcceptanceProps> = ({ auctions }) => {
                 <div className="text-sm">
                   <p className="font-medium">{selectedAuction.motorcycle.make} {selectedAuction.motorcycle.model}</p>
                   <p className="text-muted-foreground">{selectedAuction.motorcycle.year} • {selectedAuction.motorcycle.mileage} miles</p>
+                  <p className="text-xs text-muted-foreground mt-2">Bid from: {getDealerName(selectedBid.dealerId)}</p>
                 </div>
                 <div className="text-right">
                   <p className="font-bold">£{selectedBid.amount.toLocaleString()}</p>
                   <p className="text-xs text-muted-foreground">Bid amount</p>
+                  <p className="text-xs text-muted-foreground mt-2">{formatDate(selectedBid.createdAt)}</p>
                 </div>
               </div>
             </div>
