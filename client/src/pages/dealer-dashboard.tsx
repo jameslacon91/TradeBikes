@@ -92,7 +92,7 @@ export default function DealerDashboard() {
               </div>
 
               {/* Total Bids */}
-              <Link href="/bids/received">
+              <div onClick={() => setActiveTab("ongoing-underwrites")}>
                 <StatCard 
                   title="Total Bids Received" 
                   value={statsLoading ? "Loading..." : stats?.totalBids || 0}
@@ -104,7 +104,7 @@ export default function DealerDashboard() {
               </Link>
 
               {/* Pending Completion */}
-              <Link href="/auctions/pending">
+              <div onClick={() => setActiveTab("ongoing-underwrites")}>
                 <StatCard 
                   title="Pending Completion" 
                   value={statsLoading ? "Loading..." : stats?.pendingCompletion || 0}
@@ -115,7 +115,7 @@ export default function DealerDashboard() {
               </Link>
 
               {/* Total Revenue */}
-              <Link href="/revenue">
+              <div onClick={() => setActiveTab("past-listings")}>
                 <StatCard 
                   title="Revenue (MTD)" 
                   value={statsLoading ? "Loading..." : `£${stats?.revenue?.toLocaleString() || 0}`}
@@ -124,7 +124,7 @@ export default function DealerDashboard() {
                   className="cursor-pointer transition-transform hover:translate-y-[-5px]"
                 />
               </Link>
-            </div>
+            </Link>
 
             {/* My Active Underwrites Section */}
             <div className="mt-8">
@@ -148,20 +148,20 @@ export default function DealerDashboard() {
                       <SelectItem value="kawasaki">Kawasaki</SelectItem>
                     </SelectContent>
                   </Select>
-                </div>
-              </div>
+                </Link>
+              </Link>
 
               {myAuctionsLoading ? (
                 <div className="text-center py-10">
                   <p className="text-gray-500">Loading your listings...</p>
-                </div>
+                </Link>
               ) : displayedSellingAuctions.length === 0 ? (
                 <div className="text-center py-10">
                   <p className="text-gray-500">You don't have any active listings.</p>
                   <Button className="mt-4" asChild>
                     <Link href="/create-auction">List Your First Bike</Link>
                   </Button>
-                </div>
+                </Link>
               ) : (
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                   {displayedSellingAuctions.map((auction) => (
@@ -175,7 +175,7 @@ export default function DealerDashboard() {
                       status={auction.status}
                     />
                   ))}
-                </div>
+                </Link>
               )}
 
               <div className="mt-4 text-right">
@@ -187,8 +187,8 @@ export default function DealerDashboard() {
                     </svg>
                   </Link>
                 </Button>
-              </div>
-            </div>
+              </Link>
+            </Link>
           </TabsContent>
           
           {/* ONGOING UNDERWRITES TAB CONTENT */}
@@ -238,7 +238,7 @@ export default function DealerDashboard() {
                   className="cursor-pointer transition-transform hover:translate-y-[-5px]"
                 />
               </Link>
-            </div>
+            </Link></TabsContent>
 
             {/* Available Underwrites Section */}
             <div className="mt-8">
@@ -262,17 +262,17 @@ export default function DealerDashboard() {
                       <SelectItem value="kawasaki">Kawasaki</SelectItem>
                     </SelectContent>
                   </Select>
-                </div>
-              </div>
+                </Link>
+              </Link>
 
               {allAuctionsLoading ? (
                 <div className="text-center py-10">
                   <p className="text-gray-500">Loading available underwrites...</p>
-                </div>
+                </Link>
               ) : displayedBuyingAuctions.length === 0 ? (
                 <div className="text-center py-10">
                   <p className="text-gray-500">No active underwrites found.</p>
-                </div>
+                </Link>
               ) : (
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                   {displayedBuyingAuctions.map((auction) => (
@@ -286,7 +286,7 @@ export default function DealerDashboard() {
                       status={auction.status}
                     />
                   ))}
-                </div>
+                </Link>
               )}
 
               <div className="mt-4 text-right">
@@ -298,8 +298,8 @@ export default function DealerDashboard() {
                     </svg>
                   </Link>
                 </Button>
-              </div>
-            </div>
+              </Link>
+            </Link>
           </TabsContent>
 
           {/* PAST LISTINGS TAB CONTENT */}
@@ -313,8 +313,8 @@ export default function DealerDashboard() {
                 <Button className="mt-4 mx-auto block" asChild>
                   <Link href="/auctions/dealer?filter=completed">View All Past Listings</Link>
                 </Button>
-              </div>
-            </div>
+              </Link>
+            </Link>
           </TabsContent>
           
           {/* PAST PURCHASES TAB CONTENT */}
@@ -328,8 +328,8 @@ export default function DealerDashboard() {
                 <Button className="mt-4 mx-auto block" asChild>
                   <Link href="/auctions?filter=purchased">View All Purchases</Link>
                 </Button>
-              </div>
-            </div>
+              </Link>
+            </Link>
           </TabsContent>
           
           {/* MESSAGES TAB CONTENT */}
@@ -340,11 +340,11 @@ export default function DealerDashboard() {
                 {activitiesLoading ? (
                   <div className="text-center py-10">
                     <p className="text-gray-500">Loading recent activity...</p>
-                  </div>
+                  </Link>
                 ) : activities.length === 0 ? (
                   <div className="text-center py-10">
                     <p className="text-gray-500">No recent activity to display.</p>
-                  </div>
+                  </Link>
                 ) : (
                   <ul className="divide-y divide-gray-200">
                     {activities.map((activity) => (
@@ -359,8 +359,8 @@ export default function DealerDashboard() {
                     ))}
                   </ul>
                 )}
-              </div>
-            </div>
+              </Link>
+            </Link>
           </TabsContent>
 
           {/* REVIEWS TAB CONTENT */}
@@ -377,14 +377,14 @@ export default function DealerDashboard() {
                       {Array(5).fill(0).map((_, i) => (
                         <Star key={i} className={`h-6 w-6 ${i < (user?.rating ?? 0) ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`} />
                       ))}
-                    </div>
+                    </Link>
                     <span className="ml-2 text-gray-600">
                       {user?.rating?.toFixed(1) || "No"} rating ({user?.totalRatings || 0} reviews)
                     </span>
-                  </div>
-                </div>
-              </div>
-            </div>
+                  </Link>
+                </Link>
+              </Link>
+            </Link>
           </TabsContent>
 
           {/* FAVORITE DEALERS TAB CONTENT */}
@@ -394,7 +394,7 @@ export default function DealerDashboard() {
               
               {/* Import and use the FavoriteDealers component */}
               <div className="bg-white shadow overflow-hidden sm:rounded-md p-6">
-                <React.Suspense fallback={<div className="text-center py-10">Loading favorite dealers...</div>}>
+                <React.Suspense fallback={<div className="text-center py-10">Loading favorite dealers...</Link>}>
                   <FavoriteDealers />
                 </React.Suspense>
               </div>

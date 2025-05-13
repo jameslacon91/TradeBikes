@@ -1,5 +1,5 @@
 /**
- * Format time difference into HH:MM:SS format
+ * Format time difference to show days remaining instead of hours
  */
 export function formatTimeDifference(endDate: Date): string {
   const now = new Date();
@@ -11,14 +11,20 @@ export function formatTimeDifference(endDate: Date): string {
     return "Ended";
   }
   
-  // Calculate hours, minutes, seconds
+  // Calculate days, hours, minutes, seconds
   const diffSeconds = Math.floor(diffMs / 1000);
-  const hours = Math.floor(diffSeconds / 3600);
+  const days = Math.floor(diffSeconds / 86400);
+  const hours = Math.floor((diffSeconds % 86400) / 3600);
   const minutes = Math.floor((diffSeconds % 3600) / 60);
-  const seconds = diffSeconds % 60;
   
-  // Format with leading zeros
-  return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+  // Format the output to show days
+  if (days > 0) {
+    return days === 1 ? `1 day` : `${days} days`;
+  } else if (hours > 0) {
+    return hours === 1 ? `1 hour` : `${hours} hours`;
+  } else {
+    return `${minutes} min`;
+  }
 }
 
 /**

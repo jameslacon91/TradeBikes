@@ -49,12 +49,23 @@ export default function BidForm({ auctionId, currentBid, isStock = false }: BidF
   // Mutation for submitting a bid
   const bidMutation = useMutation({
     mutationFn: async (data: BidFormValues) => {
-      const res = await apiRequest("POST", "/api/bids", {
-        auctionId,
-        amount: parseInt(data.amount, 10),
-        comments: data.comments,
-      });
-      return await res.json();
+      try {
+        const res = await apiRequest("POST", "/api/bids", {
+          auctionId,
+          amount: parseInt(data.amount, 10),
+          comments: data.comments,
+        });
+        
+        if (!res.ok) {
+          const errorData = await res.json();
+          throw new Error(errorData.message || "Failed to place bid");
+        }
+        
+        return await res.json();
+      } catch (error: any) {
+        console.error("Bid submission error:", error);
+        throw new Error(error.message || "Failed to place bid");
+      }
     },
     onSuccess: (data) => {
       toast({
@@ -69,6 +80,7 @@ export default function BidForm({ auctionId, currentBid, isStock = false }: BidF
       form.reset({ amount: '', comments: '' });
     },
     onError: (error: any) => {
+      console.error("Bid mutation error:", error);
       toast({
         title: isStock ? "Failed to submit offer" : "Failed to place bid",
         description: error.message || `An error occurred while ${isStock ? 'submitting your offer' : 'placing your bid'}.`,

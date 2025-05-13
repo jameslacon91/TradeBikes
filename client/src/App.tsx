@@ -132,7 +132,7 @@ function MainNavigation() {
                   <li>
                     <Link 
                       href="/create-auction" 
-                      className="text-white bg-accent-foreground hover:bg-accent-foreground/90 rounded-md px-3 py-2 flex items-center"
+                      className="text-white bg-primary hover:bg-primary/90 rounded-md px-3 py-2 flex items-center"
                     >
                       <Plus className="w-4 h-4 mr-1" />
                       List Motorcycle
@@ -201,7 +201,7 @@ function MainNavigation() {
                       <Link 
                         onClick={closeMobileMenu}
                         href="/create-auction" 
-                        className="flex items-center justify-center py-3 text-white bg-primary hover:bg-primary-dark rounded-md"
+                        className="flex items-center justify-center py-3 text-white bg-primary hover:bg-primary/90 rounded-md"
                       >
                         <Plus className="w-5 h-5 mr-2" />
                         List Motorcycle

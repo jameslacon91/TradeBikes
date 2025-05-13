@@ -226,8 +226,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Bids
   app.post("/api/bids", isAuthenticated, async (req, res, next) => {
     try {
-      const validationResult = insertBidSchema.safeParse(req.body);
+      console.log("Received bid request:", req.body);
+      
+      const validationResult = insertBidSchema.safeParse({
+        auctionId: req.body.auctionId,
+        dealerId: req.user.id,
+        amount: req.body.amount
+      });
+      
       if (!validationResult.success) {
+        console.error("Bid validation failed:", validationResult.error.format());
         return res.status(400).json({ message: "Invalid bid data", errors: validationResult.error.format() });
       }
 
