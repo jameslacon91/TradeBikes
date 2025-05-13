@@ -13,7 +13,7 @@ import {
   Clock,
   Phone
 } from 'lucide-react';
-import { format } from 'date-fns';
+import { format, isValid } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
@@ -330,7 +330,7 @@ const BidAcceptance: React.FC<BidAcceptanceProps> = ({ auctions }) => {
                   <CalendarComponent
                     mode="single"
                     selected={collectionDate}
-                    onSelect={(date) => setCollectionDate(date)}
+                    onSelect={(date) => setCollectionDate(date && isValid(date) ? date : null)}
                     initialFocus
                   />
                 </PopoverContent>

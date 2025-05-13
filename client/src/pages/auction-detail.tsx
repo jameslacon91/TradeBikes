@@ -393,7 +393,7 @@ export default function AuctionDetail() { // Component name kept as-is for compa
                             <div>
                               <p className="font-medium">£{bid.amount.toLocaleString()}</p>
                               <p className="text-xs text-gray-500">
-                                {dealerName} • {new Date(bid.createdAt).toLocaleString()}
+                                {dealerName} • {bid.createdAt ? new Date(bid.createdAt).toLocaleString() : 'Recently'}
                               </p>
                             </div>
                             <Button 
