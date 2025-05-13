@@ -37,7 +37,7 @@ export default function DealerDashboard() {
   });
   
   // Fetch activity feed
-  const { data: activityItems, isLoading: activityLoading } = useQuery({
+  const { data: activityItems = [], isLoading: activityLoading } = useQuery<ActivityItemType[]>({
     queryKey: ['/api/activity'],
     enabled: activeTab === 'dashboard'
   });
