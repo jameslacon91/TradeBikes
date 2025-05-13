@@ -573,11 +573,72 @@ export class MemStorage implements IStorage {
     };
     this.auctions.set(auction5.id, auction5);
     
+    // Create auctions for new motorcycles
+    const auction6: Auction = { 
+      id: this.auctionId++,
+      motorcycleId: motorcycle6.id,
+      dealerId: trader4.id, // Sam's Superbikes
+      startTime: new Date(now.getTime() - oneHour * 8), // 8 hours ago
+      endTime: oneWeekFromNow,
+      status: 'active',
+      winningBidId: null,
+      winningBidderId: null,
+      bidAccepted: false,
+      dealConfirmed: false,
+      collectionConfirmed: false,
+      collectionDate: null,
+      highestBidderId: null,
+      visibilityType: 'all',
+      visibilityRadius: null,
+      createdAt: new Date(now.getTime() - oneHour * 8)
+    };
+    this.auctions.set(auction6.id, auction6);
+    
+    const auction7: Auction = { 
+      id: this.auctionId++,
+      motorcycleId: motorcycle7.id,
+      dealerId: trader5.id, // Lucy's Luxury Bikes
+      startTime: new Date(now.getTime() - oneHour * 6), // 6 hours ago
+      endTime: twoDaysFromNow,
+      status: 'active',
+      winningBidId: null,
+      winningBidderId: null,
+      bidAccepted: false,
+      dealConfirmed: false,
+      collectionConfirmed: false,
+      collectionDate: null,
+      highestBidderId: null,
+      visibilityType: 'radius',
+      visibilityRadius: 100, // 100 miles radius
+      createdAt: new Date(now.getTime() - oneHour * 6)
+    };
+    this.auctions.set(auction7.id, auction7);
+    
+    const auction8: Auction = { 
+      id: this.auctionId++,
+      motorcycleId: motorcycle8.id,
+      dealerId: dealer3.id, // Scott Motors
+      startTime: new Date(now.getTime() - oneHour * 10), // 10 hours ago
+      endTime: oneWeekFromNow,
+      status: 'active',
+      winningBidId: null,
+      winningBidderId: null,
+      bidAccepted: false,
+      dealConfirmed: false,
+      collectionConfirmed: false,
+      collectionDate: null,
+      highestBidderId: null,
+      visibilityType: 'favorites',
+      visibilityRadius: null,
+      createdAt: new Date(now.getTime() - oneHour * 10)
+    };
+    this.auctions.set(auction8.id, auction8);
+    
     // Create sample bids
     const bid1: Bid = { 
       id: this.bidId++,
       auctionId: auction1.id,
-      traderId: trader1.id,
+      dealerId: trader1.id,
       amount: 6500,
       createdAt: new Date(now.getTime() - oneHour * 4) // 4 hours ago
     };
@@ -586,7 +647,7 @@ export class MemStorage implements IStorage {
     const bid2: Bid = { 
       id: this.bidId++,
       auctionId: auction1.id,
-      traderId: trader2.id,
+      dealerId: trader2.id,
       amount: 6800,
       createdAt: new Date(now.getTime() - oneHour * 3) // 3 hours ago
     };
@@ -595,7 +656,7 @@ export class MemStorage implements IStorage {
     const bid3: Bid = { 
       id: this.bidId++,
       auctionId: auction1.id,
-      traderId: trader1.id,
+      dealerId: trader1.id,
       amount: 7000,
       createdAt: new Date(now.getTime() - oneHour * 2) // 2 hours ago
     };
@@ -604,7 +665,7 @@ export class MemStorage implements IStorage {
     const bid4: Bid = { 
       id: this.bidId++,
       auctionId: auction1.id,
-      traderId: trader3.id,
+      dealerId: trader3.id,
       amount: 7200,
       createdAt: new Date(now.getTime() - oneHour * 1) // 1 hour ago
     };
@@ -614,7 +675,7 @@ export class MemStorage implements IStorage {
     const bid5: Bid = { 
       id: this.bidId++,
       auctionId: auction2.id,
-      traderId: trader1.id,
+      dealerId: trader1.id,
       amount: 15500,
       createdAt: new Date(now.getTime() - oneHour * 9) // 9 hours ago
     };
@@ -623,7 +684,7 @@ export class MemStorage implements IStorage {
     const bid6: Bid = { 
       id: this.bidId++,
       auctionId: auction2.id,
-      traderId: trader2.id,
+      dealerId: trader2.id,
       amount: 16000,
       createdAt: new Date(now.getTime() - oneHour * 7) // 7 hours ago
     };
@@ -633,7 +694,7 @@ export class MemStorage implements IStorage {
     const bid7: Bid = { 
       id: this.bidId++,
       auctionId: auction4.id,
-      traderId: trader1.id,
+      dealerId: trader1.id,
       amount: 8200,
       createdAt: new Date(now.getTime() - oneHour * 10) // 10 hours ago
     };
@@ -642,7 +703,7 @@ export class MemStorage implements IStorage {
     const bid8: Bid = { 
       id: this.bidId++,
       auctionId: auction4.id,
-      traderId: trader3.id,
+      dealerId: trader3.id,
       amount: 8500,
       createdAt: new Date(now.getTime() - oneHour * 8) // 8 hours ago
     };
