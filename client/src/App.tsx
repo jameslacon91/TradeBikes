@@ -281,8 +281,11 @@ function App() {
           <AuthProvider>
             <TooltipProvider>
               <Toaster />
-              <div className="min-h-screen bg-background text-foreground">
-                <Router />
+              <div className="min-h-screen flex flex-col bg-background text-foreground">
+                <MainNavigation />
+                <main className="flex-grow">
+                  <Router />
+                </main>
                 <InstallPrompt />
               </div>
             </TooltipProvider>
