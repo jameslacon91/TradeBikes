@@ -18,7 +18,7 @@ import { Label } from '@/components/ui/label';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { CalendarIcon } from '@radix-ui/react-icons';
 import { Calendar as CalendarComponent } from '@/components/ui/calendar';
-import { format } from 'date-fns';
+import { format, isValid } from 'date-fns';
 import { apiRequest, queryClient } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
 

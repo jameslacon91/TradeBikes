@@ -385,6 +385,51 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // API for bid acceptance (dealer only)
+  // Endpoint to end an auction early
+  app.patch("/api/auctions/:id/end", isAuthenticated, hasRole("dealer"), async (req, res, next) => {
+    try {
+      const auctionId = parseInt(req.params.id);
+      
+      const auction = await storage.getAuction(auctionId);
+      
+      if (!auction) {
+        return res.status(404).json({ message: "Auction not found" });
+      }
+      
+      if (auction.dealerId !== req.user.id) {
+        return res.status(403).json({ message: "Not authorized to end this auction" });
+      }
+      
+      if (auction.status !== "active") {
+        return res.status(400).json({ message: "Auction is not active" });
+      }
+      
+      // Update the auction end time to now and mark as completed
+      const now = new Date();
+      const updatedAuction = await storage.updateAuction(auctionId, {
+        endTime: now,
+        status: "completed"
+      });
+      
+      // Send WebSocket notification
+      const wsMessage: WSMessage = {
+        type: "auction_completed",
+        data: {
+          auctionId: auction.id,
+          message: "The auction has been ended early by the seller",
+        },
+        timestamp: new Date().toISOString()
+      };
+      
+      // Broadcast to all users
+      broadcast(wsMessage);
+      
+      return res.status(200).json(updatedAuction);
+    } catch (error) {
+      next(error);
+    }
+  });
+
   app.post("/api/auctions/:id/accept-bid", isAuthenticated, hasRole("dealer"), async (req, res, next) => {
     try {
       const auctionId = parseInt(req.params.id);
