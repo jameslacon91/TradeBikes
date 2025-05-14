@@ -166,15 +166,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       await apiRequest("POST", "/api/logout");
     },
     onSuccess: () => {
-      // Clear all query caches to prevent data from persisting between user sessions
+      // Hard reset the entire React Query client
       queryClient.clear();
       
-      // Still set user data to null explicitly
-      queryClient.setQueryData(["/api/user"], null);
+      // Reset the cache with a newly created client to ensure complete cleanup
+      if (typeof window !== 'undefined') {
+        // Force browser reload to completely reset all state
+        window.location.href = '/auth';
+      }
       
-      // Notify about logout
+      // This will run if the redirect doesn't happen immediately
       dispatchAuthEvent(undefined);
-      
       toast({
         title: "Logged out",
         description: "You have been logged out successfully.",

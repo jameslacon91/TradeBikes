@@ -27,6 +27,41 @@ export default function DealerDashboard() {
   const [activeTab, setActiveTab] = useState('dashboard');
   const { toast } = useToast();
   
+  // Get query references for manual refetching
+  const { refetch: refetchStats } = useQuery<DashboardStats>({
+    queryKey: ['/api/dashboard/stats', user?.id],
+    enabled: false // Just to get the refetch function
+  });
+  
+  const { refetch: refetchDealerAuctions } = useQuery<AuctionWithDetails[]>({
+    queryKey: ['/api/auctions/dealer', user?.id],
+    enabled: false // Just to get the refetch function
+  });
+  
+  const { refetch: refetchActivity } = useQuery<ActivityItemType[]>({
+    queryKey: ['/api/activity', user?.id],
+    enabled: false // Just to get the refetch function
+  });
+  
+  const { refetch: refetchBids } = useQuery<AuctionWithDetails[]>({
+    queryKey: ['/api/auctions/bids', user?.id],
+    enabled: false // Just to get the refetch function
+  });
+  
+  // Force a refetch of all data when the user changes
+  useEffect(() => {
+    // This effect runs when the user ID changes, ensuring fresh data
+    if (user) {
+      console.log("User ID changed, refetching all dashboard data");
+      
+      // Manually refetch all data to ensure fresh state
+      refetchStats();
+      refetchDealerAuctions();
+      refetchActivity();
+      refetchBids();
+    }
+  }, [user?.id, refetchStats, refetchDealerAuctions, refetchActivity, refetchBids]);
+  
   // Fetch dashboard stats
   const { data: stats, isLoading: statsLoading } = useQuery<DashboardStats>({
     queryKey: ['/api/dashboard/stats', user?.id],
