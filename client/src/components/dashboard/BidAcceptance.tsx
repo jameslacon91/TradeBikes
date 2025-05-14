@@ -45,7 +45,8 @@ const BidAcceptance: React.FC<BidAcceptanceProps> = ({ auctions }) => {
   const [selectedBid, setSelectedBid] = useState<Bid | null>(null);
   const [isAcceptDialogOpen, setIsAcceptDialogOpen] = useState(false);
   const [isCollectionDialogOpen, setIsCollectionDialogOpen] = useState(false);
-  const [collectionDate, setCollectionDate] = useState<Date | null>(null);
+  // Using Date | undefined for the calendar component which doesn't accept null
+  const [collectionDate, setCollectionDate] = useState<Date | undefined>(undefined);
   const [collectionNotes, setCollectionNotes] = useState('');
   
   // Fetch dealer information
@@ -97,7 +98,14 @@ const BidAcceptance: React.FC<BidAcceptanceProps> = ({ auctions }) => {
   // Schedule collection
   const scheduleCollectionMutation = useMutation({
     mutationFn: async () => {
-      if (!selectedAuction || !selectedBid || !collectionDate) return;
+      if (!selectedAuction || !selectedBid || !collectionDate) {
+        toast({
+          title: 'Error',
+          description: 'Please select a collection date',
+          variant: 'destructive',
+        });
+        return;
+      }
       return await apiRequest('POST', `/api/auctions/${selectedAuction.id}/schedule-collection`, {
         bidId: selectedBid.id,
         collectionDate,
@@ -344,7 +352,7 @@ const BidAcceptance: React.FC<BidAcceptanceProps> = ({ auctions }) => {
                   <CalendarComponent
                     mode="single"
                     selected={collectionDate}
-                    onSelect={(date) => setCollectionDate(date && isValid(date) ? date : null)}
+                    onSelect={(date) => setCollectionDate(date && isValid(date) ? date : undefined)}
                     initialFocus
                   />
                 </PopoverContent>
