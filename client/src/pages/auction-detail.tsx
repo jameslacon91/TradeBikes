@@ -316,7 +316,10 @@ export default function AuctionDetail() { // Component name kept as-is for compa
                   <div>
                     <h4 className="text-sm font-medium text-gray-500">Current Bid</h4>
                     <p className="text-2xl font-bold text-gray-900">
-                      {auction.currentBid ? `£${auction.currentBid.toLocaleString()}` : 'No bids yet'}
+                      {dealerOwnsAuction
+                        ? (auction.currentBid ? `£${auction.currentBid.toLocaleString()}` : 'No bids yet')
+                        : (auction.totalBids > 0 ? 'Blind Underwrite' : 'No bids yet')
+                      }
                     </p>
                   </div>
                   <div>
