@@ -64,9 +64,9 @@ export default function DealerDashboard() {
   
   // Fetch dashboard stats
   const { data: stats, isLoading: statsLoading } = useQuery<DashboardStats>({
-    queryKey: ['/api/dashboard/stats', user?.id],
-    enabled: activeTab === 'dashboard' && !!user,
-    staleTime: 0 // Always refetch when query key changes (e.g., when user changes)
+    queryKey: ['/api/dashboard/stats', user?.id], // Include user ID in cache key for isolation
+    staleTime: 0, // Always consider data stale to force refetching
+    enabled: activeTab === 'dashboard' && !!user
   });
   
   // Fetch dealer auctions - needed for multiple tabs

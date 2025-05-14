@@ -94,12 +94,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     },
     onSuccess: (user: User) => {
       console.log("Login mutation successful, updating user data");
+      
+      // Clear all cache data to ensure no data from previous users remains
+      queryClient.clear();
+      
+      // Set new user data
       queryClient.setQueryData(["/api/user"], user);
       
       // Explicitly refetch user data to ensure session is established
       setTimeout(() => {
         console.log("Refetching user data after login");
         refetchUser();
+        
+        // Force page reload to ensure clean state
+        if (typeof window !== 'undefined') {
+          window.location.href = '/dashboard';
+        }
       }, 500);
       
       // Notify about successful login
@@ -135,12 +145,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     },
     onSuccess: (user: User) => {
       console.log("Registration mutation successful, updating user data");
+      
+      // Clear all cache data for clean state
+      queryClient.clear();
+      
+      // Set new user data
       queryClient.setQueryData(["/api/user"], user);
       
       // Explicitly refetch user data to ensure session is established
       setTimeout(() => {
         console.log("Refetching user data after registration");
         refetchUser();
+        
+        // Force page reload to ensure clean state
+        if (typeof window !== 'undefined') {
+          window.location.href = '/dashboard';
+        }
       }, 500);
       
       // Notify about successful registration
