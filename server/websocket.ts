@@ -38,8 +38,8 @@ export function setupWebSocket(server: Server) {
           case 'auction_ending':
             // Handle auction ending notifications
             break;
-          case 'auction_completed':
-            await handleAuctionCompleted(data);
+          case 'underwrite_completed':
+            await handleUnderwriteCompleted(data);
             break;
           case 'new_message':
             await handleNewMessage(data);
@@ -147,7 +147,7 @@ async function handleNewBid(message: WSMessage) {
 }
 
 // Handle underwrite completed event
-async function handleAuctionCompleted(message: WSMessage) {
+async function handleUnderwriteCompleted(message: WSMessage) {
   const { auctionId } = message.data;
   
   try {
