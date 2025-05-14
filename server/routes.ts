@@ -256,11 +256,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Auction has ended" });
       }
       
-      // Check if bid is higher than current highest bid
-      const highestBid = await storage.getHighestBidForAuction(auctionId);
-      if (highestBid && amount <= highestBid.amount) {
-        return res.status(400).json({ message: "Bid must be higher than current highest bid" });
-      }
+      // No need to check if bid is higher than current highest bid
+      // Blind bidding system allows any bid amount
+      // The seller will decide which bid to accept
       
       // Create bid
       const bid = await storage.createBid({
