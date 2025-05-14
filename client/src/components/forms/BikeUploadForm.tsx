@@ -289,8 +289,8 @@ export default function BikeUploadForm() {
         
         {/* Basic Details Section */}
         <div>
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Basic Details</h2>
-          <p className="text-sm text-gray-500 mb-4">Fields marked with * are required.</p>
+          <h2 className="text-lg font-semibold text-gray-100 mb-4">Basic Details</h2>
+          <p className="text-sm text-gray-400 mb-4">Fields marked with * are required.</p>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <FormField
               control={form.control}
@@ -381,7 +381,7 @@ export default function BikeUploadForm() {
         
         {/* Specifications Section */}
         <div>
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Specifications</h2>
+          <h2 className="text-lg font-semibold text-gray-100 mb-4">Specifications</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <FormField
               control={form.control}
@@ -453,7 +453,7 @@ export default function BikeUploadForm() {
         
         {/* Registration Number */}
         <div>
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Registration Information</h2>
+          <h2 className="text-lg font-semibold text-gray-100 mb-4">Registration Information</h2>
           <FormField
             control={form.control}
             name="regNumber"
@@ -477,7 +477,7 @@ export default function BikeUploadForm() {
         
         {/* Additional Vehicle Details Section */}
         <div>
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Vehicle Condition</h2>
+          <h2 className="text-lg font-semibold text-gray-100 mb-4">Vehicle Condition</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <FormField
               control={form.control}
@@ -557,7 +557,7 @@ export default function BikeUploadForm() {
         
         {/* Accessories & Damage */}
         <div>
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Accessories & Damage</h2>
+          <h2 className="text-lg font-semibold text-gray-100 mb-4">Accessories & Damage</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <FormField
               control={form.control}
@@ -603,7 +603,7 @@ export default function BikeUploadForm() {
         
         {/* Description Section */}
         <div>
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Description</h2>
+          <h2 className="text-lg font-semibold text-gray-100 mb-4">Description</h2>
           <FormField
             control={form.control}
             name="description"
@@ -626,7 +626,7 @@ export default function BikeUploadForm() {
         
         {/* Images Section */}
         <div>
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Images</h2>
+          <h2 className="text-lg font-semibold text-gray-100 mb-4">Images</h2>
           
           <div className="mb-4">
             <Label htmlFor="images">Upload Images (max 20)</Label>
@@ -676,7 +676,7 @@ export default function BikeUploadForm() {
         
         {/* Auction Details Section */}
         <div>
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Auction Details</h2>
+          <h2 className="text-lg font-semibold text-gray-100 mb-4">Auction Details</h2>
           <div className="mt-4 space-y-6">
             <FormField
               control={form.control}
