@@ -425,7 +425,7 @@ export default function DealerDashboard() {
             <TabsContent value="past-listings" className="space-y-6">
               <div className="space-y-4">
                 <h2 className="text-xl font-semibold">Past Listings</h2>
-                <p className="text-muted-foreground">View your completed underwrites.</p>
+                <p className="text-muted-foreground">View your completed listings.</p>
                 
                 {auctionsLoading ? (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -444,7 +444,7 @@ export default function DealerDashboard() {
                 ) : pastListings.length === 0 ? (
                   <div className="text-center py-12 border rounded-lg">
                     <Clock className="h-12 w-12 mx-auto text-muted-foreground/50 mb-4" />
-                    <h3 className="text-lg font-medium mb-2">You don't have any completed underwrites.</h3>
+                    <h3 className="text-lg font-medium mb-2">You don't have any completed listings.</h3>
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

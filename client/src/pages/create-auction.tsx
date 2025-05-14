@@ -22,7 +22,7 @@ export default function CreateAuction() { // Component name kept as-is for compa
           <div className="mb-8">
             <h1 className="text-2xl font-semibold text-gray-100">List a New Motorcycle</h1>
             <p className="mt-1 text-sm text-gray-400">
-              Fill in the details below to create a new underwrite listing for your motorcycle.
+              Fill in the details below to create a new listing for your motorcycle.
             </p>
           </div>
 

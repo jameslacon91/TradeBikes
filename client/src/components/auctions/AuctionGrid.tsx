@@ -89,7 +89,7 @@ export default function AuctionGrid() { // Component name kept as-is for compati
       
       {filteredAuctions.length === 0 && (
         <div className="text-center py-10">
-          <p className="text-gray-500">No underwrites found matching the selected filter.</p>
+          <p className="text-gray-500">No listings found matching the selected filter.</p>
         </div>
       )}
     </div>
