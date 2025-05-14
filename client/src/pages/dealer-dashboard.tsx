@@ -52,10 +52,11 @@ export default function DealerDashboard() {
   
   const hasListings = userAuctions.length > 0;
   
-  // Get auctions where the user has placed bids (excluding pending collection)
+  // Get auctions where the user has placed bids (excluding accepted bids and pending collection)
   const placedBids = activeAuctions?.filter(auction => 
     auction.bids?.some(bid => bid.dealerId === user?.id) && 
     auction.status !== 'pending_collection' &&
+    !auction.bidAccepted &&
     auction.winningBidderId !== user?.id
   ) || [];
   
@@ -80,9 +81,9 @@ export default function DealerDashboard() {
   let pendingCollection: AuctionWithDetails[] = [];
   
   if (activeAuctions) {
-    // First filter for pending collections
+    // First filter for pending collections and accepted bids
     const filteredAuctions = activeAuctions.filter(auction => 
-      auction.status === 'pending_collection' && 
+      (auction.status === 'pending_collection' || auction.bidAccepted) && 
       (auction.dealerId === user?.id || auction.winningBidderId === user?.id)
     );
     

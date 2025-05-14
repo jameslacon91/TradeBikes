@@ -9,6 +9,7 @@ import { apiRequest, queryClient } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
 import { Bid } from '@shared/schema';
 import { cn } from '@/lib/utils';
+import { useLocation } from 'wouter';
 
 interface BidConfirmationProps {
   auctionId: number;
@@ -35,6 +36,7 @@ export default function BidConfirmation({
 }: BidConfirmationProps) {
   const [date, setDate] = useState<Date | undefined>(undefined);
   const { toast } = useToast();
+  const [, navigate] = useLocation();
 
   // Accept bid mutation (seller only)
   const acceptBidMutation = useMutation({
@@ -103,6 +105,8 @@ export default function BidConfirmation({
         description: 'The buyer has been notified of the collection date.',
       });
       queryClient.invalidateQueries({ queryKey: [`/api/auctions/${auctionId}`] });
+      // Navigate to dashboard after scheduling collection
+      setTimeout(() => navigate('/dashboard'), 500);
       if (onSuccess) onSuccess();
     },
     onError: (error: Error) => {
