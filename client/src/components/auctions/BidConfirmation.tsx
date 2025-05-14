@@ -50,7 +50,10 @@ export default function BidConfirmation({
         title: 'Bid accepted',
         description: 'The buyer has been notified.',
       });
+      // Invalidate both the specific auction and the dealer's auction list
       queryClient.invalidateQueries({ queryKey: [`/api/auctions/${auctionId}`] });
+      queryClient.invalidateQueries({ queryKey: ['/api/auctions/dealer'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/dashboard/stats'] });
       if (onSuccess) onSuccess();
     },
     onError: (error: Error) => {
