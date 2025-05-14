@@ -185,6 +185,50 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Create a new auction
+  app.post("/api/auctions", isAuthenticated, hasRole("dealer"), async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const validationResult = insertAuctionSchema.safeParse(req.body);
+      if (!validationResult.success) {
+        return res.status(400).json({ message: "Invalid auction data", errors: validationResult.error.format() });
+      }
+      
+      if (!req.user || !req.user.id) {
+        return res.status(401).json({ message: "Authentication required" });
+      }
+      
+      const { motorcycleId, startTime, endTime, visibilityType, visibilityRadius } = validationResult.data;
+      
+      // Verify motorcycle exists and belongs to dealer
+      const motorcycle = await storage.getMotorcycle(motorcycleId);
+      if (!motorcycle) {
+        return res.status(404).json({ message: "Motorcycle not found" });
+      }
+      
+      if (motorcycle.dealerId !== req.user.id) {
+        return res.status(403).json({ message: "You can only create auctions for your own motorcycles" });
+      }
+      
+      // Parse dates properly if they're provided as strings
+      const startTimeDate = startTime ? new Date(startTime) : new Date();
+      const endTimeDate = new Date(endTime);
+      
+      // Create auction with visibility options
+      const auction = await storage.createAuction({
+        motorcycleId,
+        dealerId: req.user.id,
+        startTime: startTimeDate,
+        endTime: endTimeDate,
+        visibilityType: visibilityType || 'all', // Default to showing all dealers
+        visibilityRadius: visibilityType === 'radius' ? visibilityRadius : null
+      });
+      
+      res.status(201).json(auction);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  // Bids
   app.post("/api/bids", isAuthenticated, async (req, res, next) => {
     try {
       console.log("Received bid request:", req.body);
