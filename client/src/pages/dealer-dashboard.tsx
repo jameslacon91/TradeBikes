@@ -75,15 +75,19 @@ export default function DealerDashboard() {
   
   // Filter auctions by status
   const activeListings = userAuctions.filter(a => a.status === 'active');
-  const pastListings = userAuctions.filter(a => a.status === 'completed');
+  // Past listings should include completed auctions and collections that have been confirmed
+  const pastListings = userAuctions.filter(a => 
+    a.status === 'completed' || a.collectionConfirmed === true
+  );
   
   // Get pending collection auctions (for both sellers and buyers)
   let pendingCollection: AuctionWithDetails[] = [];
   
   if (activeAuctions) {
-    // First filter for pending collections and accepted bids
+    // First filter for pending collections and accepted bids (but exclude those that have been marked as completed)
     const filteredAuctions = activeAuctions.filter(auction => 
       (auction.status === 'pending_collection' || auction.bidAccepted) && 
+      !auction.collectionConfirmed && // Exclude completed collections
       (auction.dealerId === user?.id || auction.winningBidderId === user?.id)
     );
     
