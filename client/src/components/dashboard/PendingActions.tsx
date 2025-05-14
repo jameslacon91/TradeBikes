@@ -23,8 +23,9 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
-import { Check, Calendar as CalendarIcon, Clock, MessageSquare } from 'lucide-react';
-import { format, isValid, parseISO } from 'date-fns';
+import { format } from 'date-fns';
+import { CalendarIcon } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface PendingActionsProps {
   auction: AuctionWithDetails;
@@ -37,6 +38,7 @@ export default function PendingActions({ auction, isSeller }: PendingActionsProp
   const [isExtendDateDialogOpen, setIsExtendDateDialogOpen] = useState(false);
   const [message, setMessage] = useState('');
   const [newDate, setNewDate] = useState<Date | null>(null);
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   
   const completeDealMutation = useMutation({
     mutationFn: async () => {
@@ -48,11 +50,12 @@ export default function PendingActions({ auction, isSeller }: PendingActionsProp
         title: 'Transaction completed',
         description: 'The motorcycle transaction has been marked as completed',
       });
-      queryClient.invalidateQueries({ queryKey: ['/api/auctions/dealer'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/auctions'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/dashboard'] });
     },
     onError: (error: Error) => {
       toast({
-        title: 'Failed to complete transaction',
+        title: 'Error',
         description: error.message,
         variant: 'destructive',
       });
@@ -60,11 +63,10 @@ export default function PendingActions({ auction, isSeller }: PendingActionsProp
   });
   
   const extendDateMutation = useMutation({
-    mutationFn: async (newDateValue: Date | null) => {
-      if (!newDateValue) throw new Error('Please select a valid date');
-      
+    mutationFn: async () => {
+      if (!newDate) return;
       const res = await apiRequest('POST', `/api/auctions/${auction.id}/extend-date`, {
-        newAvailabilityDate: newDateValue.toISOString(),
+        newAvailabilityDate: newDate.toISOString(),
       });
       return await res.json();
     },
@@ -73,12 +75,13 @@ export default function PendingActions({ auction, isSeller }: PendingActionsProp
         title: 'Date extended',
         description: 'The availability date has been updated',
       });
-      queryClient.invalidateQueries({ queryKey: ['/api/auctions/dealer'] });
       setIsExtendDateDialogOpen(false);
+      queryClient.invalidateQueries({ queryKey: ['/api/auctions'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/dashboard'] });
     },
     onError: (error: Error) => {
       toast({
-        title: 'Failed to extend date',
+        title: 'Error',
         description: error.message,
         variant: 'destructive',
       });
@@ -86,207 +89,197 @@ export default function PendingActions({ auction, isSeller }: PendingActionsProp
   });
   
   const sendMessageMutation = useMutation({
-    mutationFn: async (messageContent: string) => {
-      if (!messageContent.trim()) throw new Error('Please enter a message');
-      
-      const recipientId = isSeller 
-        ? auction.winningBidderId 
-        : auction.dealerId;
+    mutationFn: async () => {
+      const recipientId = isSeller ? auction.winningBidderId : auction.dealerId;
+      if (!recipientId) return;
       
       const res = await apiRequest('POST', '/api/messages', {
-        content: messageContent,
-        receiverId: recipientId,
-        auctionId: auction.id,
+        recipientId: recipientId,
+        content: message,
+        relatedAuctionId: auction.id,
       });
       return await res.json();
     },
     onSuccess: () => {
       toast({
         title: 'Message sent',
-        description: 'Your message has been sent',
+        description: 'Your message has been sent successfully',
       });
-      setMessage('');
       setIsMessageDialogOpen(false);
-      queryClient.invalidateQueries({ queryKey: ['/api/messages'] });
+      setMessage('');
     },
     onError: (error: Error) => {
       toast({
-        title: 'Failed to send message',
+        title: 'Error',
         description: error.message,
         variant: 'destructive',
       });
     },
   });
   
-  const handleCompleteAction = () => {
-    completeDealMutation.mutate();
+  const handleCompleteDeal = () => {
+    if (window.confirm('Are you sure you want to mark this transaction as complete?')) {
+      completeDealMutation.mutate();
+    }
   };
   
-  const handleSendMessage = () => {
-    sendMessageMutation.mutate(message);
+  const handleExtendDate = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newDate) {
+      toast({
+        title: 'Error',
+        description: 'Please select a new availability date',
+        variant: 'destructive',
+      });
+      return;
+    }
+    extendDateMutation.mutate();
   };
   
-  const handleExtendDate = () => {
-    extendDateMutation.mutate(newDate);
+  const handleSendMessage = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!message.trim()) {
+      toast({
+        title: 'Error',
+        description: 'Message cannot be empty',
+        variant: 'destructive',
+      });
+      return;
+    }
+    sendMessageMutation.mutate();
   };
   
-  const availabilityDate = auction.motorcycle?.dateAvailable 
-    ? typeof auction.motorcycle.dateAvailable === 'string'
-      ? auction.motorcycle.dateAvailable.includes('T')
-        ? parseISO(auction.motorcycle.dateAvailable)
-        : new Date()
-      : new Date()
-    : new Date();
+  // Determine available actions based on role and auction state
+  const canMarkComplete = isSeller && auction.status === 'pending_collection';
+  const canExtendDate = isSeller && auction.status === 'pending_collection';
+  const canMessage = true; // Both buyer and seller can message
   
-  const partnerRole = isSeller ? 'Buyer' : 'Seller';
-  const partnerName = isSeller 
-    ? `Buyer #${auction.winningBidderId}`
-    : `${auction.motorcycle?.make || 'Vehicle'} Seller`;
-  
+  const motorcycle = auction.motorcycle;
+  const availabilityDate = motorcycle?.dateAvailable 
+    ? new Date(motorcycle.dateAvailable)
+    : null;
+    
   return (
-    <div className="flex flex-col gap-4 mt-4">
-      <div className="bg-muted/40 p-4 rounded-lg">
-        <h3 className="font-medium mb-2">Collection Information</h3>
-        <p className="text-sm text-muted-foreground mb-1">
-          <span className="font-medium">Status:</span> Pending Collection
-        </p>
-        <p className="text-sm text-muted-foreground mb-1">
-          <span className="font-medium">Available from:</span>{' '}
-          {typeof auction.motorcycle?.dateAvailable === 'string'
-            ? auction.motorcycle.dateAvailable
-            : 'Date not specified'}
-        </p>
-        {isSeller && (
-          <div className="flex gap-2 mt-4">
-            <Button
-              size="sm"
-              onClick={handleCompleteAction}
-              disabled={completeDealMutation.isPending}
-            >
-              {completeDealMutation.isPending ? (
-                <Clock className="mr-2 h-4 w-4 animate-spin" />
-              ) : (
-                <Check className="mr-2 h-4 w-4" />
-              )}
-              Mark as Completed
-            </Button>
-            
-            <Dialog open={isExtendDateDialogOpen} onOpenChange={setIsExtendDateDialogOpen}>
-              <DialogTrigger asChild>
-                <Button variant="outline" size="sm">
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  Extend Date
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Extend Availability Date</DialogTitle>
-                  <DialogDescription>
-                    Update when the motorcycle will be available for collection.
-                  </DialogDescription>
-                </DialogHeader>
-                
-                <div className="my-4 space-y-4">
-                  <div className="space-y-2">
-                    <Label>Current availability: </Label>
-                    <p className="text-sm text-muted-foreground">
-                      {typeof auction.motorcycle?.dateAvailable === 'string'
-                        ? auction.motorcycle.dateAvailable
-                        : 'Date not specified'}
-                    </p>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="collectionDate">New availability date</Label>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <Button
-                          variant="outline"
-                          className="w-full justify-start text-left"
-                        >
-                          <CalendarIcon className="mr-2 h-4 w-4" />
-                          {newDate && isValid(newDate)
-                            ? format(newDate, 'PPP')
-                            : "Select a new date"}
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0">
-                        <Calendar
-                          mode="single"
-                          selected={newDate}
-                          onSelect={setNewDate}
-                          disabled={(date) => date < new Date()}
-                          initialFocus
-                        />
-                      </PopoverContent>
-                    </Popover>
-                  </div>
-                </div>
-                
-                <DialogFooter>
-                  <Button 
-                    variant="ghost" 
-                    onClick={() => setIsExtendDateDialogOpen(false)}
-                  >
-                    Cancel
-                  </Button>
-                  <Button 
-                    onClick={handleExtendDate}
-                    disabled={extendDateMutation.isPending || !newDate}
-                  >
-                    {extendDateMutation.isPending ? 'Updating...' : 'Update Date'}
-                  </Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
-          </div>
-        )}
-      </div>
+    <div className="flex flex-col gap-2">
+      {/* Only show complete button to seller */}
+      {canMarkComplete && (
+        <Button 
+          onClick={handleCompleteDeal}
+          className="w-full"
+          variant="success"
+          disabled={completeDealMutation.isPending}
+        >
+          {completeDealMutation.isPending ? 'Processing...' : 'Mark as Complete'}
+        </Button>
+      )}
       
-      <Dialog open={isMessageDialogOpen} onOpenChange={setIsMessageDialogOpen}>
-        <DialogTrigger asChild>
-          <Button variant="outline" className="w-full">
-            <MessageSquare className="mr-2 h-4 w-4" />
-            Message {partnerRole}
-          </Button>
-        </DialogTrigger>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Message to {partnerName}</DialogTitle>
-            <DialogDescription>
-              Send a message about this motorcycle transaction.
-            </DialogDescription>
-          </DialogHeader>
-          
-          <div className="my-4 space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="message">Your message</Label>
-              <Textarea
-                id="message"
-                placeholder={`Type your message to the ${partnerRole.toLowerCase()}...`}
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                className="min-h-[100px]"
-              />
-            </div>
-          </div>
-          
-          <DialogFooter>
+      {/* Only show extend date to seller */}
+      {canExtendDate && (
+        <Dialog open={isExtendDateDialogOpen} onOpenChange={setIsExtendDateDialogOpen}>
+          <DialogTrigger asChild>
             <Button 
-              variant="ghost" 
-              onClick={() => setIsMessageDialogOpen(false)}
+              className="w-full" 
+              variant="outline"
+              disabled={extendDateMutation.isPending}
             >
-              Cancel
+              Extend Availability Date
             </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Extend Availability Date</DialogTitle>
+              <DialogDescription>
+                Current availability date: {availabilityDate 
+                  ? format(availabilityDate, 'PPP') 
+                  : 'Not set'
+                }
+              </DialogDescription>
+            </DialogHeader>
+            
+            <form onSubmit={handleExtendDate} className="space-y-4 py-4">
+              <div className="flex flex-col gap-2">
+                <Label htmlFor="newDate">New Availability Date</Label>
+                <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className={cn(
+                        "w-full justify-start text-left font-normal",
+                        !newDate && "text-muted-foreground"
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {newDate ? format(newDate, "PPP") : "Select a date"}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0">
+                    <Calendar
+                      mode="single"
+                      selected={newDate || undefined}
+                      onSelect={(date) => {
+                        setNewDate(date || null);
+                        setIsCalendarOpen(false);
+                      }}
+                      initialFocus
+                      disabled={(date) => date < new Date()}
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
+              
+              <DialogFooter>
+                <Button type="submit" disabled={!newDate || extendDateMutation.isPending}>
+                  {extendDateMutation.isPending ? 'Saving...' : 'Save Date'}
+                </Button>
+              </DialogFooter>
+            </form>
+          </DialogContent>
+        </Dialog>
+      )}
+      
+      {/* Both buyer and seller can send messages */}
+      {canMessage && (
+        <Dialog open={isMessageDialogOpen} onOpenChange={setIsMessageDialogOpen}>
+          <DialogTrigger asChild>
             <Button 
-              onClick={handleSendMessage}
-              disabled={sendMessageMutation.isPending || !message.trim()}
+              className="w-full" 
+              variant="secondary"
+              disabled={sendMessageMutation.isPending}
             >
-              {sendMessageMutation.isPending ? 'Sending...' : 'Send Message'}
+              Send Message
             </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Send Message</DialogTitle>
+              <DialogDescription>
+                Send a message to the {isSeller ? 'buyer' : 'seller'} about this motorcycle.
+              </DialogDescription>
+            </DialogHeader>
+            
+            <form onSubmit={handleSendMessage} className="space-y-4 py-4">
+              <div className="flex flex-col gap-2">
+                <Label htmlFor="message">Message</Label>
+                <Textarea
+                  id="message"
+                  placeholder="Type your message here..."
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  rows={5}
+                  className="resize-none"
+                  required
+                />
+              </div>
+              
+              <DialogFooter>
+                <Button type="submit" disabled={!message.trim() || sendMessageMutation.isPending}>
+                  {sendMessageMutation.isPending ? 'Sending...' : 'Send Message'}
+                </Button>
+              </DialogFooter>
+            </form>
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   );
 }

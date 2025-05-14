@@ -911,5 +911,125 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // API for completing a deal (only the seller can mark as complete)
+  app.post("/api/auctions/:id/complete-deal", isAuthenticated, hasRole("dealer"), async (req, res, next) => {
+    try {
+      const auctionId = parseInt(req.params.id);
+      
+      const auction = await storage.getAuction(auctionId);
+      if (!auction) {
+        return res.status(404).json({ message: "Auction not found" });
+      }
+      
+      // Only the seller can complete the deal
+      if (auction.dealerId !== req.user.id) {
+        return res.status(403).json({ message: "Only the seller can mark this deal as complete" });
+      }
+      
+      // Update auction status to completed
+      const updatedAuction = await storage.updateAuction(auctionId, {
+        status: "completed",
+        collectionConfirmed: true
+      });
+      
+      // Get motorcycle details for the notification
+      const motorcycle = await storage.getMotorcycle(auction.motorcycleId);
+      
+      // Send WebSocket notification to buyer
+      const wsMessage: WSMessage = {
+        type: "collection_confirmed",
+        data: {
+          auctionId: auctionId,
+          motorcycleId: auction.motorcycleId,
+          sellerId: auction.dealerId,
+          bidderId: auction.winningBidderId,
+          make: motorcycle?.make || '',
+          model: motorcycle?.model || '',
+          year: motorcycle?.year || 0
+        },
+        timestamp: Date.now()
+      };
+      
+      if (auction.winningBidderId) {
+        sendToUser(auction.winningBidderId, wsMessage);
+        
+        // Create notification for buyer
+        await storage.createNotification({
+          userId: auction.winningBidderId,
+          type: "collection_confirmed",
+          content: `The seller has confirmed completion of your ${motorcycle?.make} ${motorcycle?.model} purchase.`,
+          relatedId: auctionId
+        });
+      }
+      
+      res.json(updatedAuction);
+    } catch (error) {
+      next(error);
+    }
+  });
+  
+  // API for extending availability date (only the seller can extend the date)
+  app.post("/api/auctions/:id/extend-date", isAuthenticated, hasRole("dealer"), async (req, res, next) => {
+    try {
+      const auctionId = parseInt(req.params.id);
+      const { newAvailabilityDate } = req.body;
+      
+      if (!newAvailabilityDate) {
+        return res.status(400).json({ message: "New availability date is required" });
+      }
+      
+      const auction = await storage.getAuction(auctionId);
+      if (!auction) {
+        return res.status(404).json({ message: "Auction not found" });
+      }
+      
+      // Only the seller can extend the date
+      if (auction.dealerId !== req.user.id) {
+        return res.status(403).json({ message: "Only the seller can extend the availability date" });
+      }
+      
+      // Update motorcycle availability date
+      await storage.updateMotorcycle(auction.motorcycleId, {
+        dateAvailable: new Date(newAvailabilityDate).toISOString()
+      });
+      
+      // Get motorcycle details for the notification
+      const motorcycle = await storage.getMotorcycle(auction.motorcycleId);
+      
+      // Send WebSocket notification to buyer
+      const wsMessage: WSMessage = {
+        type: "date_extended",
+        data: {
+          auctionId: auctionId,
+          motorcycleId: auction.motorcycleId,
+          sellerId: auction.dealerId,
+          bidderId: auction.winningBidderId,
+          newAvailabilityDate: newAvailabilityDate,
+          make: motorcycle?.make || '',
+          model: motorcycle?.model || '',
+          year: motorcycle?.year || 0
+        },
+        timestamp: Date.now()
+      };
+      
+      if (auction.winningBidderId) {
+        sendToUser(auction.winningBidderId, wsMessage);
+        
+        // Create notification for buyer
+        const formattedDate = new Date(newAvailabilityDate).toLocaleDateString();
+        await storage.createNotification({
+          userId: auction.winningBidderId,
+          type: "date_extended",
+          content: `The seller has updated the availability date for ${motorcycle?.make} ${motorcycle?.model} to ${formattedDate}.`,
+          relatedId: auctionId
+        });
+      }
+      
+      res.json({ success: true, message: "Availability date updated", motorcycle });
+    } catch (error) {
+      next(error);
+    }
+  });
+
   return httpServer;
 }

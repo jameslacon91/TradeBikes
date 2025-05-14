@@ -3,9 +3,10 @@ import { Link } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { formatDistanceToNow } from 'date-fns';
-import { Clock, Users } from 'lucide-react';
+import { Clock, Users, AlertCircle } from 'lucide-react';
 import { AuctionWithDetails } from '@shared/types';
 import { useAuth } from '@/hooks/use-auth';
+import PendingActions from '@/components/dashboard/PendingActions';
 
 interface AuctionCardProps {
   auction: AuctionWithDetails;
@@ -140,16 +141,36 @@ export default function AuctionCard({
           </div>
         </div>
         
-        <Link href={`/auctions/${id}`}>
-          <Button className="w-full mt-4" variant={isActive ? "default" : "outline"}>
-            {isActive 
-              ? (dealerId === user?.id 
-                ? "View" 
-                : "View & Bid") 
-              : "View Details"
-            }
-          </Button>
-        </Link>
+        {status === 'pending_collection' && (
+          <div className="mt-4 border-t pt-3">
+            <div className="flex items-center gap-2 mb-3 text-amber-600">
+              <AlertCircle className="h-4 w-4" />
+              <span className="text-sm font-medium">
+                {dealerId === user?.id 
+                  ? "Pending buyer collection"
+                  : "Ready for collection"
+                }
+              </span>
+            </div>
+            <PendingActions 
+              auction={auction} 
+              isSeller={dealerId === user?.id} 
+            />
+          </div>
+        )}
+
+        {status !== 'pending_collection' && (
+          <Link href={`/auctions/${id}`}>
+            <Button className="w-full mt-4" variant={isActive ? "default" : "outline"}>
+              {isActive 
+                ? (dealerId === user?.id 
+                  ? "View" 
+                  : "View & Bid") 
+                : "View Details"
+              }
+            </Button>
+          </Link>
+        )}
       </div>
     </div>
   );
