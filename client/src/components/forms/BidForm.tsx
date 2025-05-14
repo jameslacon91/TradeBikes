@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useMutation } from '@tanstack/react-query';
+import { useLocation } from 'wouter';
 import { useAuth } from '@/hooks/use-auth';
 import { useWebSocket } from '@/hooks/use-websocket';
 import { useToast } from '@/hooks/use-toast';
@@ -26,6 +27,7 @@ interface BidFormProps {
 
 export default function BidForm({ auctionId, isStock = false }: BidFormProps) {
   const { user } = useAuth();
+  const [_, navigate] = useLocation();
   const { sendMessage } = useWebSocket();
   const { toast } = useToast();
 
@@ -91,6 +93,11 @@ export default function BidForm({ auctionId, isStock = false }: BidFormProps) {
       
       // Reset form
       form.reset({ amount: '', comments: '' });
+      
+      // Redirect to dashboard after successful bid
+      setTimeout(() => {
+        navigate('/dashboard');
+      }, 500);
     },
     onError: (error: any) => {
       console.error("Bid mutation error:", error);

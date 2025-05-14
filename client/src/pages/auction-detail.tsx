@@ -312,11 +312,11 @@ export default function AuctionDetail() { // Component name kept as-is for compa
                 </TabsContent>
               </Tabs>
               
-              <div className="mt-6 bg-gray-50 p-4 rounded-lg">
+              <div className="mt-6 bg-blue-700 p-4 rounded-lg shadow-md">
                 <div className="flex justify-between items-center mb-4">
                   <div>
-                    <h4 className="text-sm font-medium text-gray-500">Current Bid</h4>
-                    <p className="text-2xl font-bold text-gray-900">
+                    <h4 className="text-sm font-medium text-blue-100">Current Bid</h4>
+                    <p className="text-2xl font-bold text-white">
                       {dealerOwnsAuction
                         ? (auction.currentBid ? `£${auction.currentBid.toLocaleString()}` : 'No bids yet')
                         : (auction.totalBids > 0 ? 'Blind Underwrite' : 'No bids yet')
@@ -324,8 +324,8 @@ export default function AuctionDetail() { // Component name kept as-is for compa
                     </p>
                   </div>
                   <div>
-                    <h4 className="text-sm font-medium text-gray-500">Time Remaining</h4>
-                    <p className={`text-2xl font-bold ${timeLeft === 'Ended' ? 'text-gray-500' : endingSoon ? 'text-accent countdown animate-pulse' : 'text-accent countdown'}`}>
+                    <h4 className="text-sm font-medium text-blue-100">Time Remaining</h4>
+                    <p className={`text-2xl font-bold ${timeLeft === 'Ended' ? 'text-blue-200' : endingSoon ? 'text-amber-300 countdown animate-pulse' : 'text-amber-300 countdown'}`}>
                       {timeLeft}
                     </p>
                   </div>
