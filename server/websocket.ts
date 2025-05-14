@@ -59,6 +59,9 @@ export function setupWebSocket(server: Server) {
           case 'collection_confirmed':
             await handleCollectionConfirmed(data);
             break;
+          case 'date_extended':
+            await handleDateExtended(data);
+            break;
         }
       } catch (error) {
         console.error('Error processing WebSocket message:', error);
@@ -415,5 +418,46 @@ async function handleCollectionConfirmed(message: WSMessage) {
     });
   } catch (error) {
     console.error('Error handling collection confirmed:', error);
+  }
+}
+
+// Handle date extended event
+async function handleDateExtended(message: WSMessage) {
+  const { auctionId, motorcycleId, sellerId, bidderId, newAvailabilityDate } = message.data;
+  
+  try {
+    // Retrieve auction and motorcycle details
+    const auction = await storage.getAuctionWithDetails(auctionId);
+    if (!auction) {
+      console.error('Missing auction data for date extension');
+      return;
+    }
+    
+    const formattedDate = new Date(newAvailabilityDate).toLocaleDateString();
+    
+    // Create notification for buyer
+    if (bidderId) {
+      await storage.createNotification({
+        userId: bidderId,
+        type: 'date_extended',
+        content: `The seller has extended the availability date for ${auction.motorcycle.make} ${auction.motorcycle.model} to ${formattedDate}.`,
+        relatedId: auctionId
+      });
+      
+      sendToUser(bidderId, {
+        type: 'date_extended',
+        data: {
+          auctionId,
+          sellerId,
+          motorcycle: auction.motorcycle,
+          newAvailabilityDate
+        },
+        timestamp: Date.now()
+      });
+    }
+    
+    console.log(`Date extension notification sent for auction ${auctionId}`);
+  } catch (error) {
+    console.error('Error handling date extension:', error);
   }
 }

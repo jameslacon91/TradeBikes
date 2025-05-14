@@ -41,7 +41,8 @@ export type WSMessageType =
   'bid_accepted' | 
   'deal_confirmed' | 
   'collection_scheduled' |
-  'collection_confirmed';
+  'collection_confirmed' |
+  'date_extended';
 
 export interface WSMessage {
   type: WSMessageType;

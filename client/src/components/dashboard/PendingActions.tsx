@@ -165,8 +165,8 @@ export default function PendingActions({ auction, isSeller }: PendingActionsProp
       {canMarkComplete && (
         <Button 
           onClick={handleCompleteDeal}
-          className="w-full"
-          variant="success"
+          className="w-full bg-green-600 hover:bg-green-700 text-white"
+          variant="default"
           disabled={completeDealMutation.isPending}
         >
           {completeDealMutation.isPending ? 'Processing...' : 'Mark as Complete'}
