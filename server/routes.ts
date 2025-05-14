@@ -404,21 +404,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Auction is not active" });
       }
       
-      // Update the auction end time to now and mark as completed
+      // Update the auction end time to now
       const now = new Date();
+      
+      // Check if there are any bids
+      const highestBid = await storage.getHighestBidForAuction(auctionId);
+      
+      // If there are bids, set to pending_collection, otherwise completed
+      const status = highestBid ? "pending_collection" : "completed";
+      
       const updatedAuction = await storage.updateAuction(auctionId, {
         endTime: now,
-        status: "completed"
+        status: status,
+        ...(highestBid && {
+          winningBidId: highestBid.id,
+          winningBidderId: highestBid.dealerId
+        })
       });
       
       // Send WebSocket notification
       const wsMessage: WSMessage = {
-        type: "auction_completed",
+        type: "underwrite_completed",
         data: {
           auctionId: auction.id,
-          message: "The auction has been ended early by the seller",
+          message: "The underwrite has been ended early by the seller",
+          hasWinningBid: !!highestBid
         },
-        timestamp: new Date().toISOString()
+        timestamp: Date.now()
       };
       
       // Broadcast to all users
