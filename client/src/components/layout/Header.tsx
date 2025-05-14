@@ -57,7 +57,7 @@ export default function Header() {
 
   const navLinks = [
     { name: 'Home', href: '/', icon: <Home className="h-5 w-5 mr-2" /> },
-    { name: 'Bikes for Sale', href: '/underwrites', icon: <Gavel className="h-5 w-5 mr-2" /> },
+    { name: 'Active Listings', href: '/underwrites', icon: <Gavel className="h-5 w-5 mr-2" /> },
     { name: 'Search Stock', href: '/search-map', icon: <Search className="h-5 w-5 mr-2" /> },
     { name: 'Events', href: '/events', icon: <Calendar className="h-5 w-5 mr-2" /> },
     { name: 'About Us', href: '/about', icon: null },
@@ -238,7 +238,7 @@ export default function Header() {
               <Link href="/create-underwrite">
                 <Button className="hidden sm:flex bg-amber-600 hover:bg-amber-700 text-white shadow-md">
                   <Gavel className="mr-2 h-4 w-4" />
-                  List a Bike
+                  +List Motorcycle
                 </Button>
               </Link>
               <Link href="/search-map">
@@ -268,7 +268,7 @@ export default function Header() {
                   <Link href="/create-underwrite">
                     <a className="flex w-full items-center text-amber-600 font-medium">
                       <Gavel className="mr-2 h-4 w-4 text-amber-600" />
-                      List a Bike
+                      +List Motorcycle
                     </a>
                   </Link>
                 </DropdownMenuItem>
