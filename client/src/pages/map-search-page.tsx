@@ -12,15 +12,40 @@ import { useAuth } from "@/hooks/use-auth";
 import { useQuery } from "@tanstack/react-query";
 import { Auction } from "@shared/schema";
 
+// Available motorcycle brands
 const brands = [
   "All Brands", "Honda", "Yamaha", "Kawasaki", "Suzuki", "Ducati", 
   "BMW", "Triumph", "Harley-Davidson", "KTM", "Aprilia"
 ];
 
+// Available motorcycle types
 const types = [
   "All Types", "Sport", "Cruiser", "Touring", "Adventure", "Naked", 
   "Custom", "Dirt", "Scooter", "Electric"
 ];
+
+// Interface to represent auction with detailed data
+interface AuctionWithDetails extends Auction {
+  motorcycle: {
+    id: number;
+    make: string;
+    model: string;
+    year: number;
+    color: string;
+    mileage: number;
+    engineSize: number;
+    description: string;
+    condition: string;
+    category: string;
+    images: string[];
+    features: string[];
+    dealerId: number;
+    registrationNumber: string;
+    createdAt: Date;
+  };
+  currentBid?: number;
+  totalBids: number;
+}
 
 export default function MapSearchPage() {
   const { user } = useAuth();
@@ -29,16 +54,38 @@ export default function MapSearchPage() {
   const [selectedMake, setSelectedMake] = useState<string>("All Brands");
   const [selectedType, setSelectedType] = useState<string>("All Types");
   const [filterVisible, setFilterVisible] = useState<boolean>(false);
-  const [motorcycles, setMotorcycles] = useState(mockMotorcycles);
+  
+  // Fetch active auctions from the API
+  const { data: auctions, isLoading, error } = useQuery<AuctionWithDetails[]>({
+    queryKey: ["/api/auctions"],
+    refetchInterval: 30000, // Refresh every 30 seconds
+  });
 
+  // Filter auctions based on selected criteria
+  const filteredAuctions = auctions?.filter(auction => {
+    // Filter by make
+    if (selectedMake !== "All Brands" && auction.motorcycle.make !== selectedMake) {
+      return false;
+    }
+    
+    // Filter by type/category
+    if (selectedType !== "All Types" && auction.motorcycle.category !== selectedType) {
+      return false;
+    }
+    
+    // Additional filtering could be implemented here
+    return true;
+  });
+  
+  // Handle applying search filters
   const handleSearch = () => {
-    // In a real implementation, this would call an API with the filters
-    console.log("Searching with filters:", { 
+    console.log("Applying filters:", { 
       searchRadius, 
       postCode,
       make: selectedMake, 
       type: selectedType 
     });
+    // This would trigger a refetch or apply client-side filtering
   };
 
   return (
@@ -208,38 +255,60 @@ export default function MapSearchPage() {
 
             {/* Search results */}
             <div>
-              <h2 className="text-2xl font-bold mb-4">Motorcycles Near You</h2>
+              <h2 className="text-2xl font-bold mb-4">Available Motorcycles</h2>
               
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {motorcycles.map((motorcycle) => (
-                  <Card key={motorcycle.id} className="overflow-hidden">
-                    <div className="relative h-48 bg-gray-100">
-                      <img
-                        src={motorcycle.image}
-                        alt={`${motorcycle.make} ${motorcycle.model}`}
-                        className="w-full h-full object-cover"
-                      />
-                      <div className="absolute top-2 right-2 bg-black bg-opacity-70 text-white px-2 py-1 rounded text-sm">
-                        {motorcycle.distance} mi
+              {isLoading ? (
+                <div className="flex justify-center items-center h-40">
+                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                  <span className="ml-2">Loading available listings...</span>
+                </div>
+              ) : error ? (
+                <div className="p-4 border border-red-300 bg-red-50 text-red-700 rounded">
+                  <p>Error loading listings. Please try again later.</p>
+                </div>
+              ) : !filteredAuctions || filteredAuctions.length === 0 ? (
+                <div className="p-4 border border-amber-300 bg-amber-50 text-amber-700 rounded">
+                  <p>No active listings found matching your criteria.</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {filteredAuctions.map((auction) => (
+                    <Card key={auction.id} className="overflow-hidden">
+                      <div className="relative h-48 bg-gray-100">
+                        <img
+                          src={auction.motorcycle.images[0] || "https://via.placeholder.com/400x300?text=No+Image+Available"}
+                          alt={`${auction.motorcycle.make} ${auction.motorcycle.model}`}
+                          className="w-full h-full object-cover"
+                        />
+                        {auction.endTime && (
+                          <div className="absolute top-2 right-2 bg-black bg-opacity-70 text-white px-2 py-1 rounded text-sm">
+                            Ends: {new Date(auction.endTime).toLocaleDateString()}
+                          </div>
+                        )}
                       </div>
-                    </div>
-                    <CardContent className="p-4">
-                      <div className="space-y-1">
-                        <h3 className="font-semibold text-lg truncate">
-                          {motorcycle.make} {motorcycle.model}
-                        </h3>
-                        <p className="text-muted-foreground text-sm">
-                          {motorcycle.year} • {motorcycle.dealer}
-                        </p>
-                        <p className="font-bold text-lg">£{motorcycle.price.toLocaleString()}</p>
-                      </div>
-                      <Button className="w-full mt-3" variant="outline" asChild>
-                        <a href={`/auctions/${motorcycle.id}`}>View Details</a>
-                      </Button>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
+                      <CardContent className="p-4">
+                        <div className="space-y-1">
+                          <h3 className="font-semibold text-lg truncate">
+                            {auction.motorcycle.make} {auction.motorcycle.model}
+                          </h3>
+                          <p className="text-muted-foreground text-sm">
+                            {auction.motorcycle.year} • {auction.motorcycle.mileage.toLocaleString()} miles
+                          </p>
+                          <p className="font-bold text-lg">
+                            {auction.currentBid 
+                              ? `Current Bid: £${auction.currentBid.toLocaleString()}` 
+                              : `Open for Bids`
+                            }
+                          </p>
+                        </div>
+                        <Button className="w-full mt-3" variant="outline" asChild>
+                          <a href={`/underwrites/${auction.id}`}>View Details</a>
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </div>
