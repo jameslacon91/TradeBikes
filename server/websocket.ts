@@ -146,7 +146,7 @@ async function handleNewBid(message: WSMessage) {
   }
 }
 
-// Handle auction completed event
+// Handle underwrite completed event
 async function handleAuctionCompleted(message: WSMessage) {
   const { auctionId } = message.data;
   
@@ -225,7 +225,7 @@ async function handleAuctionCompleted(message: WSMessage) {
       });
     }
   } catch (error) {
-    console.error('Error handling auction completed:', error);
+    console.error('Error handling underwrite completed:', error);
   }
 }
 
@@ -269,7 +269,7 @@ async function handleNewMessage(message: WSMessage) {
   }
 }
 
-// Handle auction created event
+// Handle underwrite created event
 async function handleAuctionCreated(message: WSMessage) {
   const { auctionId, dealerId } = message.data;
   
@@ -277,13 +277,13 @@ async function handleAuctionCreated(message: WSMessage) {
     const auction = await storage.getAuctionWithDetails(auctionId);
     if (!auction) return;
     
-    // Broadcast to all traders
+    // Broadcast to all bidders
     for (const [userId, client] of clients.entries()) {
       try {
         const user = await storage.getUser(userId);
-        if (user && user.role === 'trader' && client.readyState === WebSocket.OPEN) {
+        if (user && user.role === 'bidder' && client.readyState === WebSocket.OPEN) {
           client.send(JSON.stringify({
-            type: 'auction_created',
+            type: 'underwrite_created',
             data: {
               auction
             },
@@ -291,11 +291,11 @@ async function handleAuctionCreated(message: WSMessage) {
           }));
         }
       } catch (error) {
-        console.error(`Error sending auction_created to user ${userId}:`, error);
+        console.error(`Error sending underwrite_created to user ${userId}:`, error);
       }
     }
   } catch (error) {
-    console.error('Error handling auction created:', error);
+    console.error('Error handling underwrite created:', error);
   }
 }
 
