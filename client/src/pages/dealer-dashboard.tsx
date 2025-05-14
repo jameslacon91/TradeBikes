@@ -31,10 +31,10 @@ export default function DealerDashboard() {
     enabled: activeTab === 'dashboard'
   });
   
-  // Fetch active auctions
+  // Fetch dealer auctions - needed for multiple tabs
   const { data: activeAuctions, isLoading: auctionsLoading } = useQuery<AuctionWithDetails[]>({
     queryKey: ['/api/auctions/dealer'],
-    enabled: activeTab === 'ongoing-underwrites' || activeTab === 'dashboard'
+    enabled: activeTab === 'ongoing-underwrites' || activeTab === 'dashboard' || activeTab === 'pending-completion' || activeTab === 'past-listings'
   });
   
   // Fetch activity feed
