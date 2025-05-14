@@ -195,8 +195,8 @@ export default function DealerDashboard() {
                 <div onClick={() => setActiveTab("placed-bids")}>
                   <StatCard 
                     title="Placed Bids" 
-                    value={statsLoading || auctionsLoading ? "Loading..." : placedBids.length}
-                    subtitle={statsLoading || auctionsLoading ? "" : totalBidAmount > 0 ? `Total: £${totalBidAmount.toLocaleString()}` : "No bids"}
+                    value={statsLoading ? "Loading..." : stats?.activeBids || 0}
+                    subtitle={statsLoading ? "" : stats?.amountSpent ? `Total: £${stats.amountSpent.toLocaleString()}` : "No bids"}
                     icon={<Gavel className="h-6 w-6 text-white" />}
                     bgColor="bg-blue-500"
                     className="cursor-pointer transition-transform hover:translate-y-[-5px]"

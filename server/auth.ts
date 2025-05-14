@@ -12,7 +12,14 @@ const MemoryStore = createMemoryStore(session);
 
 declare global {
   namespace Express {
-    interface User extends User {}
+    // Fix circular reference by explicitly defining required properties
+    interface User {
+      id: number;
+      username: string;
+      role: string;
+      companyName: string;
+      [key: string]: any; // Allow other properties from the User type
+    }
   }
 }
 

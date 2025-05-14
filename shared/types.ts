@@ -22,12 +22,19 @@ export interface ActivityItem {
 
 // Stats for dashboard
 export interface DashboardStats {
+  // Selling stats
   activeListings: number;
   totalBids: number;
   pendingCompletion: number;
   revenue: number;
   trendUp?: boolean;
   trendValue?: number;
+  
+  // Buying stats
+  activeBids: number;
+  wonAuctions: number;
+  pendingCollection: number;
+  amountSpent: number;
 }
 
 // WebSocket message types

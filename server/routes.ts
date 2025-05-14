@@ -668,8 +668,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Dashboard data
-  app.get("/api/dashboard", isAuthenticated, async (req, res, next) => {
+  // Dashboard data - support both endpoints for backward compatibility
+  app.get(["/api/dashboard", "/api/dashboard/stats"], isAuthenticated, async (req, res, next) => {
     try {
       // Get auctions created by this dealer
       const dealerAuctions = await storage.getAuctionsByDealerId(req.user.id);
