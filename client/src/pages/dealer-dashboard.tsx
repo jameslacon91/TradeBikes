@@ -164,7 +164,7 @@ export default function DealerDashboard() {
                 {/* Active Listings */}
                 <div onClick={() => setActiveTab("ongoing-underwrites")}>
                   <StatCard 
-                    title="Ongoing Underwrites" 
+                    title="Active Listings" 
                     value={statsLoading || auctionsLoading ? "Loading..." : activeListings.length}
                     icon={<Package className="h-6 w-6 text-white" />}
                     bgColor="bg-primary"
@@ -307,11 +307,11 @@ export default function DealerDashboard() {
               </div>
             </TabsContent>
             
-            {/* Ongoing Underwrites Tab */}
+            {/* Active Listings Tab */}
             <TabsContent value="ongoing-underwrites" className="space-y-6">
               <div className="space-y-4">
-                <h2 className="text-xl font-semibold">Ongoing Underwrites</h2>
-                <p className="text-muted-foreground">Manage your active auctions and bids.</p>
+                <h2 className="text-xl font-semibold">Active Listings</h2>
+                <p className="text-muted-foreground">Manage your active listings and bids.</p>
                 
                 {auctionsLoading ? (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
