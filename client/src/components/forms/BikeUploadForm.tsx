@@ -283,9 +283,19 @@ export default function BikeUploadForm() {
     createAuctionMutation.mutate(data);
   }
 
+  // Log form state for debugging
+  console.log('Form errors:', form.formState.errors);
+  
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+      <form onSubmit={form.handleSubmit(onSubmit, (errors) => {
+        console.log('Form validation errors:', errors);
+        toast({
+          title: "Form validation failed",
+          description: "Please check all required fields and try again.",
+          variant: "destructive",
+        });
+      })} className="space-y-8">
         
         {/* Basic Details Section */}
         <div>
