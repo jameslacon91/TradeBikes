@@ -23,7 +23,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
-import { format } from 'date-fns';
+import { format, isValid } from 'date-fns';
 import { CalendarIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -155,9 +155,20 @@ export default function PendingActions({ auction, isSeller }: PendingActionsProp
   const canMessage = true; // Both buyer and seller can message
   
   const motorcycle = auction.motorcycle;
-  const availabilityDate = motorcycle?.dateAvailable 
-    ? new Date(motorcycle.dateAvailable)
-    : null;
+  
+  // Safely parse the availability date with validation
+  let availabilityDate = null;
+  try {
+    if (motorcycle?.dateAvailable) {
+      const parsedDate = new Date(motorcycle.dateAvailable);
+      // Check if date is valid before using it
+      if (!isNaN(parsedDate.getTime())) {
+        availabilityDate = parsedDate;
+      }
+    }
+  } catch (error) {
+    console.error("Error parsing date:", error);
+  }
     
   return (
     <div className="flex flex-col gap-2">

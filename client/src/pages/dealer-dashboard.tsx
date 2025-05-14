@@ -186,7 +186,7 @@ export default function DealerDashboard() {
                 </div>
 
                 {/* Pending Completion */}
-                <div onClick={() => setActiveTab("pending-collection")}>
+                <div onClick={() => setActiveTab("pending-completion")}>
                   <StatCard 
                     title="Pending Completion" 
                     value={statsLoading || auctionsLoading ? "Loading..." : pendingCollection.length}
