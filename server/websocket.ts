@@ -158,9 +158,9 @@ async function handleUnderwriteCompleted(message: WSMessage) {
     const motorcycle = await storage.getMotorcycle(auction.motorcycleId);
     
     if (highestBid) {
-      // Update auction with winning bid
+      // Update auction with winning bid and move to pending collection
       await storage.updateAuction(auctionId, {
-        status: 'completed',
+        status: 'pending_collection',
         winningBidId: highestBid.id,
         winningBidderId: highestBid.dealerId
       });
