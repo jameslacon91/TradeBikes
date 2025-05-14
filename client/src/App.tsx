@@ -104,9 +104,7 @@ function MainNavigation() {
               <li>
                 <Link href="/about" className="text-gray-600 dark:text-gray-300 hover:text-primary">About</Link>
               </li>
-              <li>
-                <Link href="/stock" className="text-gray-600 dark:text-gray-300 hover:text-primary">View Stock</Link>
-              </li>
+
               
               {user ? (
                 // Navigation for logged in users
@@ -124,7 +122,7 @@ function MainNavigation() {
                         <circle cx="12" cy="10" r="3"/>
                         <path d="M12 2a8 8 0 0 0-8 8c0 1.892.402 3.13 1.5 4.5L12 22l6.5-7.5c1.098-1.37 1.5-2.608 1.5-4.5a8 8 0 0 0-8-8z"/>
                       </svg>
-                      Map Search
+                      Search Stock
                     </Link>
                   </li>
                   
@@ -145,7 +143,7 @@ function MainNavigation() {
                       className="text-white bg-primary hover:bg-primary/80 rounded-md px-3 py-2 flex items-center ml-2"
                     >
                       <TrendingUp className="w-4 h-4 mr-1" />
-                      View Underwrites
+                      Search Stock
                     </Link>
                   </li>
                   
@@ -189,9 +187,7 @@ function MainNavigation() {
                 <li>
                   <Link onClick={closeMobileMenu} href="/about" className="block py-2 text-gray-600 dark:text-gray-300 hover:text-primary">About</Link>
                 </li>
-                <li>
-                  <Link onClick={closeMobileMenu} href="/stock" className="block py-2 text-gray-600 dark:text-gray-300 hover:text-primary">View Stock</Link>
-                </li>
+
                 
                 {user ? (
                   // Mobile Navigation for logged in users
@@ -215,7 +211,7 @@ function MainNavigation() {
                         className="flex items-center justify-center py-3 text-white bg-primary hover:bg-primary-dark rounded-md"
                       >
                         <TrendingUp className="w-5 h-5 mr-2" />
-                        View Underwrites
+                        Search Stock
                       </Link>
                     </li>
                     
@@ -232,7 +228,7 @@ function MainNavigation() {
                           <circle cx="12" cy="10" r="3"/>
                           <path d="M12 2a8 8 0 0 0-8 8c0 1.892.402 3.13 1.5 4.5L12 22l6.5-7.5c1.098-1.37 1.5-2.608 1.5-4.5a8 8 0 0 0-8-8z"/>
                         </svg>
-                        Map Search
+                        Search Stock
                       </Link>
                     </li>
                     
