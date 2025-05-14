@@ -79,6 +79,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
   }, [user, isLoading, refetchUser]);
 
+  // Helper to perform a full reset of application state
+  const resetAppState = (user: User, redirectTo: string = '/dashboard') => {
+    // 1. Clear all existing cached data
+    console.log("Performing full application state reset");
+    queryClient.clear();
+    
+    // 2. Set the basic user data in cache
+    queryClient.setQueryData(["/api/user"], user);
+    
+    // 3. Dispatch auth event
+    dispatchAuthEvent(user.id);
+    
+    // 4. After a brief delay to allow other components to react:
+    setTimeout(() => {
+      // 5. Force reload the entire page to reset all components
+      if (typeof window !== 'undefined') {
+        // Use replace to prevent back button from causing issues
+        window.location.replace(redirectTo);
+      }
+    }, 300);
+  };
+
   const loginMutation = useMutation({
     mutationFn: async (credentials: LoginData) => {
       try {
@@ -95,25 +117,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     onSuccess: (user: User) => {
       console.log("Login mutation successful, updating user data");
       
-      // Clear all cache data to ensure no data from previous users remains
-      queryClient.clear();
-      
-      // Set new user data
-      queryClient.setQueryData(["/api/user"], user);
-      
-      // Explicitly refetch user data to ensure session is established
-      setTimeout(() => {
-        console.log("Refetching user data after login");
-        refetchUser();
-        
-        // Force page reload to ensure clean state
-        if (typeof window !== 'undefined') {
-          window.location.href = '/dashboard';
-        }
-      }, 500);
-      
-      // Notify about successful login
-      dispatchAuthEvent(user.id);
+      // Do a complete app state reset with the new user
+      resetAppState(user);
       
       toast({
         title: "Login successful",
@@ -146,25 +151,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     onSuccess: (user: User) => {
       console.log("Registration mutation successful, updating user data");
       
-      // Clear all cache data for clean state
-      queryClient.clear();
-      
-      // Set new user data
-      queryClient.setQueryData(["/api/user"], user);
-      
-      // Explicitly refetch user data to ensure session is established
-      setTimeout(() => {
-        console.log("Refetching user data after registration");
-        refetchUser();
-        
-        // Force page reload to ensure clean state
-        if (typeof window !== 'undefined') {
-          window.location.href = '/dashboard';
-        }
-      }, 500);
-      
-      // Notify about successful registration
-      dispatchAuthEvent(user.id);
+      // Use the same app state reset helper as login
+      resetAppState(user);
       
       toast({
         title: "Registration successful",
@@ -183,33 +171,62 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logoutMutation = useMutation({
     mutationFn: async () => {
-      await apiRequest("POST", "/api/logout");
+      try {
+        console.log("Sending logout request to server");
+        await apiRequest("POST", "/api/logout");
+        // Don't return anything to match void return type
+      } catch (error) {
+        console.error("Logout API error:", error);
+        throw error;
+      }
     },
     onSuccess: () => {
-      // Hard reset the entire React Query client
+      console.log("Logout successful, clearing all application state");
+      
+      // 1. Clear all cached data
       queryClient.clear();
       
-      // Reset the cache with a newly created client to ensure complete cleanup
-      if (typeof window !== 'undefined') {
-        // Force browser reload to completely reset all state
-        window.location.href = '/auth';
-      }
+      // 2. Set user to null in cache
+      queryClient.setQueryData(["/api/user"], null);
       
-      // This will run if the redirect doesn't happen immediately
+      // 3. Dispatch auth event for null user
       dispatchAuthEvent(undefined);
+      
+      // 4. Show toast notification
       toast({
         title: "Logged out",
         description: "You have been logged out successfully.",
       });
+      
+      // 5. Force a complete page reload to ensure all components are reset
+      if (typeof window !== 'undefined') {
+        // Use replace to prevent back button from restoring previous state
+        setTimeout(() => {
+          window.location.replace('/auth');
+        }, 300);
+      }
     },
     onError: (error: Error) => {
+      console.error("Logout failed:", error);
       toast({
         title: "Logout failed",
-        description: error.message,
+        description: error.message || "Unable to log out. Please try again.",
         variant: "destructive",
       });
     },
   });
+
+  // Wrapper for refetchUser to return the user data
+  const refetchUserData = async (): Promise<User | null> => {
+    try {
+      console.log("Manually refreshing user data");
+      const result = await refetchUser();
+      return result.data || null;
+    } catch (error) {
+      console.error("Error refreshing user data:", error);
+      return null;
+    }
+  };
 
   return (
     <AuthContext.Provider
@@ -220,7 +237,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         loginMutation,
         logoutMutation,
         registerMutation,
-        refetchUser, // Include the refetch function
+        refetchUser: refetchUserData, // Use our wrapper that returns User | null
       }}
     >
       {children}
