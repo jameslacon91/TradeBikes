@@ -749,7 +749,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Favorite Dealers
-  app.get("/api/favorite-dealers", isAuthenticated, async (req, res, next) => {
+  app.get("/api/user/favorites", isAuthenticated, async (req, res, next) => {
     try {
       const user = await storage.getUser(req.user.id);
       if (!user) {
@@ -785,37 +785,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  app.post("/api/favorite-dealers", isAuthenticated, async (req, res, next) => {
+  // Add favorite dealer
+  app.post("/api/user/favorites/add", isAuthenticated, async (req, res, next) => {
     try {
       const { dealerId } = req.body;
+      
       if (!dealerId) {
-        return res.status(400).json({ message: "dealerId is required" });
+        return res.status(400).json({ message: "Dealer ID is required" });
       }
       
-      // Check if dealer exists
-      const dealer = await storage.getUser(dealerId);
-      if (!dealer) {
-        return res.status(404).json({ message: "Dealer not found" });
-      }
-      
-      // Get current user
       const user = await storage.getUser(req.user.id);
       if (!user) {
         return res.status(404).json({ message: "User not found" });
       }
       
-      // Initialize favorites array if it doesn't exist
-      const currentFavorites = user.favoriteDealers || [];
+      // Initialize favoriteDealers array if it doesn't exist
+      const favoriteDealers = user.favoriteDealers || [];
       
-      // Check if already in favorites
-      if (currentFavorites.includes(dealerId)) {
-        return res.status(400).json({ message: "Dealer already in favorites" });
+      // Check if dealer is already a favorite
+      if (favoriteDealers.includes(dealerId)) {
+        return res.status(400).json({ message: "Dealer is already a favorite" });
       }
       
-      // Add to favorites
-      const updatedUser = await storage.updateUser(req.user.id, {
-        favoriteDealers: [...currentFavorites, dealerId]
-      });
+      // Add dealer to favorites
+      favoriteDealers.push(dealerId);
+      
+      // Update user
+      const updatedUser = await storage.updateUser(user.id, { favoriteDealers });
       
       res.status(200).json({ message: "Dealer added to favorites" });
     } catch (error) {
@@ -823,31 +819,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  app.delete("/api/favorite-dealers/:dealerId", isAuthenticated, async (req, res, next) => {
+  // Remove favorite dealer
+  app.post("/api/user/favorites/remove", isAuthenticated, async (req, res, next) => {
     try {
-      const dealerId = parseInt(req.params.dealerId, 10);
+      const { dealerId } = req.body;
+      if (!dealerId) {
+        return res.status(400).json({ message: "Dealer ID is required" });
+      }
       
-      // Get current user
       const user = await storage.getUser(req.user.id);
       if (!user) {
         return res.status(404).json({ message: "User not found" });
       }
       
-      // Check if favorites exist
-      if (!user.favoriteDealers || !user.favoriteDealers.includes(dealerId)) {
-        return res.status(400).json({ message: "Dealer not in favorites" });
+      // Initialize favoriteDealers array if it doesn't exist
+      const favoriteDealers = user.favoriteDealers || [];
+      
+      // Check if dealer is not a favorite
+      if (!favoriteDealers.includes(dealerId)) {
+        return res.status(400).json({ message: "Dealer is not a favorite" });
       }
       
-      // Remove from favorites
-      const updatedUser = await storage.updateUser(req.user.id, {
-        favoriteDealers: user.favoriteDealers.filter(id => id !== dealerId)
-      });
+      // Remove dealer from favorites
+      const updatedFavorites = favoriteDealers.filter(id => id !== dealerId);
+      
+      // Update user
+      const updatedUser = await storage.updateUser(user.id, { favoriteDealers: updatedFavorites });
       
       res.status(200).json({ message: "Dealer removed from favorites" });
     } catch (error) {
       next(error);
     }
   });
+  
+  // Endpoint deleted in favor of POST /api/user/favorites/remove
 
   // Get all dealers (for favorites selection)
   app.get("/api/dealers", isAuthenticated, async (req, res, next) => {
