@@ -68,7 +68,7 @@ export default function DealerDashboard() {
   );
   
   // Calculate total bid amount for the user
-  const totalBidAmount = placedBids.reduce((total, auction) => {
+  const totalBidAmount = biddedAuctions.reduce((total, auction) => {
     // Find the highest bid made by this user for this auction
     const userBids = auction.bids?.filter(bid => bid.dealerId === user?.id) || [];
     if (userBids.length > 0) {
@@ -392,7 +392,7 @@ export default function DealerDashboard() {
                 <h2 className="text-xl font-semibold">Placed Bids</h2>
                 <p className="text-muted-foreground">Review bikes you've bid on from other dealers.</p>
                 
-                {auctionsLoading ? (
+                {bidsLoading ? (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {[...Array(3)].map((_, i) => (
                       <div key={i} className="border rounded-lg p-4">
