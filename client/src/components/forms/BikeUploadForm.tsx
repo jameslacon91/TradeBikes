@@ -253,8 +253,8 @@ export default function BikeUploadForm() {
         const auctionRes = await apiRequest("POST", "/api/auctions", {
           motorcycleId: motorcycle.id,
           dealerId: data.dealerId || user?.id, // Ensure dealerId is set here too
-          startTime: startTime.toISOString(),
-          endTime: endTime.toISOString(),
+          startTime: startTime.toISOString(),  // Convert to ISO string for proper serialization
+          endTime: endTime.toISOString(),      // Convert to ISO string for proper serialization
           visibilityType: data.visibilityType,
           visibilityRadius: data.visibilityType === 'radius' ? data.visibilityRadius : null,
         });

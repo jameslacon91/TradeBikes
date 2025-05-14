@@ -127,17 +127,29 @@ export const insertMotorcycleSchema = createInsertSchema(motorcycles)
     images: z.array(z.string()).optional()
   });
 
-export const insertAuctionSchema = createInsertSchema(auctions).omit({ 
-  id: true,
-  createdAt: true,
-  status: true,
-  winningBidId: true,
-  winningBidderId: true,
-  bidAccepted: true,
-  dealConfirmed: true,
-  collectionConfirmed: true,
-  highestBidderId: true
-});
+export const insertAuctionSchema = createInsertSchema(auctions)
+  .omit({ 
+    id: true,
+    createdAt: true,
+    status: true,
+    winningBidId: true,
+    winningBidderId: true,
+    bidAccepted: true,
+    dealConfirmed: true,
+    collectionConfirmed: true,
+    highestBidderId: true
+  })
+  .extend({
+    // Use preprocess to convert ISO string dates to Date objects
+    startTime: z.preprocess(
+      (val) => val instanceof Date ? val : new Date(String(val)),
+      z.date()
+    ),
+    endTime: z.preprocess(
+      (val) => val instanceof Date ? val : new Date(String(val)),
+      z.date()
+    ),
+  });
 
 export const insertBidSchema = createInsertSchema(bids).omit({ 
   id: true, 
