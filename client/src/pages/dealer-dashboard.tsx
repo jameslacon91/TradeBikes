@@ -1,6 +1,8 @@
 import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { useAuth } from '@/hooks/use-auth';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation } from '@tanstack/react-query';
+import { useToast } from '@/hooks/use-toast';
+import { apiRequest, queryClient } from '@/lib/queryClient';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -24,6 +26,33 @@ const BidAcceptance = lazy(() => import('@/components/dashboard/BidAcceptance'))
 export default function DealerDashboard() {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('dashboard');
+  const { toast } = useToast();
+  
+  // Mutation to reset test auctions
+  const resetAuctionsMutation = useMutation({
+    mutationFn: async () => {
+      const res = await apiRequest('POST', '/api/reset-auctions', {});
+      return res.json();
+    },
+    onSuccess: (data) => {
+      toast({
+        title: 'Auctions Reset',
+        description: `Successfully reset ${data.count} auctions for testing.`,
+      });
+      
+      // Invalidate queries to refresh data
+      queryClient.invalidateQueries({ queryKey: ['/api/auctions/dealer'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/dashboard/stats'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/activity'] });
+    },
+    onError: (error) => {
+      toast({
+        title: 'Reset Failed',
+        description: error.message,
+        variant: 'destructive',
+      });
+    }
+  });
   
   // Fetch dashboard stats
   const { data: stats, isLoading: statsLoading } = useQuery<DashboardStats>({
@@ -141,6 +170,17 @@ export default function DealerDashboard() {
                 Welcome back, {user?.companyName || 'Dealer'}
               </p>
             </div>
+            
+            {/* Reset test auctions button (for development) */}
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => resetAuctionsMutation.mutate()}
+              disabled={resetAuctionsMutation.isPending}
+              className="border-blue-500 text-blue-600 hover:bg-blue-50 self-end"
+            >
+              {resetAuctionsMutation.isPending ? 'Resetting...' : 'Reset Test Auctions'}
+            </Button>
             <div className="flex space-x-2">
               <Link href="/create-auction">
                 <Button className="bg-amber-500 hover:bg-amber-600">

@@ -925,6 +925,47 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Reset auctions for testing (for development only)
+  app.post("/api/reset-auctions", isAuthenticated, async (req, res, next) => {
+    try {
+      const userId = req.user?.id;
+      if (!userId) {
+        return res.status(401).json({ message: "Authentication required" });
+      }
+      
+      // Get all auctions for this user
+      const userAuctions = await storage.getAuctionsByDealerId(userId);
+      console.log(`Found ${userAuctions.length} auctions for user ${userId}`);
+      
+      // Reset each auction to active status
+      for (const auction of userAuctions) {
+        console.log(`Resetting auction ${auction.id} for motorcycle ${auction.motorcycleId}`);
+        
+        await storage.updateAuction(auction.id, {
+          status: 'active',
+          bidAccepted: false,
+          dealConfirmed: false,
+          collectionConfirmed: false,
+          winningBidId: null,
+          winningBidderId: null,
+          completedAt: null
+        });
+        
+        // Reset the motorcycle status as well
+        await storage.updateMotorcycle(auction.motorcycleId, {
+          status: 'available'
+        });
+      }
+      
+      return res.status(200).json({ 
+        message: `Reset ${userAuctions.length} auctions successfully`,
+        count: userAuctions.length
+      });
+    } catch (error) {
+      next(error);
+    }
+  });
+  
   // API for completing a deal (only the seller can mark as complete)
   app.post("/api/auctions/:id/complete-deal", isAuthenticated, hasRole("dealer"), async (req, res, next) => {
     try {
