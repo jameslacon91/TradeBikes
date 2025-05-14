@@ -137,6 +137,7 @@ export default function BikeUploadForm() {
   const form = useForm<UploadFormValues>({
     resolver: zodResolver(uploadSchema),
     defaultValues: {
+      dealerId: user?.id, // Add dealerId to default values
       make: '',
       model: '',
       year: currentYear,
@@ -227,21 +228,31 @@ export default function BikeUploadForm() {
         // First, mock upload the images
         const imageUrls = await uploadImages(imageFiles);
         
-        // Create the motorcycle
-        const motorcycleRes = await apiRequest("POST", "/api/motorcycles", {
+        // Ensure dealerId is in the data object
+        if (!data.dealerId && user) {
+          console.log("No dealerId in form data, adding from user:", user.id);
+        }
+        
+        // Create the motorcycle with all required fields
+        const motorcyclePayload = {
           ...data,
           images: imageUrls,
-          dealerId: user?.id // Add the current user's id as dealerId
-        });
+          dealerId: data.dealerId || user?.id // Ensure dealerId is set
+        };
+        
+        console.log("Sending motorcycle payload:", motorcyclePayload);
+        
+        const motorcycleRes = await apiRequest("POST", "/api/motorcycles", motorcyclePayload);
         const motorcycle = await motorcycleRes.json();
         
         // Calculate end time based on duration
         const startTime = new Date();
         const endTime = new Date(startTime.getTime() + getDurationMs(data.auctionDuration));
         
-        // Create the auction
+        // Create the auction with dealerId explicitly set
         const auctionRes = await apiRequest("POST", "/api/auctions", {
           motorcycleId: motorcycle.id,
+          dealerId: data.dealerId || user?.id, // Ensure dealerId is set here too
           startTime: startTime.toISOString(),
           endTime: endTime.toISOString(),
           visibilityType: data.visibilityType,
@@ -296,8 +307,16 @@ export default function BikeUploadForm() {
       return;
     }
     
+    // Make sure dealerId is included and set correctly
+    const formDataWithId = {
+      ...data,
+      dealerId: user.id // Explicitly set dealerId to user.id
+    };
+    
+    console.log("Form data with dealerId set:", formDataWithId);
+    
     // Images are optional now
-    createAuctionMutation.mutate(data);
+    createAuctionMutation.mutate(formDataWithId);
   }
 
   // Log form state for debugging
