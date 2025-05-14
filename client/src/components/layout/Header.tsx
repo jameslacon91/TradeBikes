@@ -134,7 +134,7 @@ export default function Header() {
                     onClick={closeMenu}
                   >
                     <Search className="mr-2 h-4 w-4" />
-                    View Bikes
+                    Browse Listings
                   </Button>
                 </Link>
               </div>

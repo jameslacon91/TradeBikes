@@ -34,7 +34,7 @@ export default function DealerDashboard() {
   // Fetch dealer auctions - needed for multiple tabs
   const { data: activeAuctions, isLoading: auctionsLoading } = useQuery<AuctionWithDetails[]>({
     queryKey: ['/api/auctions/dealer'],
-    enabled: activeTab === 'ongoing-underwrites' || activeTab === 'dashboard' || activeTab === 'pending-completion' || activeTab === 'past-listings'
+    enabled: activeTab === 'ongoing-underwrites' || activeTab === 'dashboard' || activeTab === 'pending-completion' || activeTab === 'past-listings' || activeTab === 'placed-bids'
   });
   
   // Fetch activity feed
@@ -51,6 +51,11 @@ export default function DealerDashboard() {
   ) || [];
   
   const hasListings = userAuctions.length > 0;
+  
+  // Get auctions where the user has placed bids
+  const placedBids = activeAuctions?.filter(auction => 
+    auction.bids?.some(bid => bid.dealerId === user?.id)
+  ) || [];
   
   // Filter auctions by status
   const activeListings = userAuctions.filter(a => a.status === 'active');
@@ -139,10 +144,10 @@ export default function DealerDashboard() {
                   List Motorcycle
                 </Button>
               </Link>
-              <Link href="/auctions">
+              <Link href="/underwrites">
                 <Button variant="outline">
                   <LinkIcon className="mr-2 h-5 w-5" />
-                  View Underwrites
+                  Browse All Listings
                 </Button>
               </Link>
             </div>
@@ -150,9 +155,10 @@ export default function DealerDashboard() {
           
           {/* Tabs Navigation */}
           <Tabs defaultValue="dashboard" value={activeTab} onValueChange={setActiveTab}>
-            <TabsList className="grid grid-cols-2 md:grid-cols-4">
+            <TabsList className="grid grid-cols-2 md:grid-cols-5">
               <TabsTrigger value="dashboard">Overview</TabsTrigger>
-              <TabsTrigger value="ongoing-underwrites">Ongoing Underwrites</TabsTrigger>
+              <TabsTrigger value="ongoing-underwrites">Active Listings</TabsTrigger>
+              <TabsTrigger value="placed-bids">Placed Bids</TabsTrigger>
               <TabsTrigger value="past-listings">Past Listings</TabsTrigger>
               <TabsTrigger value="pending-completion">Pending Completion</TabsTrigger>
             </TabsList>
@@ -173,14 +179,25 @@ export default function DealerDashboard() {
                   />
                 </div>
 
-                {/* Total Bids */}
+                {/* Total Bids Received */}
                 <div onClick={() => setActiveTab("ongoing-underwrites")}>
                   <StatCard 
-                    title="Total Bids Received" 
+                    title="Bids Received" 
                     value={statsLoading ? "Loading..." : stats?.totalBids || 0}
                     icon={<Clock className="h-6 w-6 text-white" />}
                     bgColor="bg-accent"
                     trend={stats?.trendUp ? { up: true, value: stats.trendValue || 0 } : undefined}
+                    className="cursor-pointer transition-transform hover:translate-y-[-5px]"
+                  />
+                </div>
+                
+                {/* Placed Bids */}
+                <div onClick={() => setActiveTab("placed-bids")}>
+                  <StatCard 
+                    title="Placed Bids" 
+                    value={statsLoading || auctionsLoading ? "Loading..." : placedBids.length}
+                    icon={<Gavel className="h-6 w-6 text-white" />}
+                    bgColor="bg-blue-500"
                     className="cursor-pointer transition-transform hover:translate-y-[-5px]"
                   />
                 </div>
@@ -352,6 +369,53 @@ export default function DealerDashboard() {
                   <React.Suspense fallback={<div className="text-center py-10">Loading bids...</div>}>
                     <BidAcceptance auctions={activeListings.filter(a => a.totalBids > 0)} />
                   </React.Suspense>
+                )}
+              </div>
+            </TabsContent>
+            
+            {/* Placed Bids Tab */}
+            <TabsContent value="placed-bids" className="space-y-6">
+              <div className="space-y-4">
+                <h2 className="text-xl font-semibold">Placed Bids</h2>
+                <p className="text-muted-foreground">Review bikes you've bid on from other dealers.</p>
+                
+                {auctionsLoading ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {[...Array(3)].map((_, i) => (
+                      <div key={i} className="border rounded-lg p-4">
+                        <Skeleton className="h-40 w-full mb-3" />
+                        <Skeleton className="h-5 w-2/3 mb-2" />
+                        <Skeleton className="h-4 w-1/2 mb-4" />
+                        <div className="flex justify-between">
+                          <Skeleton className="h-8 w-20" />
+                          <Skeleton className="h-8 w-20" />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : placedBids.length === 0 ? (
+                  <div className="text-center py-12 border rounded-lg">
+                    <Search className="h-12 w-12 mx-auto text-muted-foreground/50 mb-4" />
+                    <h3 className="text-lg font-medium">No bids placed yet</h3>
+                    <p className="text-muted-foreground mt-2">
+                      You haven't placed any bids on motorcycles yet.
+                    </p>
+                    <Link href="/underwrites">
+                      <Button className="mt-4">
+                        Browse Available Listings
+                      </Button>
+                    </Link>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {placedBids.map(auction => (
+                      <AuctionCard 
+                        key={auction.id}
+                        auction={auction}
+                        showDealerInfo={true}
+                      />
+                    ))}
+                  </div>
                 )}
               </div>
             </TabsContent>
