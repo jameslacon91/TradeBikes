@@ -170,11 +170,11 @@ const BidAcceptance: React.FC<BidAcceptanceProps> = ({ auctions }) => {
   const resetState = () => {
     setSelectedAuction(null);
     setSelectedBid(null);
-    setCollectionDate(null);
+    setCollectionDate(undefined);
     setCollectionNotes('');
   };
 
-  const formatDate = (date: Date | null) => {
+  const formatDate = (date: Date | undefined) => {
     if (!date) return 'N/A';
     return format(new Date(date), 'dd MMM yyyy');
   };
