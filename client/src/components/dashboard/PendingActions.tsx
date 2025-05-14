@@ -91,7 +91,15 @@ export default function PendingActions({ auction, isSeller }: PendingActionsProp
   const sendMessageMutation = useMutation({
     mutationFn: async () => {
       const recipientId = isSeller ? auction.winningBidderId : auction.dealerId;
-      if (!recipientId) return;
+      if (!recipientId) {
+        throw new Error('Unable to determine recipient for this message');
+      }
+      
+      console.log('Sending message:', {
+        receiverId: recipientId,
+        content: message,
+        auctionId: auction.id
+      });
       
       const res = await apiRequest('POST', '/api/messages', {
         receiverId: recipientId,

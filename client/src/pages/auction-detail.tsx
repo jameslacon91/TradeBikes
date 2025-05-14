@@ -87,6 +87,11 @@ export default function AuctionDetail() { // Component name kept as-is for compa
       queryClient.invalidateQueries({ queryKey: ['/api/dashboard/stats'] });
       queryClient.invalidateQueries({ queryKey: ['/api/activity'] });
       
+      // Redirect to dashboard after successful bid acceptance
+      setTimeout(() => {
+        navigate('/dashboard');
+      }, 500);
+      
       setShowBidSelection(false);
       setShowAvailabilityDialog(false);
       setSelectedBid(null);
