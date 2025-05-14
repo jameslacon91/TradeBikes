@@ -147,6 +147,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       next(error);
     }
   });
+  
+  // Get auctions where the current user has placed bids
+  app.get("/api/auctions/bids", isAuthenticated, hasRole("dealer"), async (req, res, next) => {
+    try {
+      const dealerId = req.user.id;
+      const auctions = await storage.getAuctionsWithBidsByDealer(dealerId);
+      res.json(auctions);
+    } catch (error) {
+      next(error);
+    }
+  });
 
   app.get("/api/auctions/:id", async (req, res, next) => {
     try {

@@ -53,7 +53,9 @@ export interface IStorage {
   createBid(bid: InsertBid): Promise<Bid>;
   getBid(id: number): Promise<Bid | undefined>;
   getBidsByAuctionId(auctionId: number): Promise<Bid[]>;
+  getBidsByDealerId(dealerId: number): Promise<Bid[]>;
   getHighestBidForAuction(auctionId: number): Promise<Bid | undefined>;
+  getAuctionsWithBidsByDealer(dealerId: number): Promise<AuctionWithDetails[]>;
   
   // Message methods
   createMessage(message: InsertMessage): Promise<Message>;
@@ -1151,6 +1153,45 @@ export class MemStorage implements IStorage {
     return bids.reduce((highest, current) => {
       return current.amount > highest.amount ? current : highest;
     }, bids[0]);
+  }
+  
+  async getBidsByDealerId(dealerId: number): Promise<Bid[]> {
+    const result: Bid[] = [];
+    for (const bid of this.bids.values()) {
+      if (bid.dealerId === dealerId) {
+        result.push(bid);
+      }
+    }
+    
+    // Sort by creation date (newest first)
+    return result.sort((a, b) => {
+      const dateA = new Date(a.createdAt).getTime();
+      const dateB = new Date(b.createdAt).getTime();
+      return dateB - dateA;
+    });
+  }
+  
+  async getAuctionsWithBidsByDealer(dealerId: number): Promise<AuctionWithDetails[]> {
+    // Get all bids placed by this dealer
+    const dealerBids = await this.getBidsByDealerId(dealerId);
+    
+    // Get unique auction IDs from these bids
+    const auctionIds = new Set<number>();
+    for (const bid of dealerBids) {
+      auctionIds.add(bid.auctionId);
+    }
+    
+    // Get detailed auction data for each auction with bids
+    const auctions: AuctionWithDetails[] = [];
+    
+    for (const auctionId of auctionIds) {
+      const auctionDetails = await this.getAuctionWithDetails(auctionId);
+      if (auctionDetails) {
+        auctions.push(auctionDetails);
+      }
+    }
+    
+    return auctions;
   }
 
   // Message methods

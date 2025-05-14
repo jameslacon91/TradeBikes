@@ -54,13 +54,18 @@ export default function DealerDashboard() {
   
   const hasListings = userAuctions.length > 0;
   
-  // Get auctions where the user has placed bids (excluding accepted bids and pending collection)
-  const placedBids = activeAuctions?.filter(auction => 
-    auction.bids?.some(bid => bid.dealerId === user?.id) && 
+  // Fetch auctions where the user has placed bids
+  const { data: biddedAuctions = [], isLoading: bidsLoading } = useQuery<AuctionWithDetails[]>({
+    queryKey: ['/api/auctions/bids'],
+    enabled: activeTab === 'placed-bids'
+  });
+  
+  // Filter to only show active bids that haven't been accepted yet
+  const placedBids = biddedAuctions.filter(auction => 
     auction.status !== 'pending_collection' &&
     !auction.bidAccepted &&
     auction.winningBidderId !== user?.id
-  ) || [];
+  );
   
   // Calculate total bid amount for the user
   const totalBidAmount = placedBids.reduce((total, auction) => {
