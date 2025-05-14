@@ -57,6 +57,13 @@ export default function BidCollectionConfirmation({
   const handleConfirmCollection = () => {
     setIsConfirming(true);
     confirmCollectionMutation.mutate();
+    
+    // Add a slight delay before redirecting to ensure the mutation completes
+    setTimeout(() => {
+      if (typeof window !== 'undefined') {
+        window.location.href = '/dashboard';
+      }
+    }, 1000);
   };
 
   return (

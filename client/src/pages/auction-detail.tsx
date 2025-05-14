@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
-import { useRoute } from 'wouter';
+import { useRoute, useLocation } from 'wouter';
 import { useAuth } from '@/hooks/use-auth';
 import Layout from '@/components/layout/Layout';
 import BidForm from '@/components/forms/BidForm';
@@ -26,6 +26,7 @@ export default function AuctionDetail() { // Component name kept as-is for compa
   const [auctionsMatch, auctionsParams] = useRoute<{ id: string }>('/auctions/:id');
   const [stockMatch, stockParams] = useRoute<{ id: string }>('/stock/:id');
   const [underwritesMatch, underwritesParams] = useRoute<{ id: string }>('/underwrites/:id');
+  const [, navigate] = useLocation();
   
   const params = auctionsParams || stockParams || underwritesParams;
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
@@ -492,7 +493,10 @@ export default function AuctionDetail() { // Component name kept as-is for compa
                       bidderId={auction.winningBidderId || 0}
                       dealConfirmed={auction.dealConfirmed || false}
                       collectionConfirmed={auction.collectionConfirmed || false}
-                      onSuccess={() => {/* Refresh auction data */}}
+                      onSuccess={() => {
+                        // Navigate back to dashboard after deal confirmation
+                        navigate('/dashboard');
+                      }}
                     />
                     
                     {/* Show collection confirmation for accepted bids */}
@@ -509,7 +513,10 @@ export default function AuctionDetail() { // Component name kept as-is for compa
                         dealConfirmed={auction.dealConfirmed || false}
                         collectionConfirmed={auction.collectionConfirmed || false}
                         collectionDate={auction.collectionDate ? new Date(auction.collectionDate) : null}
-                        onSuccess={() => {/* Refresh auction data */}}
+                        onSuccess={() => {
+                          // Navigate back to dashboard after collection confirmation
+                          navigate('/dashboard');
+                        }}
                       />
                     )}
                   </div>
