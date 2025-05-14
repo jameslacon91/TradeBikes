@@ -190,6 +190,12 @@ export function setupAuth(app: Express) {
       // Remove password from response
       const { password: _, ...userWithoutPassword } = user;
       
+      // Add timestamp for cache busting
+      const userData = {
+        ...userWithoutPassword,
+        _ts: new Date().getTime() // Add timestamp to force client cache invalidation
+      };
+      
       // Log the user in automatically
       req.login(user, (err) => {
         if (err) {
@@ -207,7 +213,7 @@ export function setupAuth(app: Express) {
           secure: false, // Will be true in production
         });
         
-        res.status(201).json(userWithoutPassword);
+        res.status(201).json(userData);
       });
     } catch (error) {
       console.error("Registration error:", error);
@@ -243,6 +249,12 @@ export function setupAuth(app: Express) {
         // Remove password from response
         const { password, ...userWithoutPassword } = user;
         
+        // Add timestamp for cache busting
+        const userData = {
+          ...userWithoutPassword,
+          _ts: new Date().getTime() // Add timestamp to force client cache invalidation
+        };
+        
         // Set a cookie header to help with cross-domain issues
         res.cookie('loggedIn', 'true', {
           httpOnly: false, // Readable by browser
@@ -251,7 +263,7 @@ export function setupAuth(app: Express) {
           secure: false, // Will be true in production
         });
         
-        return res.status(200).json(userWithoutPassword);
+        return res.status(200).json(userData);
       });
     })(req, res, next);
   });
@@ -276,6 +288,13 @@ export function setupAuth(app: Express) {
     
     // Remove password from response
     const { password, ...userWithoutPassword } = req.user;
-    res.json(userWithoutPassword);
+    
+    // Add timestamp for cache busting
+    const userData = {
+      ...userWithoutPassword,
+      _ts: new Date().getTime() // Add timestamp to force client cache invalidation
+    };
+    
+    res.json(userData);
   });
 }

@@ -93,16 +93,27 @@ export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       queryFn: getQueryFn({ on401: "throw" }),
-      refetchInterval: false,
+      
+      // Force refetching more aggressively
+      refetchInterval: false, 
       refetchOnWindowFocus: true, // Refetch data when window regains focus
-      staleTime: 30 * 1000, // 30 seconds instead of infinity
-      retry: false,
-      // Add a unique key to ensure data can't be shared between users
-      // and is properly invalidated on user change
-      gcTime: 5 * 60 * 1000, // 5 minutes instead of default 5 minutes
+      refetchOnMount: true, // Refetch whenever a component using the query mounts
+      refetchOnReconnect: true, // Refetch when internet reconnects
+      
+      // Reduce stale time to force more frequent refreshes
+      staleTime: 0, // Consider data stale immediately to ensure fresh data
+      
+      // Error handling
+      retry: 1, // Retry once in case of network glitches
+      retryDelay: 1000, // Wait 1 second between retries
+      
+      // Cache management
+      gcTime: 5 * 60 * 1000, // Keep inactive data for 5 minutes
     },
     mutations: {
       retry: false,
+      // Add a small delay to ensure mutations complete before redirects
+      networkMode: 'always', // Allow mutations to work regardless of network state
     },
   },
 });
