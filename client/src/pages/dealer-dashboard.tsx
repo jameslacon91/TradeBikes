@@ -34,7 +34,7 @@ export default function DealerDashboard() {
   // Fetch dealer auctions - needed for multiple tabs
   const { data: activeAuctions, isLoading: auctionsLoading } = useQuery<AuctionWithDetails[]>({
     queryKey: ['/api/auctions/dealer'],
-    enabled: activeTab === 'ongoing-underwrites' || activeTab === 'dashboard' || activeTab === 'pending-completion' || activeTab === 'past-listings' || activeTab === 'placed-bids'
+    enabled: activeTab === 'active-listings' || activeTab === 'dashboard' || activeTab === 'pending-completion' || activeTab === 'past-listings' || activeTab === 'placed-bids'
   });
   
   // Fetch activity feed
@@ -157,7 +157,7 @@ export default function DealerDashboard() {
           <Tabs defaultValue="dashboard" value={activeTab} onValueChange={setActiveTab}>
             <TabsList className="grid grid-cols-2 md:grid-cols-5">
               <TabsTrigger value="dashboard">Overview</TabsTrigger>
-              <TabsTrigger value="ongoing-underwrites">Active Listings</TabsTrigger>
+              <TabsTrigger value="active-listings">Active Listings</TabsTrigger>
               <TabsTrigger value="placed-bids">Placed Bids</TabsTrigger>
               <TabsTrigger value="past-listings">Past Listings</TabsTrigger>
               <TabsTrigger value="pending-completion">Pending Completion</TabsTrigger>
@@ -168,7 +168,7 @@ export default function DealerDashboard() {
               {/* Stats Cards */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 {/* Active Listings */}
-                <div onClick={() => setActiveTab("ongoing-underwrites")}>
+                <div onClick={() => setActiveTab("active-listings")}>
                   <StatCard 
                     title="Active Listings" 
                     value={statsLoading || auctionsLoading ? "Loading..." : activeListings.length}
@@ -180,7 +180,7 @@ export default function DealerDashboard() {
                 </div>
 
                 {/* Total Bids Received */}
-                <div onClick={() => setActiveTab("ongoing-underwrites")}>
+                <div onClick={() => setActiveTab("active-listings")}>
                   <StatCard 
                     title="Bids Received" 
                     value={statsLoading ? "Loading..." : stats?.totalBids || 0}
@@ -325,7 +325,7 @@ export default function DealerDashboard() {
             </TabsContent>
             
             {/* Active Listings Tab */}
-            <TabsContent value="ongoing-underwrites" className="space-y-6">
+            <TabsContent value="active-listings" className="space-y-6">
               <div className="space-y-4">
                 <h2 className="text-xl font-semibold">Active Listings</h2>
                 <p className="text-muted-foreground">Manage your active listings and bids.</p>

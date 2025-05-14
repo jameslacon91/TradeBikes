@@ -71,12 +71,11 @@ export function setupWebSocket(server: Server) {
     // Handle disconnection
     ws.on('close', () => {
       // Remove client from map
-      for (const [userId, client] of clients.entries()) {
+      Array.from(clients.entries()).forEach(([userId, client]) => {
         if (client === ws) {
           clients.delete(userId);
-          break;
         }
-      }
+      });
       console.log('WebSocket connection closed');
     });
   });

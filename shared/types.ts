@@ -34,6 +34,7 @@ export interface DashboardStats {
 export type WSMessageType = 
   'register' |
   'new_bid' | 
+  'bid_placed' |
   'auction_ending' | 
   'auction_completed' | 
   'underwrite_completed' |
