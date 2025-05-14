@@ -229,7 +229,7 @@ export default function DealerDashboard() {
               {/* My Active Underwrites Section */}
               <div className="mt-8">
                 <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-xl font-semibold">My Active Underwrites</h2>
+                  <h2 className="text-xl font-semibold">My Active Listings</h2>
                   <Link href="/auctions/dealer">
                     <Button variant="link" className="gap-1">
                       View All <LinkIcon className="h-4 w-4" />
@@ -258,9 +258,9 @@ export default function DealerDashboard() {
                 ) : !hasListings ? (
                   <div className="text-center py-12 border rounded-lg">
                     <Package className="h-12 w-12 mx-auto text-muted-foreground/50 mb-4" />
-                    <h3 className="text-lg font-medium mb-2">No Active Underwrites</h3>
-                    <p className="text-muted-foreground mb-6">You don't have any active underwrites yet.</p>
-                    <Link href="/create-auction">List Your First Bike</Link>
+                    <h3 className="text-lg font-medium mb-2">No Active Listings</h3>
+                    <p className="text-muted-foreground mb-6">You don't have any active listings yet.</p>
+                    <Link href="/create-underwrite">+List Your First Motorcycle</Link>
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

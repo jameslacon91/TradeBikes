@@ -194,8 +194,8 @@ export default function AuctionCard({
             <Button className="w-full mt-4" variant={isActive ? "default" : "outline"}>
               {isActive 
                 ? (dealerId === user?.id 
-                  ? "View" 
-                  : "View & Bid") 
+                  ? "View Listing" 
+                  : "Place a Bid") 
                 : "View Details"
               }
             </Button>
