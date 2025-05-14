@@ -69,11 +69,25 @@ export default function BidForm({ auctionId, isStock = false }: BidFormProps) {
     onSuccess: (data) => {
       toast({
         title: isStock ? "Offer submitted successfully" : "Bid placed successfully",
-        description: `Your ${isStock ? 'offer' : 'bid'} of £${data.amount.toLocaleString()} has been placed.`,
+        description: `Your ${isStock ? 'offer' : 'bid'} has been placed. Check "My Bids" to track its status.`,
       });
+      
+      // Send WebSocket notification about the new bid to update dealer stats
+      sendMessage({
+        type: 'new_bid',
+        data: {
+          bidId: data.id,
+          auctionId: auctionId,
+          dealerId: user?.id || 0,
+          amount: data.amount
+        },
+        timestamp: Date.now()
+      });
+      
       // Invalidate queries to refresh the auction data
       queryClient.invalidateQueries({ queryKey: [`/api/auctions/${auctionId}`] });
       queryClient.invalidateQueries({ queryKey: [`/api/bids/auction/${auctionId}`] });
+      queryClient.invalidateQueries({ queryKey: ["/api/dashboard/stats"] });
       
       // Reset form
       form.reset({ amount: '', comments: '' });

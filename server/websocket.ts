@@ -104,7 +104,7 @@ export function broadcast(message: WSMessage, excludeUserId?: number) {
 
 // Handle new bid event
 async function handleNewBid(message: WSMessage) {
-  const { auctionId, traderId, amount } = message.data;
+  const { auctionId, dealerId, bidId, amount } = message.data;
   
   try {
     // Get auction details
@@ -112,7 +112,7 @@ async function handleNewBid(message: WSMessage) {
     if (!auction) return;
     
     // Notify dealer about new bid
-    const notificationContent = `New bid of £${amount} received on your auction`;
+    const notificationContent = `New bid received on your underwrite`;
     await storage.createNotification({
       userId: auction.dealerId,
       type: 'bid',
@@ -120,27 +120,34 @@ async function handleNewBid(message: WSMessage) {
       relatedId: auctionId
     });
     
-    // Send real-time notification to dealer
+    // Send real-time notification to dealer and update their stats
     sendToUser(auction.dealerId, {
       type: 'new_bid',
       data: {
         auctionId,
-        traderId,
+        dealerId,
+        bidId,
         amount,
         motorcycle: await storage.getMotorcycle(auction.motorcycleId)
       },
       timestamp: Date.now()
     });
     
-    // Broadcast bid update to all other traders
+    // Invalidate dealer's dashboard stats to update bid count
+    sendToUser(auction.dealerId, {
+      type: 'refresh_stats',
+      data: {},
+      timestamp: Date.now()
+    });
+    
+    // Don't broadcast bid amount to others - keeping it blind
     broadcast({
-      type: 'new_bid',
+      type: 'auction_updated',
       data: {
-        auctionId,
-        amount
+        auctionId
       },
       timestamp: Date.now()
-    }, traderId); // exclude the trader who placed the bid
+    }, dealerId); // exclude the trader who placed the bid
   } catch (error) {
     console.error('Error handling new bid:', error);
   }

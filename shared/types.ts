@@ -39,12 +39,14 @@ export type WSMessageType =
   'underwrite_completed' |
   'new_message' | 
   'auction_created' |
+  'auction_updated' |
   'underwrite_created' |
   'bid_accepted' | 
   'deal_confirmed' | 
   'collection_scheduled' |
   'collection_confirmed' |
-  'date_extended';
+  'date_extended' |
+  'refresh_stats';
 
 export interface WSMessage {
   type: WSMessageType;
