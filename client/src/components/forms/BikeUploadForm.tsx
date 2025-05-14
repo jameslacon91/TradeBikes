@@ -286,12 +286,6 @@ export default function BikeUploadForm() {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-        <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-md">
-          <h3 className="text-amber-700 font-medium mb-2">Form Update</h3>
-          <p className="text-amber-800 text-sm">
-            Most fields are now optional. Only make is required. This will make it easier to quickly list motorcycles.
-          </p>
-        </div>
         
         {/* Basic Details Section */}
         <div>

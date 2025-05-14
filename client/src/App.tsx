@@ -45,8 +45,8 @@ function Router() {
       <ProtectedRoute path="/dashboard" component={DealerDashboard} />
       
       <ProtectedRoute path="/subscription" component={SubscriptionPage} />
-      <ProtectedRoute path="/auctions" component={AuctionsPage} />
-      <ProtectedRoute path="/underwrites" component={AuctionsPage} /> {/* Alias for /auctions */}
+      <ProtectedRoute path="/auctions" component={MapSearchPage} />
+      <ProtectedRoute path="/underwrites" component={MapSearchPage} /> {/* Alias for /auctions */}
       <ProtectedRoute path="/auctions/:id" component={AuctionDetail} />
       <ProtectedRoute path="/underwrites/:id" component={AuctionDetail} /> {/* Alias for /auctions/:id */}
       <ProtectedRoute path="/create-auction" component={CreateAuction} />
@@ -137,15 +137,7 @@ function MainNavigation() {
                     </Link>
                   </li>
                   
-                  <li>
-                    <Link 
-                      href="/auctions" 
-                      className="text-white bg-primary hover:bg-primary/80 rounded-md px-3 py-2 flex items-center ml-2"
-                    >
-                      <TrendingUp className="w-4 h-4 mr-1" />
-                      Search Stock
-                    </Link>
-                  </li>
+
                   
                   <li>
                     <Button 
@@ -204,16 +196,7 @@ function MainNavigation() {
                       </Link>
                     </li>
                     
-                    <li className="py-2">
-                      <Link 
-                        onClick={closeMobileMenu}
-                        href="/auctions" 
-                        className="flex items-center justify-center py-3 text-white bg-primary hover:bg-primary-dark rounded-md"
-                      >
-                        <TrendingUp className="w-5 h-5 mr-2" />
-                        Search Stock
-                      </Link>
-                    </li>
+
                     
                     <li>
                       <Link onClick={closeMobileMenu} href="/dashboard" className="block py-2 text-gray-600 dark:text-gray-300 hover:text-primary flex items-center">
