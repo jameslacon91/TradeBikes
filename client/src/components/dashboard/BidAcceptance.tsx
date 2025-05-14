@@ -22,6 +22,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { useAuth } from '@/hooks/use-auth';
+import { useLocation, useRoute } from 'wouter';
 
 interface DealerInfo {
   id: number;
@@ -39,6 +40,7 @@ const BidAcceptance: React.FC<BidAcceptanceProps> = ({ auctions }) => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { user } = useAuth();
+  const [, navigate] = useLocation();
   const [selectedAuction, setSelectedAuction] = useState<AuctionWithDetails | null>(null);
   const [selectedBid, setSelectedBid] = useState<Bid | null>(null);
   const [isAcceptDialogOpen, setIsAcceptDialogOpen] = useState(false);

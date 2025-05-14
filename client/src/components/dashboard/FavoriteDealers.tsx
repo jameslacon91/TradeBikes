@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useQuery, queryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { User } from '@shared/schema';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -38,6 +38,9 @@ const FavoriteDealers = () => {
       const endpoint = isFavorite ? '/api/user/favorites/remove' : '/api/user/favorites/add';
       
       await apiRequest('POST', endpoint, { dealerId });
+      
+      // Invalidate the favorites query to refresh the list
+      queryClient.invalidateQueries({queryKey: ['/api/user/favorites']});
       
       toast({
         title: isFavorite ? 'Removed from favorites' : 'Added to favorites',
