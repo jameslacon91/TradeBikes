@@ -172,16 +172,17 @@ export default function DealerDashboard() {
             </div>
             
             {/* Reset test auctions button (for development) */}
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={() => resetAuctionsMutation.mutate()}
-              disabled={resetAuctionsMutation.isPending}
-              className="border-blue-500 text-blue-600 hover:bg-blue-50 self-end"
-            >
-              {resetAuctionsMutation.isPending ? 'Resetting...' : 'Reset Test Auctions'}
-            </Button>
             <div className="flex space-x-2">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => resetAuctionsMutation.mutate()}
+                disabled={resetAuctionsMutation.isPending}
+                className="border-blue-500 text-blue-600 hover:bg-blue-50 mx-2"
+              >
+                {resetAuctionsMutation.isPending ? 'Resetting...' : 'Reset Test Auctions'}
+              </Button>
+              
               <Link href="/create-auction">
                 <Button className="bg-amber-500 hover:bg-amber-600">
                   <Gavel className="mr-2 h-5 w-5" />
