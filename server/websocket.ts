@@ -93,7 +93,7 @@ export function sendToUser(userId: number, message: WSMessage) {
 
 // Broadcast message to all connected clients
 export function broadcast(message: WSMessage, excludeUserId?: number) {
-  clients.forEach((client, userId) => {
+  Array.from(clients.entries()).forEach(([userId, client]) => {
     if (excludeUserId && userId === excludeUserId) return;
     if (client.readyState === WebSocket.OPEN) {
       client.send(JSON.stringify(message));
@@ -316,7 +316,7 @@ async function handleAuctionCreated(message: WSMessage) {
     if (!auction) return;
     
     // Broadcast to all bidders
-    for (const [userId, client] of clients.entries()) {
+    await Promise.all(Array.from(clients.entries()).map(async ([userId, client]) => {
       try {
         const user = await storage.getUser(userId);
         if (user && user.role === 'bidder' && client.readyState === WebSocket.OPEN) {
@@ -331,7 +331,7 @@ async function handleAuctionCreated(message: WSMessage) {
       } catch (error) {
         console.error(`Error sending underwrite_created to user ${userId}:`, error);
       }
-    }
+    }));
   } catch (error) {
     console.error('Error handling underwrite created:', error);
   }
