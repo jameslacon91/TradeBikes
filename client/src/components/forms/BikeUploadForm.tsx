@@ -61,13 +61,13 @@ const yearOptions = Array.from({ length: 50 }, (_, i) => currentYear - i);
 // Extend the motorcycle schema for form validation
 const uploadSchema = insertMotorcycleSchema.extend({
   auctionDuration: z.enum(['1day', '1week', '2weeks', '1month'], {
-    required_error: "Please select an underwrite duration",
+    required_error: "Please select a listing duration",
   }),
   images: z.any().optional(),
   
   // Visibility options
   visibilityType: z.enum(['all', 'favorites', 'radius'], {
-    required_error: "Please select a visibility option",
+    required_error: "Please select who can see your listing",
   }),
   visibilityRadius: z.preprocess(
     (val) => (val === '' ? null : Number(val)),
@@ -98,7 +98,7 @@ export default function BikeUploadForm() {
   const [imageUrls, setImageUrls] = useState<string[]>([]);
   const [isUploading, setIsUploading] = useState(false);
 
-  // Define underwrite duration options
+  // Define listing duration options
   const durationOptions = [
     { value: '1day', label: '1 day' },
     { value: '1week', label: '1 week' },
@@ -108,9 +108,9 @@ export default function BikeUploadForm() {
   
   // Define visibility options
   const visibilityOptions = [
-    { value: 'all', label: 'All Dealers', description: 'Show to all registered dealers' },
-    { value: 'favorites', label: 'Favorite Dealers Only', description: 'Only show to dealers in your favorites list' },
-    { value: 'radius', label: 'Dealers in Radius', description: 'Only show to dealers within a specific radius' },
+    { value: 'all', label: 'All Buyers', description: 'Show to all registered buyers' },
+    { value: 'favorites', label: 'Favorite Buyers Only', description: 'Only show to buyers in your favorites list' },
+    { value: 'radius', label: 'Buyers in Radius', description: 'Only show to buyers within a specific radius' },
   ];
 
   const form = useForm<UploadFormValues>({
@@ -234,11 +234,11 @@ export default function BikeUploadForm() {
     },
     onSuccess: (auction) => {
       toast({
-        title: "Auction created successfully",
-        description: "Your motorcycle has been listed for auction.",
+        title: "Listing created successfully",
+        description: "Your motorcycle has been listed for underwrite.",
       });
       
-      // Send WebSocket notification about new auction
+      // Send WebSocket notification about new listing
       sendMessage({
         type: "auction_created",
         data: { auctionId: auction.id },
@@ -253,21 +253,25 @@ export default function BikeUploadForm() {
       navigate(`/auctions/${auction.id}`);
     },
     onError: (error: any) => {
+      console.error("Listing creation error:", error);
       toast({
-        title: "Failed to create auction",
-        description: error.message || "An error occurred while creating your auction.",
+        title: "Failed to create listing",
+        description: error.message || "An error occurred while creating your listing.",
         variant: "destructive",
       });
     },
   });
 
   function onSubmit(data: UploadFormValues) {
+    console.log("Form submitted with data:", data);
+    
     if (!user) {
       toast({
         title: "Authentication required",
-        description: "You must be logged in as a dealer to create an auction.",
+        description: "You must be logged in as a seller to create a listing.",
         variant: "destructive",
       });
+      navigate("/auth");
       return;
     }
     
@@ -709,7 +713,7 @@ export default function BikeUploadForm() {
                     </RadioGroup>
                   </FormControl>
                   <FormDescription>
-                    How long the auction will run for
+                    How long the listing will be available for bids
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -772,7 +776,7 @@ export default function BikeUploadForm() {
                         />
                       </FormControl>
                       <FormDescription>
-                        Only dealers within this distance will see your listing
+                        Only buyers within this distance will see your listing
                       </FormDescription>
                       <FormMessage />
                     </FormItem>
@@ -794,12 +798,12 @@ export default function BikeUploadForm() {
             {(isUploading || createAuctionMutation.isPending) ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Creating Auction...
+                Creating Listing...
               </>
             ) : (
               <>
                 <Plus className="mr-2 h-4 w-4" />
-                Create Auction
+                List Motorcycle
               </>
             )}
           </Button>
