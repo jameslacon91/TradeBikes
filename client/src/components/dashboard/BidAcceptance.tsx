@@ -63,7 +63,14 @@ const BidAcceptance: React.FC<BidAcceptanceProps> = ({ auctions }) => {
       });
     },
     onSuccess: () => {
+      // Invalidate all relevant queries to ensure UI updates across all pages
       queryClient.invalidateQueries({ queryKey: ['/api/auctions/dealer'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/dashboard/stats'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/activity'] });
+      if (selectedAuction) {
+        queryClient.invalidateQueries({ queryKey: [`/api/auctions/${selectedAuction.id}`] });
+      }
+      
       toast({
         title: 'Bid Accepted',
         description: 'The bid has been accepted. Arrange collection details.',

@@ -50,7 +50,10 @@ export default function AuctionDetail() { // Component name kept as-is for compa
         description: "You can now select a winning bid.",
         variant: "default",
       });
+      // Invalidate all relevant queries to update UI across the app
       queryClient.invalidateQueries({ queryKey: [`/api/auctions/${auctionId}`] });
+      queryClient.invalidateQueries({ queryKey: ['/api/auctions/dealer'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/dashboard/stats'] });
       setShowBidSelection(true);
     },
     onError: (error: Error) => {
@@ -77,7 +80,12 @@ export default function AuctionDetail() { // Component name kept as-is for compa
         description: "The bidder has been notified and estimated availability date has been set.",
         variant: "default",
       });
+      // Invalidate all relevant queries to update UI across the app
       queryClient.invalidateQueries({ queryKey: [`/api/auctions/${auctionId}`] });
+      queryClient.invalidateQueries({ queryKey: ['/api/auctions/dealer'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/dashboard/stats'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/activity'] });
+      
       setShowBidSelection(false);
       setShowAvailabilityDialog(false);
       setSelectedBid(null);
@@ -442,7 +450,7 @@ export default function AuctionDetail() { // Component name kept as-is for compa
                             <PopoverContent className="w-auto p-0">
                               <CalendarComponent
                                 mode="single"
-                                selected={availabilityDate}
+                                selected={availabilityDate ?? undefined}
                                 onSelect={(date) => setAvailabilityDate(date && isValid(date) ? date : null)}
                                 initialFocus
                                 disabled={(date) => date < new Date()}
