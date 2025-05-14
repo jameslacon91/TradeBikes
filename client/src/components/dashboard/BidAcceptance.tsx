@@ -79,6 +79,11 @@ const BidAcceptance: React.FC<BidAcceptanceProps> = ({ auctions }) => {
       });
       setIsAcceptDialogOpen(false);
       setIsCollectionDialogOpen(true);
+      
+      // Redirect to dashboard if we're not already there
+      if (window.location.pathname !== '/dashboard') {
+        navigate('/dashboard');
+      }
     },
     onError: (error: any) => {
       toast({

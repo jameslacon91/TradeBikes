@@ -94,9 +94,9 @@ export default function PendingActions({ auction, isSeller }: PendingActionsProp
       if (!recipientId) return;
       
       const res = await apiRequest('POST', '/api/messages', {
-        recipientId: recipientId,
+        receiverId: recipientId,
         content: message,
-        relatedAuctionId: auction.id,
+        auctionId: auction.id,
       });
       return await res.json();
     },
