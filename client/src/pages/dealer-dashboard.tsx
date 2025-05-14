@@ -52,76 +52,62 @@ export default function DealerDashboard() {
   
   const hasListings = userAuctions.length > 0;
   
-  // Get auctions where the user has placed bids
+  // Get auctions where the user has placed bids (excluding pending collection)
   const placedBids = activeAuctions?.filter(auction => 
-    auction.bids?.some(bid => bid.dealerId === user?.id)
+    auction.bids?.some(bid => bid.dealerId === user?.id) && 
+    auction.status !== 'pending_collection' &&
+    auction.winningBidderId !== user?.id
   ) || [];
   
   // Filter auctions by status
   const activeListings = userAuctions.filter(a => a.status === 'active');
   const pastListings = userAuctions.filter(a => a.status === 'completed');
   
-  // Get pending collection auctions and sort them by motorcycle availability date
-  const pendingCollection = userAuctions
-    .filter(a => a.status === 'pending_collection')
-    .sort((a, b) => {
+  // Get pending collection auctions (for both sellers and buyers)
+  let pendingCollection: AuctionWithDetails[] = [];
+  
+  if (activeAuctions) {
+    // First filter for pending collections
+    const filteredAuctions = activeAuctions.filter(auction => 
+      auction.status === 'pending_collection' && 
+      (auction.dealerId === user?.id || auction.winningBidderId === user?.id)
+    );
+    
+    // Then sort by availability date
+    pendingCollection = filteredAuctions.sort((a, b) => {
       try {
-        // Try to get and parse dates - if dateAvailable is a string date format
-        let aDate, bDate;
-        
-        if (a.motorcycle?.dateAvailable && typeof a.motorcycle.dateAvailable === 'string') {
-          // First try to parse as ISO date if it looks like one
-          if (a.motorcycle.dateAvailable.includes('-') || a.motorcycle.dateAvailable.includes('T')) {
-            aDate = parseISO(a.motorcycle.dateAvailable);
-          } else {
-            // Handle text dates like "Immediate" or "End of the month" by giving them relative priority
-            if (a.motorcycle.dateAvailable.toLowerCase().includes('immediate')) {
-              aDate = new Date(); // Today
-            } else if (a.motorcycle.dateAvailable.toLowerCase().includes('week')) {
-              aDate = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // Roughly a week from now
-            } else {
-              aDate = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // Default to roughly a month
-            }
+        // Convert availability dates to comparable Date objects
+        const getDate = (auction: AuctionWithDetails): Date => {
+          const dateStr = auction.motorcycle?.dateAvailable;
+          
+          if (!dateStr || typeof dateStr !== 'string') {
+            return new Date(Date.now() + 90 * 24 * 60 * 60 * 1000); // 90 days in future
           }
-        } else {
-          aDate = new Date(Date.now() + 90 * 24 * 60 * 60 * 1000); // Far future if no date
-        }
-        
-        if (b.motorcycle?.dateAvailable && typeof b.motorcycle.dateAvailable === 'string') {
-          if (b.motorcycle.dateAvailable.includes('-') || b.motorcycle.dateAvailable.includes('T')) {
-            bDate = parseISO(b.motorcycle.dateAvailable);
-          } else {
-            if (b.motorcycle.dateAvailable.toLowerCase().includes('immediate')) {
-              bDate = new Date(); 
-            } else if (b.motorcycle.dateAvailable.toLowerCase().includes('week')) {
-              bDate = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
-            } else {
-              bDate = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
-            }
+          
+          if (dateStr.includes('-') || dateStr.includes('T')) {
+            const parsed = parseISO(dateStr);
+            return isValid(parsed) ? parsed : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
           }
-        } else {
-          bDate = new Date(Date.now() + 90 * 24 * 60 * 60 * 1000);
-        }
+          
+          if (dateStr.toLowerCase().includes('immediate')) {
+            return new Date();
+          } else if (dateStr.toLowerCase().includes('week')) {
+            return new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+          } else {
+            return new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+          }
+        };
         
-        // Check if dates are valid and sort
-        const aValid = isValid(aDate);
-        const bValid = isValid(bDate);
+        const aDate = getDate(a);
+        const bDate = getDate(b);
         
-        // Sort by date if both are valid
-        if (aValid && bValid) {
-          return aDate.getTime() - bDate.getTime();
-        }
-        
-        // Handle case where only one is valid
-        if (aValid) return -1;
-        if (bValid) return 1;
-        
-        return 0;
+        return aDate.getTime() - bDate.getTime();
       } catch (error) {
         console.log("Error sorting by date availability:", error);
-        return 0; // Keep original order if there's an error
+        return 0;
       }
     });
+  }
     
   const completedDeals = userAuctions.filter(a => a.status === 'completed');
   

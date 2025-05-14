@@ -337,7 +337,7 @@ export default function BikeUploadForm() {
                   <FormLabel>Year</FormLabel>
                   <Select 
                     onValueChange={(value) => field.onChange(parseInt(value, 10))} 
-                    defaultValue={field.value.toString()}
+                    value={field.value ? field.value.toString() : ""}
                   >
                     <FormControl>
                       <SelectTrigger>
