@@ -59,6 +59,19 @@ export default function DealerDashboard() {
     auction.winningBidderId !== user?.id
   ) || [];
   
+  // Calculate total bid amount for the user
+  const totalBidAmount = placedBids.reduce((total, auction) => {
+    // Find the highest bid made by this user for this auction
+    const userBids = auction.bids?.filter(bid => bid.dealerId === user?.id) || [];
+    if (userBids.length > 0) {
+      // Get the highest bid amount
+      const highestUserBid = userBids.reduce((highest, bid) => 
+        bid.amount > highest ? bid.amount : highest, 0);
+      return total + highestUserBid;
+    }
+    return total;
+  }, 0);
+  
   // Filter auctions by status
   const activeListings = userAuctions.filter(a => a.status === 'active');
   const pastListings = userAuctions.filter(a => a.status === 'completed');
@@ -182,6 +195,7 @@ export default function DealerDashboard() {
                   <StatCard 
                     title="Placed Bids" 
                     value={statsLoading || auctionsLoading ? "Loading..." : placedBids.length}
+                    subtitle={statsLoading || auctionsLoading ? "" : totalBidAmount > 0 ? `Total: £${totalBidAmount.toLocaleString()}` : "No bids"}
                     icon={<Gavel className="h-6 w-6 text-white" />}
                     bgColor="bg-blue-500"
                     className="cursor-pointer transition-transform hover:translate-y-[-5px]"

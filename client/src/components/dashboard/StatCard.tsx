@@ -10,6 +10,7 @@ export interface StatCardProps {
     up: boolean;
     value: number;
   };
+  subtitle?: string;
   className?: string;
 }
 
@@ -19,6 +20,7 @@ export default function StatCard({
   icon, 
   bgColor, 
   trend, 
+  subtitle,
   className = "" 
 }: StatCardProps) {
   return (
@@ -31,7 +33,12 @@ export default function StatCard({
           </div>
         </div>
         <div className="mt-3 flex items-end justify-between">
-          <p className="text-2xl font-bold text-white">{value}</p>
+          <div>
+            <p className="text-2xl font-bold text-white">{value}</p>
+            {subtitle && (
+              <p className="text-sm text-white/80 mt-1">{subtitle}</p>
+            )}
+          </div>
           
           {trend && (
             <div className={`flex items-center text-sm ${trend.up ? 'text-green-100' : 'text-red-100'}`}>
