@@ -21,11 +21,10 @@ import { Textarea } from '@/components/ui/textarea';
 
 interface BidFormProps {
   auctionId: number;
-  currentBid?: number;
   isStock?: boolean; // Flag to determine if this is a stock listing
 }
 
-export default function BidForm({ auctionId, currentBid, isStock = false }: BidFormProps) {
+export default function BidForm({ auctionId, isStock = false }: BidFormProps) {
   const { user } = useAuth();
   const { sendMessage } = useWebSocket();
   const { toast } = useToast();

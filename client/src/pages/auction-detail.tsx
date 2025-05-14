@@ -350,7 +350,6 @@ export default function AuctionDetail() { // Component name kept as-is for compa
                   <div className="border-t border-gray-200 pt-4">
                     <BidForm
                       auctionId={auction.id}
-                      currentBid={auction.currentBid}
                       isStock={isStockPage}
                     />
                   </div>

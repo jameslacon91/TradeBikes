@@ -124,7 +124,9 @@ export default function AuctionCard({
         <div className="mt-3 flex justify-between items-center">
           <div>
             <div className="font-medium">
-              {currentBid ? `£${currentBid.toLocaleString()}` : 'No bids yet'}
+              {dealerId === user?.id 
+                ? (currentBid ? `£${currentBid.toLocaleString()}` : 'No bids yet')
+                : (totalBids > 0 ? 'Blind Underwrite' : 'No bids yet')}
             </div>
             <div className="flex items-center text-xs text-muted-foreground">
               <Users className="h-3 w-3 mr-1" />
