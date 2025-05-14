@@ -106,7 +106,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         startTime: new Date(req.body.startTime),
         endTime: new Date(req.body.endTime),
         visibilityType: req.body.visibilityType || "all",
-        visibilityRadius: req.body.visibilityType === 'radius' ? parseInt(req.body.visibilityRadius, 10) : null
+        visibilityRadius: req.body.visibilityType === 'radius' ? parseInt(req.body.visibilityRadius, 10) : null,
+        status: "active" // Ensure the status is set to active for it to appear in listings
       });
       
       console.log("Auction created successfully:", auction);
