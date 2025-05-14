@@ -6,68 +6,11 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
-import { Search, MapPin, Filter } from "lucide-react";
+import { Search, MapPin, Filter, Loader2 } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useAuth } from "@/hooks/use-auth";
-
-// Mock motorcycle data
-const mockMotorcycles = [
-  {
-    id: 1,
-    make: "Honda",
-    model: "CBR1000RR",
-    year: 2020,
-    price: 9500,
-    dealer: "SuperBikes Ltd",
-    location: { lat: 51.5074, lng: -0.1278 },
-    distance: 5.2,
-    image: "https://images.unsplash.com/photo-1558981806-ec527fa84c39?w=500&h=350&fit=crop"
-  },
-  {
-    id: 2,
-    make: "Yamaha",
-    model: "MT-09",
-    year: 2019,
-    price: 7800,
-    dealer: "MotoHouse",
-    location: { lat: 51.5268, lng: -0.1251 },
-    distance: 7.8,
-    image: "https://images.unsplash.com/photo-1591637333184-19aa84b3e01f?w=500&h=350&fit=crop"
-  },
-  {
-    id: 3,
-    make: "Kawasaki",
-    model: "Ninja ZX-10R",
-    year: 2021,
-    price: 12500,
-    dealer: "GreenSpeed Motorcycles",
-    location: { lat: 51.4833, lng: -0.1163 },
-    distance: 9.3,
-    image: "https://images.unsplash.com/photo-1606136968308-fa1062eb3036?w=500&h=350&fit=crop"
-  },
-  {
-    id: 4,
-    make: "Ducati",
-    model: "Panigale V4",
-    year: 2022,
-    price: 19500,
-    dealer: "Italian Motors",
-    location: { lat: 51.5235, lng: -0.1558 },
-    distance: 3.1,
-    image: "https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?w=500&h=350&fit=crop"
-  },
-  {
-    id: 5,
-    make: "Triumph",
-    model: "Street Triple",
-    year: 2020,
-    price: 8700,
-    dealer: "British Customs",
-    location: { lat: 51.5142, lng: -0.1418 },
-    distance: 11.7,
-    image: "https://images.unsplash.com/photo-1547549082-6bc09f2049ae?w=500&h=350&fit=crop"
-  }
-];
+import { useQuery } from "@tanstack/react-query";
+import { Auction } from "@shared/schema";
 
 const brands = [
   "All Brands", "Honda", "Yamaha", "Kawasaki", "Suzuki", "Ducati", 
