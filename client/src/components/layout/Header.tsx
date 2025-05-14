@@ -241,10 +241,10 @@ export default function Header() {
                   List a Bike
                 </Button>
               </Link>
-              <Link href="/underwrites">
-                <Button className="hidden sm:flex" variant="outline">
+              <Link href="/search-map">
+                <Button className="hidden sm:flex bg-amber-600 hover:bg-amber-700 text-white shadow-md">
                   <Search className="mr-2 h-4 w-4" />
-                  View Bikes
+                  Search Stock
                 </Button>
               </Link>
             </>
@@ -273,10 +273,10 @@ export default function Header() {
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link href="/underwrites">
+                  <Link href="/search-map">
                     <a className="flex w-full items-center">
                       <Search className="mr-2 h-4 w-4" />
-                      View Bikes
+                      Search Stock
                     </a>
                   </Link>
                 </DropdownMenuItem>
