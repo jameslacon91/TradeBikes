@@ -938,14 +938,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Only the seller can mark this deal as complete" });
       }
       
-      // Update auction status to completed
+      const completionDate = new Date();
+      
+      // Update auction status to completed, so it will appear in Past Listings
       const updatedAuction = await storage.updateAuction(auctionId, {
         status: "completed",
-        collectionConfirmed: true
+        collectionConfirmed: true,
+        completedAt: completionDate.toISOString()
       });
       
       // Get motorcycle details for the notification
       const motorcycle = await storage.getMotorcycle(auction.motorcycleId);
+      
+      // Update motorcycle status to mark it as sold
+      if (motorcycle) {
+        await storage.updateMotorcycle(motorcycle.id, {
+          status: "sold",
+          soldDate: completionDate.toISOString()
+        });
+      }
       
       // Send WebSocket notification to buyer
       const wsMessage: WSMessage = {
@@ -972,7 +983,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
           content: `The seller has confirmed completion of your ${motorcycle?.make} ${motorcycle?.model} purchase.`,
           relatedId: auctionId
         });
+        
+        // Create additional notification for buyer about transaction being completed
+        await storage.createNotification({
+          userId: auction.winningBidderId,
+          type: "transaction_completed",
+          content: `Transaction for ${motorcycle?.make} ${motorcycle?.model} has been completed and moved to Past Listings.`,
+          relatedId: auctionId
+        });
       }
+      
+      // Create a notification for the seller as well
+      await storage.createNotification({
+        userId: auction.dealerId,
+        type: "transaction_completed",
+        content: `You have marked the transaction for ${motorcycle?.make} ${motorcycle?.model} as complete. It has been moved to Past Listings.`,
+        relatedId: auctionId
+      });
       
       res.json(updatedAuction);
     } catch (error) {

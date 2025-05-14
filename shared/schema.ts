@@ -38,6 +38,8 @@ export const motorcycles = pgTable("motorcycles", {
   regNumber: text("reg_number"),
   auctionDuration: text("auction_duration"), // "1day", "1week", "2weeks", "1month"
   images: text("images").array(), // URLs of uploaded images
+  status: text("status").default("available"), // available, pending, sold
+  soldDate: text("sold_date"), // Date when the motorcycle was sold
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -59,6 +61,7 @@ export const auctions = pgTable("auctions", {
   // New visibility options
   visibilityType: text("visibility_type").notNull().default("all"), // all, favorites, radius
   visibilityRadius: integer("visibility_radius"), // radius in miles (used when visibilityType is 'radius')
+  completedAt: text("completed_at"), // Date when the deal was completed
   createdAt: timestamp("created_at").defaultNow(),
 });
 
