@@ -162,22 +162,22 @@ async function handleAuctionCompleted(message: WSMessage) {
       await storage.updateAuction(auctionId, {
         status: 'completed',
         winningBidId: highestBid.id,
-        winningTraderId: highestBid.traderId
+        winningBidderId: highestBid.dealerId
       });
       
       // Notify dealer
       await storage.createNotification({
         userId: auction.dealerId,
         type: 'auction_completed',
-        content: `Your auction for ${motorcycle?.make} ${motorcycle?.model} has ended with a winning bid of £${highestBid.amount}`,
+        content: `Your underwrite for ${motorcycle?.make} ${motorcycle?.model} has ended with a winning bid of £${highestBid.amount}`,
         relatedId: auctionId
       });
       
-      // Notify winning trader
+      // Notify winning bidder
       await storage.createNotification({
-        userId: highestBid.traderId,
+        userId: highestBid.dealerId,
         type: 'auction_completed',
-        content: `Congratulations! You won the auction for ${motorcycle?.make} ${motorcycle?.model} with a bid of £${highestBid.amount}`,
+        content: `Congratulations! You won the underwrite for ${motorcycle?.make} ${motorcycle?.model} with a bid of £${highestBid.amount}`,
         relatedId: auctionId
       });
       
@@ -187,12 +187,12 @@ async function handleAuctionCompleted(message: WSMessage) {
         data: {
           auctionId,
           winningBid: highestBid.amount,
-          winningTraderId: highestBid.traderId
+          winningBidderId: highestBid.dealerId
         },
         timestamp: Date.now()
       });
       
-      sendToUser(highestBid.traderId, {
+      sendToUser(highestBid.dealerId, {
         type: 'auction_completed',
         data: {
           auctionId,
@@ -211,7 +211,7 @@ async function handleAuctionCompleted(message: WSMessage) {
       await storage.createNotification({
         userId: auction.dealerId,
         type: 'auction_completed',
-        content: `Your auction for ${motorcycle?.make} ${motorcycle?.model} has ended with no bids`,
+        content: `Your underwrite for ${motorcycle?.make} ${motorcycle?.model} has ended with no bids`,
         relatedId: auctionId
       });
       
