@@ -12,7 +12,7 @@ export interface AuctionWithDetails extends Auction {
 // Activity item for dashboard
 export interface ActivityItem {
   id: number;
-  type: 'bid' | 'auction_ending' | 'auction_completed' | 'message';
+  type: 'bid' | 'auction_ending' | 'auction_completed' | 'underwrite_completed' | 'message';
   title: string;
   description: string;
   timestamp: Date;
@@ -36,8 +36,10 @@ export type WSMessageType =
   'new_bid' | 
   'auction_ending' | 
   'auction_completed' | 
+  'underwrite_completed' |
   'new_message' | 
   'auction_created' |
+  'underwrite_created' |
   'bid_accepted' | 
   'deal_confirmed' | 
   'collection_scheduled' |

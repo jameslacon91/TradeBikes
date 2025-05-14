@@ -168,7 +168,7 @@ async function handleAuctionCompleted(message: WSMessage) {
       // Notify dealer
       await storage.createNotification({
         userId: auction.dealerId,
-        type: 'auction_completed',
+        type: 'underwrite_completed',
         content: `Your underwrite for ${motorcycle?.make} ${motorcycle?.model} has ended with a winning bid of £${highestBid.amount}`,
         relatedId: auctionId
       });
@@ -176,14 +176,14 @@ async function handleAuctionCompleted(message: WSMessage) {
       // Notify winning bidder
       await storage.createNotification({
         userId: highestBid.dealerId,
-        type: 'auction_completed',
+        type: 'underwrite_completed',
         content: `Congratulations! You won the underwrite for ${motorcycle?.make} ${motorcycle?.model} with a bid of £${highestBid.amount}`,
         relatedId: auctionId
       });
       
       // Send real-time notifications
       sendToUser(auction.dealerId, {
-        type: 'auction_completed',
+        type: 'underwrite_completed',
         data: {
           auctionId,
           winningBid: highestBid.amount,
@@ -193,7 +193,7 @@ async function handleAuctionCompleted(message: WSMessage) {
       });
       
       sendToUser(highestBid.dealerId, {
-        type: 'auction_completed',
+        type: 'underwrite_completed',
         data: {
           auctionId,
           winningBid: highestBid.amount,
@@ -210,13 +210,13 @@ async function handleAuctionCompleted(message: WSMessage) {
       // Notify dealer
       await storage.createNotification({
         userId: auction.dealerId,
-        type: 'auction_completed',
+        type: 'underwrite_completed',
         content: `Your underwrite for ${motorcycle?.make} ${motorcycle?.model} has ended with no bids`,
         relatedId: auctionId
       });
       
       sendToUser(auction.dealerId, {
-        type: 'auction_completed',
+        type: 'underwrite_completed',
         data: {
           auctionId,
           noBids: true
