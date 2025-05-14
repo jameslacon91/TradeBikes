@@ -120,6 +120,13 @@ export default function PendingActions({ auction, isSeller }: PendingActionsProp
   const handleCompleteDeal = () => {
     if (window.confirm('Are you sure you want to mark this transaction as complete?')) {
       completeDealMutation.mutate();
+      
+      // Add a slight delay before redirecting to ensure the mutation completes
+      setTimeout(() => {
+        if (typeof window !== 'undefined') {
+          window.location.href = '/dashboard';
+        }
+      }, 1000);
     }
   };
   
