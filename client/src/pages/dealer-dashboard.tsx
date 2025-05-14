@@ -144,10 +144,10 @@ export default function DealerDashboard() {
                   List Motorcycle
                 </Button>
               </Link>
-              <Link href="/underwrites">
+              <Link href="/search-map">
                 <Button variant="outline">
-                  <LinkIcon className="mr-2 h-5 w-5" />
-                  Browse All Listings
+                  <Search className="mr-2 h-5 w-5" />
+                  Search Stock
                 </Button>
               </Link>
             </div>

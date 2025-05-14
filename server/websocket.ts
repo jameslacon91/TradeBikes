@@ -111,16 +111,28 @@ async function handleNewBid(message: WSMessage) {
     const auction = await storage.getAuction(auctionId);
     if (!auction) return;
     
-    // Notify dealer about new bid
-    const notificationContent = `New bid received on your underwrite`;
+    const motorcycle = await storage.getMotorcycle(auction.motorcycleId);
+    if (!motorcycle) return;
+    
+    // Notify seller about new bid
+    const sellerNotificationContent = `New bid received on your underwrite`;
     await storage.createNotification({
       userId: auction.dealerId,
       type: 'bid',
-      content: notificationContent,
+      content: sellerNotificationContent,
       relatedId: auctionId
     });
     
-    // Send real-time notification to dealer and update their stats
+    // Notify bidder about their placed bid
+    const bidderNotificationContent = `Your bid on ${motorcycle.make} ${motorcycle.model} has been placed`;
+    await storage.createNotification({
+      userId: dealerId,
+      type: 'bid_placed',
+      content: bidderNotificationContent,
+      relatedId: auctionId
+    });
+    
+    // Send real-time notification to seller and update their stats
     sendToUser(auction.dealerId, {
       type: 'new_bid',
       data: {
@@ -128,13 +140,33 @@ async function handleNewBid(message: WSMessage) {
         dealerId,
         bidId,
         amount,
-        motorcycle: await storage.getMotorcycle(auction.motorcycleId)
+        motorcycle
       },
       timestamp: Date.now()
     });
     
-    // Invalidate dealer's dashboard stats to update bid count
+    // Send real-time notification to bidder about their placed bid
+    sendToUser(dealerId, {
+      type: 'bid_placed',
+      data: {
+        auctionId,
+        dealerId,
+        bidId,
+        amount,
+        motorcycle
+      },
+      timestamp: Date.now()
+    });
+    
+    // Invalidate seller's dashboard stats to update bid count
     sendToUser(auction.dealerId, {
+      type: 'refresh_stats',
+      data: {},
+      timestamp: Date.now()
+    });
+    
+    // Invalidate bidder's dashboard stats to update their placed bids
+    sendToUser(dealerId, {
       type: 'refresh_stats',
       data: {},
       timestamp: Date.now()
