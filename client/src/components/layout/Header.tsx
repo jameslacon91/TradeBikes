@@ -242,7 +242,7 @@ export default function Header() {
                 </Button>
               </Link>
               <Link href="/search-map">
-                <Button className="hidden sm:flex bg-amber-600 hover:bg-amber-700 text-white shadow-md">
+                <Button className="hidden sm:flex bg-blue-600 hover:bg-blue-700 text-white shadow-md">
                   <Search className="mr-2 h-4 w-4" />
                   Search Stock
                 </Button>

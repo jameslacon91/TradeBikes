@@ -265,7 +265,7 @@ export default function AuctionDetail() { // Component name kept as-is for compa
                 <TabsContent value="details">
                   <div className="mb-4">
                     <h4 className="text-sm font-medium text-gray-500">Description</h4>
-                    <p className="mt-1 text-sm text-gray-900">{motorcycle.description}</p>
+                    <p className="mt-1 text-sm p-3 rounded-md bg-blue-50 text-blue-900 font-medium">{motorcycle.description}</p>
                   </div>
                 </TabsContent>
                 <TabsContent value="specs">
