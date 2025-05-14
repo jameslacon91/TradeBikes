@@ -463,7 +463,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         bidAccepted: true,
         winningBidId: bidId,
         winningBidderId: bid.dealerId,
-        status: "completed"
+        status: "pending_collection"
       });
 
       // Fetch updated motorcycle with potential availability date
