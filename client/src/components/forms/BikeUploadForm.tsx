@@ -60,10 +60,31 @@ const yearOptions = Array.from({ length: 50 }, (_, i) => currentYear - i);
 
 // Extend the motorcycle schema for form validation
 const uploadSchema = insertMotorcycleSchema.extend({
+  // Required fields
+  make: z.string().min(1, "Make is required"),
+  year: z.preprocess(
+    (val) => (val === '' ? null : Number(val)),
+    z.number().int().positive("Year must be a positive number").nullable().refine(val => val !== null, {
+      message: "Year is required"
+    })
+  ),
+  mileage: z.preprocess(
+    (val) => (val === '' ? null : Number(val)), 
+    z.number().int().nonnegative("Mileage must be a non-negative number").nullable().refine(val => val !== null, {
+      message: "Mileage is required"
+    })
+  ),
   auctionDuration: z.enum(['1day', '1week', '2weeks', '1month'], {
     required_error: "Please select a listing duration",
   }),
+  
+  // Optional fields
   images: z.any().optional(),
+  model: z.string().optional(),
+  color: z.string().optional(),
+  condition: z.string().optional(),
+  engineSize: z.string().optional(),
+  description: z.string().optional(),
   
   // Visibility options
   visibilityType: z.enum(['all', 'favorites', 'radius'], {
@@ -275,15 +296,7 @@ export default function BikeUploadForm() {
       return;
     }
     
-    if (imageFiles.length === 0) {
-      toast({
-        title: "Images required",
-        description: "Please upload at least one image of the motorcycle.",
-        variant: "destructive",
-      });
-      return;
-    }
-    
+    // Images are optional now
     createAuctionMutation.mutate(data);
   }
 

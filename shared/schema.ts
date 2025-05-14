@@ -110,10 +110,11 @@ export const insertMotorcycleSchema = createInsertSchema(motorcycles)
     createdAt: true 
   })
   .extend({
-    // Make these fields optional
+    // Only make is required, rest are optional
+    make: z.string().min(1, "Make is required"),
     model: z.string().optional(),
-    year: z.number().optional(),
-    mileage: z.number().optional(),
+    year: z.number().int().positive("Year must be a positive number").optional(),
+    mileage: z.number().int().nonnegative("Mileage must be a non-negative number").optional(),
     color: z.string().optional(),
     condition: z.string().optional(),
     engineSize: z.string().optional(),
