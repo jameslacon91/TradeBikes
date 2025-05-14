@@ -22,6 +22,15 @@ export default function BidHistory({ auctionId, currentBid }: BidHistoryProps) {
     queryKey: [`/api/bids/auction/${auctionId}`],
   });
 
+  // Fetch auction to check if current user is the owner
+  const { data: auction, isLoading: auctionLoading } = useQuery<any>({
+    queryKey: [`/api/auctions/${auctionId}`],
+    enabled: !!auctionId,
+  });
+  
+  // Check if current user is the auction owner
+  const isAuctionOwner = user?.id === auction?.dealerId;
+
   // Fetch dealer information
   const { data: dealers = [], isLoading: dealersLoading } = useQuery<DealerInfo[]>({
     queryKey: ['/api/dealers'],
@@ -29,7 +38,7 @@ export default function BidHistory({ auctionId, currentBid }: BidHistoryProps) {
 
   // Sort bids by amount (highest first)
   const sortedBids = [...bids].sort((a, b) => b.amount - a.amount);
-  const isLoading = bidsLoading || dealersLoading;
+  const isLoading = bidsLoading || dealersLoading || auctionLoading;
 
   // Function to get dealer name from its ID
   const getDealerName = (dealerId: number): string => {
@@ -73,15 +82,19 @@ export default function BidHistory({ auctionId, currentBid }: BidHistoryProps) {
           <thead className="bg-gray-50">
             <tr>
               <th scope="col" className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Trader</th>
-              <th scope="col" className="px-3 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Bid</th>
+              {isAuctionOwner && (
+                <th scope="col" className="px-3 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Bid</th>
+              )}
               <th scope="col" className="px-3 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Time</th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
             {sortedBids.map((bid) => (
-              <tr key={bid.id} className={bid.amount === currentBid ? "bg-green-50" : ""}>
+              <tr key={bid.id}>
                 <td className="px-3 py-2 whitespace-nowrap text-xs font-medium text-gray-900">{getDealerName(bid.dealerId)}</td>
-                <td className="px-3 py-2 whitespace-nowrap text-xs text-gray-900 text-right">£{bid.amount.toLocaleString()}</td>
+                {isAuctionOwner && (
+                  <td className="px-3 py-2 whitespace-nowrap text-xs text-gray-900 text-right">£{bid.amount.toLocaleString()}</td>
+                )}
                 <td className="px-3 py-2 whitespace-nowrap text-xs text-gray-500 text-right">{bid.createdAt ? timeAgo(new Date(bid.createdAt)) : ''}</td>
               </tr>
             ))}
