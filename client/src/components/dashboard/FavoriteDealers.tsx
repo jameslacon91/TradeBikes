@@ -85,13 +85,45 @@ const FavoriteDealers = () => {
             ))}
           </div>
         ) : favoriteDealers?.length === 0 ? (
-          <div className="text-center py-8">
-            <p className="text-muted-foreground mb-4">
+          <div className="py-4">
+            <p className="text-muted-foreground mb-4 text-center">
               You don't have any favorite dealers yet.
             </p>
-            <Button variant="outline" className="mx-auto">
-              <Plus className="mr-2 h-4 w-4" /> Add Favorites
-            </Button>
+            <div className="space-y-4 mt-4">
+              <h3 className="font-medium text-sm">Available Dealers:</h3>
+              {allDealers?.filter(dealer => dealer.id !== user?.id && dealer.role === 'dealer').map(dealer => (
+                <div key={dealer.id} className="flex items-center justify-between border-b pb-3 last:border-0">
+                  <div className="flex items-center space-x-3">
+                    <Avatar>
+                      <AvatarFallback>{dealer.companyName?.[0] || dealer.username[0]}</AvatarFallback>
+                      <AvatarImage src={`https://api.dicebear.com/7.x/initials/svg?seed=${dealer.companyName || dealer.username}`} />
+                    </Avatar>
+                    <div>
+                      <h4 className="font-medium">{dealer.companyName || dealer.username}</h4>
+                      <div className="flex items-center text-sm text-muted-foreground">
+                        <div className="flex items-center mr-3">
+                          {[...Array(5)].map((_, i) => (
+                            <Star 
+                              key={i} 
+                              className={`h-3 w-3 ${i < (dealer.rating || 0) ? 'text-yellow-500 fill-yellow-500' : 'text-gray-300'}`} 
+                            />
+                          ))}
+                        </div>
+                        <span>{dealer.totalRatings} ratings</span>
+                      </div>
+                    </div>
+                  </div>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={() => toggleFavorite(dealer.id)}
+                    disabled={isUpdating}
+                  >
+                    <Plus className="mr-2 h-4 w-4" /> Add
+                  </Button>
+                </div>
+              ))}
+            </div>
           </div>
         ) : (
           <div className="space-y-4">
@@ -118,6 +150,15 @@ const FavoriteDealers = () => {
                   </div>
                 </div>
                 <div className="flex space-x-2">
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    title="Remove from favorites"
+                    onClick={() => toggleFavorite(dealer.id)}
+                    disabled={isUpdating}
+                  >
+                    <Star className="h-4 w-4 fill-yellow-500 text-yellow-500" />
+                  </Button>
                   <Button variant="ghost" size="icon" title="Message">
                     <MessageCircle className="h-4 w-4" />
                   </Button>

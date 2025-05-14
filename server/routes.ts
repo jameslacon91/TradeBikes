@@ -704,25 +704,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
       allAuctions.forEach(auction => {
         const myBids = auction.bids.filter(bid => bid.dealerId === req.user.id);
         
-        if (myBids.length > 0) {
-          // Check for active bids
-          if (auction.status === "active") {
-            activeBids += myBids.length;
-          }
-          
-          // Check for won auctions
-          if (auction.status === "completed" && auction.winningBidId) {
-            const winningBid = auction.bids.find(bid => bid.id === auction.winningBidId);
-            if (winningBid && winningBid.dealerId === req.user.id) {
-              wonAuctions++;
-              
-              // Check if pending collection
-              if (!auction.collectionDate) {
-                pendingCollection++;
-              }
-              
-              // Calculate amount spent
-              amountSpent += winningBid.amount;
+        // Count each individual bid placed by this user on any active auction
+        if (auction.status === "active") {
+          myBids.forEach(bid => {
+            activeBids++;
+            // Add bid amount to amount spent calculation
+            amountSpent += bid.amount;
+          });
+        }
+        
+        // Check for won auctions
+        if (auction.status === "completed" && auction.winningBidId) {
+          const winningBid = auction.bids.find(bid => bid.id === auction.winningBidId);
+          if (winningBid && winningBid.dealerId === req.user.id) {
+            wonAuctions++;
+            
+            // Check if pending collection
+            if (!auction.collectionDate) {
+              pendingCollection++;
             }
           }
         }

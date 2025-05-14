@@ -10,7 +10,7 @@ import StatCard from '@/components/dashboard/StatCard';
 import ActivityItem from '@/components/dashboard/ActivityItem';
 import AuctionCard from '@/components/auctions/AuctionCard';
 import { 
-  Package, AlertCircle, Clock, DollarSign, BarChart4, Users,
+  Package, AlertCircle, Clock, CheckCircle, BarChart4, Users,
   Gavel, PlusCircle, Link as LinkIcon, Home, Search
 } from 'lucide-react';
 import { Link } from 'wouter';
@@ -214,12 +214,12 @@ export default function DealerDashboard() {
                   />
                 </div>
 
-                {/* Total Revenue */}
+                {/* Completed Deals */}
                 <div onClick={() => setActiveTab("past-listings")}>
                   <StatCard 
-                    title="Revenue (MTD)" 
-                    value={statsLoading ? "Loading..." : `£${stats?.revenue?.toLocaleString() || 0}`}
-                    icon={<DollarSign className="h-6 w-6 text-white" />}
+                    title="Completed Deals" 
+                    value={statsLoading || auctionsLoading ? "Loading..." : completedDeals.length}
+                    icon={<CheckCircle className="h-6 w-6 text-white" />}
                     bgColor="bg-green-500"
                     className="cursor-pointer transition-transform hover:translate-y-[-5px]"
                   />
