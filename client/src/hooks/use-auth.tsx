@@ -166,7 +166,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       await apiRequest("POST", "/api/logout");
     },
     onSuccess: () => {
+      // Clear all query caches to prevent data from persisting between user sessions
+      queryClient.clear();
+      
+      // Still set user data to null explicitly
       queryClient.setQueryData(["/api/user"], null);
+      
       // Notify about logout
       dispatchAuthEvent(undefined);
       

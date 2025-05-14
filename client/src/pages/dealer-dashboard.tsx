@@ -29,20 +29,24 @@ export default function DealerDashboard() {
   
   // Fetch dashboard stats
   const { data: stats, isLoading: statsLoading } = useQuery<DashboardStats>({
-    queryKey: ['/api/dashboard/stats'],
-    enabled: activeTab === 'dashboard'
+    queryKey: ['/api/dashboard/stats', user?.id],
+    enabled: activeTab === 'dashboard' && !!user,
+    staleTime: 0 // Always refetch when query key changes (e.g., when user changes)
   });
   
   // Fetch dealer auctions - needed for multiple tabs
   const { data: activeAuctions, isLoading: auctionsLoading } = useQuery<AuctionWithDetails[]>({
-    queryKey: ['/api/auctions/dealer'],
-    enabled: activeTab === 'active-listings' || activeTab === 'dashboard' || activeTab === 'pending-completion' || activeTab === 'past-listings' || activeTab === 'placed-bids'
+    queryKey: ['/api/auctions/dealer', user?.id],
+    enabled: (activeTab === 'active-listings' || activeTab === 'dashboard' || activeTab === 'pending-completion' || 
+              activeTab === 'past-listings' || activeTab === 'placed-bids') && !!user,
+    staleTime: 0 // Always refetch when query key changes
   });
   
   // Fetch activity feed
   const { data: activityItems = [], isLoading: activityLoading } = useQuery<ActivityItemType[]>({
-    queryKey: ['/api/activity'],
-    enabled: activeTab === 'dashboard'
+    queryKey: ['/api/activity', user?.id],
+    enabled: activeTab === 'dashboard' && !!user,
+    staleTime: 0 // Always refetch when query key changes
   });
   
   // Get auctions by user role
@@ -56,8 +60,9 @@ export default function DealerDashboard() {
   
   // Fetch auctions where the user has placed bids
   const { data: biddedAuctions = [], isLoading: bidsLoading } = useQuery<AuctionWithDetails[]>({
-    queryKey: ['/api/auctions/bids'],
-    enabled: !!user // Load as soon as user is authenticated
+    queryKey: ['/api/auctions/bids', user?.id], // Include user ID in query key to handle user switching
+    enabled: !!user, // Load as soon as user is authenticated
+    staleTime: 0 // Always refetch when query key changes
   });
   
   // Filter to only show active bids that haven't been accepted yet
