@@ -57,7 +57,7 @@ export default function DealerDashboard() {
   // Fetch auctions where the user has placed bids
   const { data: biddedAuctions = [], isLoading: bidsLoading } = useQuery<AuctionWithDetails[]>({
     queryKey: ['/api/auctions/bids'],
-    enabled: activeTab === 'placed-bids'
+    enabled: !!user // Load as soon as user is authenticated
   });
   
   // Filter to only show active bids that haven't been accepted yet
@@ -207,8 +207,8 @@ export default function DealerDashboard() {
                 <div onClick={() => setActiveTab("placed-bids")}>
                   <StatCard 
                     title="Placed Bids" 
-                    value={statsLoading ? "Loading..." : stats?.activeBids || 0}
-                    subtitle={statsLoading ? "" : stats?.amountSpent ? `Total: £${stats.amountSpent.toLocaleString()}` : "No bids"}
+                    value={statsLoading || bidsLoading ? "Loading..." : biddedAuctions.length}
+                    subtitle={statsLoading || bidsLoading ? "" : totalBidAmount > 0 ? `Total: £${totalBidAmount.toLocaleString()}` : "No bids"}
                     icon={<Gavel className="h-6 w-6 text-white" />}
                     bgColor="bg-blue-500"
                     className="cursor-pointer transition-transform hover:translate-y-[-5px]"
