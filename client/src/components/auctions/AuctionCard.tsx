@@ -143,7 +143,7 @@ export default function AuctionCard({
         
         {status === 'pending_collection' && (
           <div className="mt-4 border-t pt-3">
-            <div className="flex items-center gap-2 mb-3 text-amber-600">
+            <div className="flex items-center gap-2 mb-1 text-amber-600">
               <AlertCircle className="h-4 w-4" />
               <span className="text-sm font-medium">
                 {dealerId === user?.id 
@@ -152,6 +152,34 @@ export default function AuctionCard({
                 }
               </span>
             </div>
+            
+            {/* Display collection date prominently */}
+            {motorcycle.dateAvailable && (
+              <div className="mb-3 p-2 bg-amber-50 rounded border border-amber-200 text-sm">
+                <p className="font-semibold">Collection Date:</p>
+                <p className="text-amber-700">
+                  {(() => {
+                    try {
+                      const date = new Date(motorcycle.dateAvailable);
+                      // Check if date is valid
+                      if (!isNaN(date.getTime())) {
+                        return date.toLocaleDateString('en-GB', {
+                          weekday: 'long',
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric'
+                        });
+                      }
+                      return "Date to be confirmed";
+                    } catch (error) {
+                      console.error("Error formatting collection date:", error);
+                      return "Date to be confirmed";
+                    }
+                  })()}
+                </p>
+              </div>
+            )}
+            
             <PendingActions 
               auction={auction} 
               isSeller={dealerId === user?.id} 
