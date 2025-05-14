@@ -301,21 +301,21 @@ async function handleAuctionCreated(message: WSMessage) {
 
 // Handle bid accepted event
 async function handleBidAccepted(message: WSMessage) {
-  const { auctionId, dealerId, traderId } = message.data;
+  const { auctionId, dealerId, bidderId } = message.data;
   
   try {
     const auction = await storage.getAuctionWithDetails(auctionId);
     if (!auction) return;
     
-    // Notify the trader
+    // Notify the bidder
     await storage.createNotification({
-      userId: traderId,
+      userId: bidderId,
       type: 'bid_accepted',
       content: `Your bid on ${auction.motorcycle.make} ${auction.motorcycle.model} has been accepted by the dealer.`,
       relatedId: auctionId
     });
 
-    sendToUser(traderId, {
+    sendToUser(bidderId, {
       type: 'bid_accepted',
       data: {
         auctionId,
@@ -332,7 +332,7 @@ async function handleBidAccepted(message: WSMessage) {
 
 // Handle deal confirmation event
 async function handleDealConfirmed(message: WSMessage) {
-  const { auctionId, dealerId, traderId } = message.data;
+  const { auctionId, dealerId, bidderId } = message.data;
   
   try {
     const auction = await storage.getAuctionWithDetails(auctionId);
@@ -342,7 +342,7 @@ async function handleDealConfirmed(message: WSMessage) {
     await storage.createNotification({
       userId: dealerId,
       type: 'deal_confirmed',
-      content: `The trader has confirmed the deal for ${auction.motorcycle.make} ${auction.motorcycle.model}. Please schedule a collection date.`,
+      content: `The buyer has confirmed the deal for ${auction.motorcycle.make} ${auction.motorcycle.model}. Please schedule a collection date.`,
       relatedId: auctionId
     });
 
@@ -350,7 +350,7 @@ async function handleDealConfirmed(message: WSMessage) {
       type: 'deal_confirmed',
       data: {
         auctionId,
-        traderId,
+        bidderId,
         motorcycle: auction.motorcycle
       },
       timestamp: Date.now()
@@ -362,21 +362,21 @@ async function handleDealConfirmed(message: WSMessage) {
 
 // Handle collection scheduled event
 async function handleCollectionScheduled(message: WSMessage) {
-  const { auctionId, dealerId, traderId, collectionDate } = message.data;
+  const { auctionId, dealerId, bidderId, collectionDate } = message.data;
   
   try {
     const auction = await storage.getAuctionWithDetails(auctionId);
     if (!auction) return;
     
-    // Notify the trader
+    // Notify the bidder
     await storage.createNotification({
-      userId: traderId,
+      userId: bidderId,
       type: 'collection_scheduled',
       content: `Collection for ${auction.motorcycle.make} ${auction.motorcycle.model} has been scheduled for ${new Date(collectionDate).toLocaleDateString()}.`,
       relatedId: auctionId
     });
 
-    sendToUser(traderId, {
+    sendToUser(bidderId, {
       type: 'collection_scheduled',
       data: {
         auctionId,
@@ -393,7 +393,7 @@ async function handleCollectionScheduled(message: WSMessage) {
 
 // Handle collection confirmation event
 async function handleCollectionConfirmed(message: WSMessage) {
-  const { auctionId, dealerId, traderId } = message.data;
+  const { auctionId, dealerId, bidderId } = message.data;
   
   try {
     const auction = await storage.getAuctionWithDetails(auctionId);
@@ -403,7 +403,7 @@ async function handleCollectionConfirmed(message: WSMessage) {
     await storage.createNotification({
       userId: dealerId,
       type: 'collection_confirmed',
-      content: `The trader has confirmed collection of ${auction.motorcycle.make} ${auction.motorcycle.model}. The transaction is now complete.`,
+      content: `The buyer has confirmed collection of ${auction.motorcycle.make} ${auction.motorcycle.model}. The transaction is now complete.`,
       relatedId: auctionId
     });
 
@@ -411,7 +411,7 @@ async function handleCollectionConfirmed(message: WSMessage) {
       type: 'collection_confirmed',
       data: {
         auctionId,
-        traderId,
+        bidderId,
         motorcycle: auction.motorcycle
       },
       timestamp: Date.now()
