@@ -140,15 +140,15 @@ export const insertAuctionSchema = createInsertSchema(auctions)
     highestBidderId: true
   })
   .extend({
-    // Use preprocess to convert ISO string dates to Date objects
-    startTime: z.preprocess(
-      (val) => val instanceof Date ? val : new Date(String(val)),
+    // Accept both string and Date types for dates
+    startTime: z.union([
+      z.string().transform(val => new Date(val)),
       z.date()
-    ),
-    endTime: z.preprocess(
-      (val) => val instanceof Date ? val : new Date(String(val)),
+    ]),
+    endTime: z.union([
+      z.string().transform(val => new Date(val)),
       z.date()
-    ),
+    ])
   });
 
 export const insertBidSchema = createInsertSchema(bids).omit({ 
