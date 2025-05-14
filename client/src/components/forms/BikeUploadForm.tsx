@@ -231,7 +231,7 @@ export default function BikeUploadForm() {
         const motorcycleRes = await apiRequest("POST", "/api/motorcycles", {
           ...data,
           images: imageUrls,
-          // Only include dealerId if not included in schema
+          dealerId: user?.id // Add the current user's id as dealerId
         });
         const motorcycle = await motorcycleRes.json();
         
