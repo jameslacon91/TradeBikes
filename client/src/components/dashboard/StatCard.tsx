@@ -24,28 +24,28 @@ export default function StatCard({
   className = "" 
 }: StatCardProps) {
   return (
-    <div className={`rounded-lg shadow-sm overflow-hidden ${className}`}>
-      <div className={`p-4 ${bgColor}`}>
-        <div className="flex justify-between">
-          <span className="text-white font-medium">{title}</span>
-          <div className="text-white/80">
+    <div className={`card shadow-md hover:shadow-lg transition-all ${className}`}>
+      <div className={`card-body p-5 ${bgColor} text-white`}>
+        <div className="flex justify-between items-start">
+          <h2 className="card-title font-semibold text-white">{title}</h2>
+          <div className="text-white/90 badge badge-outline badge-lg">
             {icon}
           </div>
         </div>
         <div className="mt-3 flex items-end justify-between">
           <div>
-            <p className="text-2xl font-bold text-white">{value}</p>
+            <p className="text-3xl font-bold text-white">{value}</p>
             {subtitle && (
-              <p className="text-sm text-white/80 mt-1">{subtitle}</p>
+              <p className="text-sm opacity-80 mt-1">{subtitle}</p>
             )}
           </div>
           
           {trend && (
-            <div className={`flex items-center text-sm ${trend.up ? 'text-green-100' : 'text-red-100'}`}>
+            <div className={`badge ${trend.up ? 'badge-success' : 'badge-error'} flex items-center gap-1`}>
               {trend.up ? (
-                <ArrowUp className="h-4 w-4 mr-0.5" />
+                <ArrowUp className="h-3 w-3" />
               ) : (
-                <ArrowDown className="h-4 w-4 mr-0.5" />
+                <ArrowDown className="h-3 w-3" />
               )}
               {trend.value}%
             </div>

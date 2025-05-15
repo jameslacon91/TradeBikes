@@ -386,323 +386,342 @@ export default function DealerDashboard() {
             {/* Using Tabs component to handle tab content while DaisyUI handles the tab buttons */}
             <Tabs defaultValue="dashboard" value={activeTab} onValueChange={setActiveTab}>
             
-              {/* Dashboard Overview */}
-              <TabsContent value="dashboard" className="space-y-6">
-                {/* Stats Cards */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                  {/* Active Listings */}
-                  <div onClick={() => setActiveTab("active-listings")}>
-                    <StatCard 
-                      title="Active Listings" 
-                      value={statsLoading || auctionsLoading ? "Loading..." : activeListings.length}
-                      icon={<Package className="h-6 w-6 text-white" />}
-                      bgColor="bg-primary"
-                      trend={stats?.trendUp ? { up: true, value: stats.trendValue || 0 } : undefined}
-                      className="cursor-pointer transition-transform hover:translate-y-[-5px]"
-                    />
-                  </div>
+            {/* Dashboard Overview */}
+            <TabsContent value="dashboard" className="space-y-6">
+              {/* Stats Cards */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                {/* Active Listings */}
+                <div onClick={() => setActiveTab("active-listings")}>
+                  <StatCard 
+                    title="Active Listings" 
+                    value={statsLoading || auctionsLoading ? "Loading..." : activeListings.length}
+                    icon={<Package className="h-6 w-6 text-white" />}
+                    bgColor="bg-primary"
+                    trend={stats?.trendUp ? { up: true, value: stats.trendValue || 0 } : undefined}
+                    className="cursor-pointer transition-transform hover:translate-y-[-5px]"
+                  />
+                </div>
 
-                  {/* Total Bids Received */}
-                  <div onClick={() => setActiveTab("active-listings")}>
-                    <StatCard 
-                      title="Bids Received" 
-                      value={statsLoading ? "Loading..." : stats?.totalBids || 0}
-                      icon={<Clock className="h-6 w-6 text-white" />}
-                      bgColor="bg-accent"
-                      trend={stats?.trendUp ? { up: true, value: stats.trendValue || 0 } : undefined}
-                      className="cursor-pointer transition-transform hover:translate-y-[-5px]"
-                    />
-                  </div>
-                  
-                  {/* Placed Bids */}
-                  <div onClick={() => setActiveTab("placed-bids")}>
-                    <StatCard 
-                      title="Placed Bids" 
-                      value={statsLoading || bidsLoading ? "Loading..." : placedBids.length}
-                      subtitle={statsLoading || bidsLoading ? "" : totalBidAmount > 0 ? `Total: £${totalBidAmount.toLocaleString()}` : "No bids"}
-                      icon={<Gavel className="h-6 w-6 text-white" />}
-                      bgColor="bg-blue-500"
-                      className="cursor-pointer transition-transform hover:translate-y-[-5px]"
-                    />
-                  </div>
-
-                  {/* Pending Completion */}
-                  <div onClick={() => setActiveTab("pending-completion")}>
-                    <StatCard 
-                      title="Pending Completion" 
-                      value={statsLoading || auctionsLoading ? "Loading..." : pendingCollection.length}
-                      icon={<AlertCircle className="h-6 w-6 text-white" />}
-                      bgColor="bg-yellow-500"
-                      className="cursor-pointer transition-transform hover:translate-y-[-5px]"
-                    />
-                  </div>
-
-                  {/* Completed Deals */}
-                  <div onClick={() => setActiveTab("completed-deals")}>
-                    <StatCard 
-                      title="Completed Deals" 
-                      value={statsLoading || auctionsLoading ? "Loading..." : completedDealsForStats.length}
-                      icon={<CheckCircle className="h-6 w-6 text-white" />}
-                      bgColor="bg-green-500"
-                      className="cursor-pointer transition-transform hover:translate-y-[-5px]"
-                    />
-                  </div>
+                {/* Total Bids Received */}
+                <div onClick={() => setActiveTab("active-listings")}>
+                  <StatCard 
+                    title="Bids Received" 
+                    value={statsLoading ? "Loading..." : stats?.totalBids || 0}
+                    icon={<Clock className="h-6 w-6 text-white" />}
+                    bgColor="bg-accent"
+                    trend={stats?.trendUp ? { up: true, value: stats.trendValue || 0 } : undefined}
+                    className="cursor-pointer transition-transform hover:translate-y-[-5px]"
+                  />
                 </div>
                 
-                {/* Two column layout for activity feed and quick view */}
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                  {/* Activity Feed */}
-                  <Card className="col-span-2">
-                    <CardHeader className="pb-3">
-                      <CardTitle>Recent Activity</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      {activityLoading ? (
-                        <>
-                          {[...Array(5)].map((_, i) => (
-                            <div key={i} className="py-3 border-b last:border-0">
-                              <div className="flex items-center">
-                                <Skeleton className="h-8 w-8 rounded-full mr-3" />
-                                <div className="space-y-2">
-                                  <Skeleton className="h-4 w-[250px]" />
-                                  <Skeleton className="h-3 w-[180px]" />
-                                </div>
-                              </div>
+                {/* Placed Bids */}
+                <div onClick={() => setActiveTab("placed-bids")}>
+                  <StatCard 
+                    title="Placed Bids" 
+                    value={statsLoading || bidsLoading ? "Loading..." : placedBids.length}
+                    subtitle={statsLoading || bidsLoading ? "" : totalBidAmount > 0 ? `Total: £${totalBidAmount.toLocaleString()}` : "No bids"}
+                    icon={<Gavel className="h-6 w-6 text-white" />}
+                    bgColor="bg-blue-500"
+                    className="cursor-pointer transition-transform hover:translate-y-[-5px]"
+                  />
+                </div>
+
+                {/* Pending Completion */}
+                <div onClick={() => setActiveTab("pending-completion")}>
+                  <StatCard 
+                    title="Pending Completion" 
+                    value={statsLoading || auctionsLoading ? "Loading..." : pendingCollection.length}
+                    icon={<AlertCircle className="h-6 w-6 text-white" />}
+                    bgColor="bg-yellow-500"
+                    className="cursor-pointer transition-transform hover:translate-y-[-5px]"
+                  />
+                </div>
+
+                {/* Completed Deals */}
+                <div onClick={() => setActiveTab("completed-deals")}>
+                  <StatCard 
+                    title="Completed Deals" 
+                    value={statsLoading || auctionsLoading ? "Loading..." : completedDealsForStats.length}
+                    icon={<CheckCircle className="h-6 w-6 text-white" />}
+                    bgColor="bg-green-500"
+                    className="cursor-pointer transition-transform hover:translate-y-[-5px]"
+                  />
+                </div>
+              </div>
+
+              {/* My Active Underwrites Section */}
+              <div className="mt-8">
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-xl font-semibold">My Active Listings</h2>
+                  <Link href="/auctions/dealer">
+                    <Button variant="link" className="gap-1">
+                      View All <LinkIcon className="h-4 w-4" />
+                    </Button>
+                  </Link>
+                </div>
+                
+                {auctionsLoading ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {[...Array(3)].map((_, i) => (
+                      <Card key={i} className="h-[340px]">
+                        <CardContent className="p-0">
+                          <Skeleton className="h-[200px] w-full" />
+                          <div className="p-4">
+                            <Skeleton className="h-5 w-[180px] mb-2" />
+                            <Skeleton className="h-4 w-[150px] mb-4" />
+                            <div className="flex justify-between">
+                              <Skeleton className="h-10 w-[80px]" />
+                              <Skeleton className="h-10 w-[80px]" />
                             </div>
-                          ))}
-                        </>
-                      ) : activityItems.length === 0 ? (
-                        <div className="py-8 text-center">
-                          <BarChart4 className="w-12 h-12 text-muted-foreground/50 mx-auto mb-3" />
-                          <h3 className="text-lg font-medium mb-1">No recent activity</h3>
-                          <p className="text-sm text-muted-foreground">
-                            Your recent activity will appear here
-                          </p>
-                        </div>
-                      ) : (
-                        <div className="space-y-4">
-                          {activityItems?.map((item: ActivityItemType) => (
-                            <ActivityItem key={item.id} item={item} />
-                          ))}
-                        </div>
-                      )}
-                    </CardContent>
-                  </Card>
-                  
-                  {/* Right sidebar */}
-                  <div className="space-y-6">
-                    {/* Favorite Dealers */}
-                    <Card>
-                      <CardHeader className="pb-3">
-                        <CardTitle>Favorite Dealers</CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <Suspense fallback={
-                          <div className="space-y-3">
-                            {[...Array(3)].map((_, i) => (
-                              <div key={i} className="flex items-center space-x-2">
-                                <Skeleton className="h-8 w-8 rounded-full" />
-                                <div className="flex-1">
-                                  <Skeleton className="h-4 w-[120px]" />
-                                </div>
-                              </div>
-                            ))}
                           </div>
-                        }>
-                          <FavoriteDealers />
-                        </Suspense>
-                      </CardContent>
-                    </Card>
-                    
-                    {/* Pending Bids */}
-                    <Card>
-                      <CardHeader className="pb-3">
-                        <CardTitle>Bid Acceptance</CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <Suspense fallback={
-                          <div className="space-y-3">
-                            <Skeleton className="h-16 w-full rounded" />
-                            <Skeleton className="h-16 w-full rounded" />
-                          </div>
-                        }>
-                          <BidAcceptance />
-                        </Suspense>
-                      </CardContent>
-                    </Card>
+                        </CardContent>
+                      </Card>
+                    ))}
                   </div>
-                </div>
-              </TabsContent>
+                ) : !hasListings ? (
+                  <div className="text-center py-12 border rounded-lg">
+                    <Package className="h-12 w-12 mx-auto text-muted-foreground/50 mb-4" />
+                    <h3 className="text-lg font-medium mb-2">No Active Listings</h3>
+                    <p className="text-muted-foreground mb-6">You don't have any active listings yet.</p>
+                    <Link href="/create-underwrite">+List Your First Motorcycle</Link>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {activeListings.slice(0, 3).map(auction => (
+                      <AuctionCard 
+                        key={auction.id} 
+                        auction={auction}
+                        showDealerInfo={false} 
+                        hideEndingSoon
+                      />
+                    ))}
+                  </div>
+                )}
+              </div>
               
-              {/* Active Listings Tab */}
-              <TabsContent value="active-listings">
-                <div className="mb-6">
-                  <h2 className="text-xl font-semibold mb-2">Active Listings</h2>
-                  <p className="text-muted-foreground">Motorcycles you currently have for underwriting.</p>
-                
-                  {auctionsLoading ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
-                      {[...Array(3)].map((_, i) => (
-                        <div key={i} className="border rounded-lg p-4">
-                          <Skeleton className="h-40 w-full mb-3" />
-                          <Skeleton className="h-5 w-2/3 mb-2" />
-                          <Skeleton className="h-4 w-1/2 mb-4" />
-                          <div className="flex justify-between">
-                            <Skeleton className="h-8 w-20" />
-                            <Skeleton className="h-8 w-20" />
+              {/* Recent Activity & Favorite Dealers */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mt-8">
+                {/* Recent Activity */}
+                <Card className="lg:col-span-2">
+                  <CardHeader className="pb-2">
+                    <CardTitle>Recent Activity</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    {activityLoading ? (
+                      <div className="space-y-4">
+                        {[...Array(5)].map((_, i) => (
+                          <div key={i} className="flex items-start gap-4">
+                            <Skeleton className="h-10 w-10 rounded-full" />
+                            <div className="space-y-2 flex-1">
+                              <Skeleton className="h-4 w-[200px]" />
+                              <Skeleton className="h-3 w-full" />
+                            </div>
                           </div>
-                        </div>
-                      ))}
-                    </div>
-                  ) : activeListings.length === 0 ? (
-                    <div className="text-center py-12 border rounded-lg mt-4">
-                      <Package className="h-12 w-12 mx-auto text-muted-foreground/50 mb-4" />
-                      <h3 className="text-lg font-medium mb-2">You don't have any active listings</h3>
-                      <Link href="/create-auction">
-                        <Button className="bg-amber-500 hover:bg-amber-600">
-                          <PlusCircle className="mr-2 h-4 w-4" />
-                          Create Your First Listing
-                        </Button>
-                      </Link>
-                    </div>
-                  ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
-                      {activeListings.map(auction => (
-                        <AuctionCard 
-                          key={auction.id}
-                          auction={auction}
-                          showDealerInfo={false}
-                        />
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </TabsContent>
-              
-              {/* Placed Bids Tab */}
-              <TabsContent value="placed-bids">
-                <div className="mb-6">
-                  <h2 className="text-xl font-semibold mb-2">Placed Bids</h2>
-                  <p className="text-muted-foreground">Bids you've placed on other dealers' listings.</p>
+                        ))}
+                      </div>
+                    ) : activityItems?.length === 0 ? (
+                      <div className="text-center py-8">
+                        <BarChart4 className="h-10 w-10 mx-auto text-muted-foreground/50 mb-2" />
+                        <h3 className="text-muted-foreground">No recent activity</h3>
+                      </div>
+                    ) : (
+                      <div className="space-y-4">
+                        {activityItems?.map((item: ActivityItemType) => (
+                          <ActivityItem key={item.id} item={item} />
+                        ))}
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
                 
-                  {bidsLoading ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
-                      {[...Array(3)].map((_, i) => (
-                        <div key={i} className="border rounded-lg p-4">
-                          <Skeleton className="h-40 w-full mb-3" />
-                          <Skeleton className="h-5 w-2/3 mb-2" />
-                          <Skeleton className="h-4 w-1/2 mb-4" />
-                          <div className="flex justify-between">
-                            <Skeleton className="h-8 w-20" />
-                            <Skeleton className="h-8 w-20" />
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  ) : placedBids.length === 0 ? (
-                    <div className="text-center py-12 border rounded-lg mt-4">
-                      <Gavel className="h-12 w-12 mx-auto text-muted-foreground/50 mb-4" />
-                      <h3 className="text-lg font-medium mb-2">You haven't placed any bids yet</h3>
-                      <Link href="/auctions">
-                        <Button variant="outline">
-                          <LinkIcon className="mr-2 h-4 w-4" />
-                          Browse Available Motorcycles
-                        </Button>
-                      </Link>
-                    </div>
-                  ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
-                      {placedBids.map(auction => (
-                        <AuctionCard 
-                          key={auction.id}
-                          auction={auction}
-                          showDealerInfo={true}
-                        />
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </TabsContent>
-              
-              {/* Completed Deals Tab */}
-              <TabsContent value="completed-deals">
-                <div className="mb-6">
-                  <h2 className="text-xl font-semibold mb-2">Completed Deals</h2>
-                  <p className="text-muted-foreground">Your historical deals (both as seller and buyer).</p>
+                {/* Favorite Dealers */}
+                <Card>
+                  <CardHeader className="pb-2">
+                    <CardTitle>Favorite Dealers</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <React.Suspense fallback={<div className="text-center py-10">Loading favorite dealers...</div>}>
+                      <FavoriteDealers />
+                    </React.Suspense>
+                  </CardContent>
+                </Card>
+              </div>
+            </TabsContent>
+            
+            {/* Active Listings Tab */}
+            <TabsContent value="active-listings" className="space-y-6">
+              <div className="space-y-4">
+                <h2 className="text-xl font-semibold">Active Listings</h2>
+                <p className="text-muted-foreground">Manage your active listings and bids.</p>
                 
-                  {auctionsLoading ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
-                      {[...Array(3)].map((_, i) => (
-                        <div key={i} className="border rounded-lg p-4">
-                          <Skeleton className="h-40 w-full mb-3" />
-                          <Skeleton className="h-5 w-2/3 mb-2" />
-                          <Skeleton className="h-4 w-1/2 mb-4" />
-                          <div className="flex justify-between">
-                            <Skeleton className="h-8 w-20" />
-                            <Skeleton className="h-8 w-20" />
-                          </div>
+                {auctionsLoading ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {[...Array(3)].map((_, i) => (
+                      <div key={i} className="border rounded-lg p-4">
+                        <Skeleton className="h-40 w-full mb-3" />
+                        <Skeleton className="h-5 w-2/3 mb-2" />
+                        <Skeleton className="h-4 w-1/2 mb-4" />
+                        <div className="flex justify-between">
+                          <Skeleton className="h-8 w-20" />
+                          <Skeleton className="h-8 w-20" />
                         </div>
-                      ))}
-                    </div>
-                  ) : completedDeals.length === 0 ? (
-                    <div className="text-center py-12 border rounded-lg mt-4">
-                      <CheckCircle className="h-12 w-12 mx-auto text-muted-foreground/50 mb-4" />
-                      <h3 className="text-lg font-medium mb-2">You don't have any completed deals yet</h3>
-                    </div>
-                  ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
-                      {completedDeals.map(auction => (
-                        <AuctionCard 
-                          key={auction.id}
-                          auction={auction}
-                          showDealerInfo={auction.dealerId !== user?.id}
-                        />
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </TabsContent>
-              
-              {/* Pending Collection Tab */}
-              <TabsContent value="pending-completion">
-                <div className="mb-6">
-                  <h2 className="text-xl font-semibold mb-2">Pending Completion</h2>
-                  <p className="text-muted-foreground">Manage your deals in process.</p>
+                      </div>
+                    ))}
+                  </div>
+                ) : activeListings.length === 0 ? (
+                  <div className="text-center py-12 border rounded-lg">
+                    <Package className="h-12 w-12 mx-auto text-muted-foreground/50 mb-4" />
+                    <h3 className="text-lg font-medium mb-2">You don't have any active underwrites.</h3>
+                    <Link href="/create-auction">
+                      <Button>List your first bike</Button>
+                    </Link>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {activeListings.map(auction => (
+                      <AuctionCard 
+                        key={auction.id}
+                        auction={auction}
+                        showDealerInfo={false}
+                      />
+                    ))}
+                  </div>
+                )}
                 
-                  {auctionsLoading ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                      {[...Array(3)].map((_, i) => (
-                        <div key={i} className="border rounded-lg p-4">
-                          <Skeleton className="h-40 w-full mb-3" />
-                          <Skeleton className="h-5 w-2/3 mb-2" />
-                          <Skeleton className="h-4 w-1/2 mb-4" />
-                          <div className="flex justify-between">
-                            <Skeleton className="h-8 w-20" />
-                            <Skeleton className="h-8 w-20" />
-                          </div>
+                {/* Bid Acceptance Section (dealers only) */}
+                {user?.role === 'dealer' && (
+                  <React.Suspense fallback={<div className="text-center py-10">Loading bids...</div>}>
+                    <BidAcceptance auctions={activeListings.filter(a => a.totalBids > 0)} />
+                  </React.Suspense>
+                )}
+              </div>
+            </TabsContent>
+            
+            {/* Placed Bids Tab */}
+            <TabsContent value="placed-bids" className="space-y-6">
+              <div className="space-y-4">
+                <h2 className="text-xl font-semibold">Placed Bids</h2>
+                <p className="text-muted-foreground">Review bikes you've bid on from other dealers.</p>
+                
+                {bidsLoading ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {[...Array(3)].map((_, i) => (
+                      <div key={i} className="border rounded-lg p-4">
+                        <Skeleton className="h-40 w-full mb-3" />
+                        <Skeleton className="h-5 w-2/3 mb-2" />
+                        <Skeleton className="h-4 w-1/2 mb-4" />
+                        <div className="flex justify-between">
+                          <Skeleton className="h-8 w-20" />
+                          <Skeleton className="h-8 w-20" />
                         </div>
-                      ))}
-                    </div>
-                  ) : pendingCollection.length === 0 ? (
-                    <div className="text-center py-12 border rounded-lg">
-                      <Home className="h-12 w-12 mx-auto text-muted-foreground/50 mb-4" />
-                      <h3 className="text-lg font-medium mb-2">You don't have any underwrites pending collection.</h3>
-                    </div>
-                  ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                      {pendingCollection.map(auction => (
-                        <AuctionCard 
-                          key={auction.id}
-                          auction={auction}
-                          showDealerInfo={false}
-                        />
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </TabsContent>
-            </Tabs>
-          </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : placedBids.length === 0 ? (
+                  <div className="text-center py-12 border rounded-lg">
+                    <Search className="h-12 w-12 mx-auto text-muted-foreground/50 mb-4" />
+                    <h3 className="text-lg font-medium">No bids placed yet</h3>
+                    <p className="text-muted-foreground mt-2">
+                      You haven't placed any bids on motorcycles yet.
+                    </p>
+                    <Link href="/underwrites">
+                      <Button className="mt-4">
+                        Browse Available Listings
+                      </Button>
+                    </Link>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {placedBids.map(auction => (
+                      <AuctionCard 
+                        key={auction.id}
+                        auction={auction}
+                        showDealerInfo={true}
+                      />
+                    ))}
+                  </div>
+                )}
+              </div>
+            </TabsContent>
+            
+            {/* Completed Deals Tab */}
+            <TabsContent value="completed-deals" className="space-y-6">
+              <div className="space-y-4">
+                <h2 className="text-xl font-semibold">Completed Deals</h2>
+                <p className="text-muted-foreground">View your completed motorcycle deals.</p>
+                
+                {auctionsLoading ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {[...Array(3)].map((_, i) => (
+                      <div key={i} className="border rounded-lg p-4">
+                        <Skeleton className="h-40 w-full mb-3" />
+                        <Skeleton className="h-5 w-2/3 mb-2" />
+                        <Skeleton className="h-4 w-1/2 mb-4" />
+                        <div className="flex justify-between">
+                          <Skeleton className="h-8 w-20" />
+                          <Skeleton className="h-8 w-20" />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : completedDeals.length === 0 ? (
+                  <div className="text-center py-12 border rounded-lg">
+                    <Clock className="h-12 w-12 mx-auto text-muted-foreground/50 mb-4" />
+                    <h3 className="text-lg font-medium mb-2">You don't have any completed deals.</h3>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {completedDeals.map(auction => (
+                      <AuctionCard 
+                        key={auction.id}
+                        auction={auction}
+                        showDealerInfo={false}
+                      />
+                    ))}
+                  </div>
+                )}
+              </div>
+            </TabsContent>
+            
+            {/* Pending Completion Tab */}
+            <TabsContent value="pending-completion" className="space-y-6">
+              <div className="space-y-4">
+                <h2 className="text-xl font-semibold">Pending Completion</h2>
+                <p className="text-muted-foreground">Manage your deals in process.</p>
+                
+                {auctionsLoading ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {[...Array(3)].map((_, i) => (
+                      <div key={i} className="border rounded-lg p-4">
+                        <Skeleton className="h-40 w-full mb-3" />
+                        <Skeleton className="h-5 w-2/3 mb-2" />
+                        <Skeleton className="h-4 w-1/2 mb-4" />
+                        <div className="flex justify-between">
+                          <Skeleton className="h-8 w-20" />
+                          <Skeleton className="h-8 w-20" />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : pendingCollection.length === 0 ? (
+                  <div className="text-center py-12 border rounded-lg">
+                    <Home className="h-12 w-12 mx-auto text-muted-foreground/50 mb-4" />
+                    <h3 className="text-lg font-medium mb-2">You don't have any underwrites pending collection.</h3>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {pendingCollection.map(auction => (
+                      <AuctionCard 
+                        key={auction.id}
+                        auction={auction}
+                        showDealerInfo={false}
+                      />
+                    ))}
+                  </div>
+                )}
+              </div>
+            </TabsContent>
+          </Tabs>
         </div>
       </main>
     </Layout>
