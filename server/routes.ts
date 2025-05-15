@@ -296,9 +296,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Create message
       const message = await storage.createMessage({
         senderId: req.user.id,
-        receiverId,
-        content,
-        auctionId
+        receiverId: receiverId,
+        content: content,
+        auctionId: auctionId || null
       });
       
       // Notify receiver via WebSocket

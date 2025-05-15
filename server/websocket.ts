@@ -272,12 +272,12 @@ async function handleNewMessage(message: WSMessage) {
   const { senderId, receiverId, content, auctionId } = message.data;
   
   try {
-    // Store message
+    // Store message - make sure to match the schema type
     const newMessage = await storage.createMessage({
-      senderId,
-      receiverId,
-      content,
-      auctionId
+      senderId: senderId,
+      receiverId: receiverId,
+      content: content,
+      auctionId: auctionId || null
     });
     
     // Create notification

@@ -159,8 +159,7 @@ export const insertBidSchema = createInsertSchema(bids).omit({
 export const insertMessageSchema = createInsertSchema(messages).omit({ 
   id: true, 
   createdAt: true,
-  read: true,
-  senderId: true
+  read: true
 });
 
 export const insertNotificationSchema = createInsertSchema(notifications).omit({ 

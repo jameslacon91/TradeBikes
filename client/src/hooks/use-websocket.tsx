@@ -144,15 +144,32 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
       case 'new_bid':
         queryClient.invalidateQueries({ queryKey: [`/api/auctions/${message.data.auctionId}`] });
         break;
+      case 'bid_accepted':
+        // Invalidate all queries that might show the auction
+        queryClient.invalidateQueries({ queryKey: ['/api/auctions'] });
+        queryClient.invalidateQueries({ queryKey: ['/api/auctions/bids'] });
+        queryClient.invalidateQueries({ queryKey: [`/api/auctions/${message.data.auctionId}`] });
+        queryClient.invalidateQueries({ queryKey: ['/api/dashboard'] });
+        queryClient.invalidateQueries({ queryKey: ['/api/notifications'] });
+        break;
       case 'auction_completed':
         queryClient.invalidateQueries({ queryKey: [`/api/auctions/${message.data.auctionId}`] });
         queryClient.invalidateQueries({ queryKey: ['/api/dashboard'] });
         break;
       case 'new_message':
         queryClient.invalidateQueries({ queryKey: ['/api/notifications'] });
+        queryClient.invalidateQueries({ queryKey: ['/api/messages'] });
         break;
       case 'auction_created':
         queryClient.invalidateQueries({ queryKey: ['/api/auctions'] });
+        break;
+      case 'deal_confirmed':
+      case 'collection_scheduled':
+      case 'collection_confirmed':
+        // Invalidate all auction-related queries
+        queryClient.invalidateQueries({ queryKey: ['/api/auctions'] });
+        queryClient.invalidateQueries({ queryKey: ['/api/auctions/bids'] });
+        queryClient.invalidateQueries({ queryKey: ['/api/dashboard'] });
         break;
     }
   };
@@ -187,4 +204,3 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
 export function useWebSocket() {
   return useContext(WebSocketContext);
 }
-
