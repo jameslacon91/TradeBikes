@@ -290,7 +290,33 @@ export default function DealerDashboard() {
     });
   }
     
-  const completedDeals = userAuctions.filter(a => a.status === 'completed');
+  // Create a combined list of all auctions for the user (both as seller and as bidder)
+  const allAuctionsForStats = [...userAuctions];
+  
+  // Add bidded auctions that aren't already in the list
+  if (biddedAuctions && biddedAuctions.length > 0) {
+    biddedAuctions.forEach(auction => {
+      if (!allAuctionsForStats.some(a => a.id === auction.id)) {
+        allAuctionsForStats.push(auction);
+      }
+    });
+  }
+  
+  // Filter completed deals - count as completed if the user either created it or won it
+  const completedDeals = allAuctionsForStats.filter(a => {
+    const isCompleted = a.status === 'completed';
+    const userIsWinner = a.winningBidderId === user?.id; 
+    const userIsSeller = a.dealerId === user?.id;
+    
+    // Count in stats if completed and user was involved as either seller or winner
+    return isCompleted && (userIsSeller || userIsWinner);
+  });
+  
+  console.log("Completed deals for stat card:", completedDeals.map(a => ({
+    id: a.id, 
+    isWinner: a.winningBidderId === user?.id,
+    isSeller: a.dealerId === user?.id
+  })));
   
   return (
     <Layout>
