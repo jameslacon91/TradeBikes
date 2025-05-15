@@ -16,31 +16,41 @@ export default function HomePage() {
   return (
     <Layout>
       {/* Hero Section */}
-      <div className="relative overflow-hidden bg-primary-dark">
-        {/* Simple solid background color */}
-        <div className="container relative z-10 mx-auto px-4 py-10 md:py-14">
-          <div className="flex flex-col items-center text-center mb-6">
-            {/* No logo or background images */}
-          </div>
-          
+      <div className="relative overflow-hidden bg-gradient-to-br from-secondary to-primary">
+        {/* Background pattern overlay for better contrast */}
+        <div className="absolute inset-0 bg-black/50 z-0"></div>
+        
+        {/* Decorative elements */}
+        <div className="absolute top-0 left-0 w-full h-full opacity-5">
+          <div className="absolute top-10 left-10 w-32 h-32 border-4 border-white rounded-full"></div>
+          <div className="absolute bottom-10 right-10 w-40 h-40 border-4 border-white rounded-full"></div>
+        </div>
+        
+        <div className="container relative z-10 mx-auto px-4 py-16 md:py-20">
           <div className="max-w-3xl mx-auto text-center">
-            <div className="inline-block mb-2 bg-white/20 backdrop-blur-sm px-4 py-1 rounded-full">
-              <p className="text-white text-sm font-medium">B2B Motorcycle Trading Platform</p>
+            <div className="inline-block mb-4 bg-primary/80 backdrop-blur-sm px-6 py-2 rounded-full shadow-lg">
+              <p className="text-white font-medium tracking-wide uppercase text-sm">B2B Motorcycle Trading Platform</p>
             </div>
-            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3 leading-tight">
-              Revolutionizing <span className="text-amber-200">Motorcycle Trading</span>
+            
+            <h1 className="text-3xl md:text-5xl font-bold text-white mb-6 leading-tight drop-shadow-lg">
+              Revolutionizing <span className="text-accent">Motorcycle Trading</span>
             </h1>
-            <p className="text-lg text-white/90 mb-5 leading-relaxed">
-              TradeBikes is the modern way to trade used motorcycles between dealerships and traders with real-time auctions.
-            </p>
+            
+            <div className="bg-black/40 backdrop-blur-sm p-6 rounded-2xl shadow-xl mb-8">
+              <p className="text-xl text-white leading-relaxed">
+                TradeBikes is the modern way to trade used motorcycles between dealerships and traders with real-time auctions.
+              </p>
+            </div>
+            
             <div className="flex flex-wrap gap-4 justify-center">
               <Link href="/auth">
-                <Button size="lg" className="bg-white text-primary hover:bg-gray-100 shadow-lg hover:shadow-xl transition-all duration-300">
+                <Button size="lg" className="bg-white text-primary hover:bg-gray-100 shadow-lg hover:shadow-xl transition-all duration-300 text-lg px-8">
                   Register Now
                 </Button>
               </Link>
             </div>
-            <p className="mt-4 text-white/70 text-sm">
+            
+            <p className="mt-6 text-white text-sm bg-black/30 backdrop-blur-sm px-4 py-2 rounded-full inline-block">
               Free 1-month trial • £125/month + VAT thereafter • No credit card required
             </p>
           </div>
