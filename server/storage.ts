@@ -1276,9 +1276,18 @@ export class MemStorage implements IStorage {
     // FIRST: Check all auctions where this dealer is the winning bidder
     // Even if they don't have explicit bid records
     const allAuctions = Array.from(this.auctions.values());
+    console.log(`Checking ${allAuctions.length} total auctions for winning bidder ${dealerId}`);
+    
+    // Log each auction with a winning bidder
+    allAuctions.forEach(auction => {
+      if (auction.winningBidderId) {
+        console.log(`Auction ${auction.id}: winningBidderId=${auction.winningBidderId}, status=${auction.status}, motorcycleId=${auction.motorcycleId}`);
+      }
+    });
+    
     for (const auction of allAuctions) {
       if (auction.winningBidderId === dealerId) {
-        console.log(`Found auction ${auction.id} where dealer ${dealerId} is the winning bidder`);
+        console.log(`Found auction ${auction.id} where dealer ${dealerId} is the winning bidder (status: ${auction.status})`);
         auctionIds.add(auction.id);
       }
     }
