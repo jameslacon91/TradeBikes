@@ -2,6 +2,28 @@ import React, { createContext, useContext, useEffect, useState, ReactNode } from
 import { WSMessage } from '@shared/types';
 import { queryClient } from '@/lib/queryClient';
 
+// Helper function to get human-readable meanings for WebSocket close codes
+function getWebSocketCloseCodeMeaning(code: number): string {
+  switch (code) {
+    case 1000: return 'Normal Closure';
+    case 1001: return 'Going Away';
+    case 1002: return 'Protocol Error';
+    case 1003: return 'Unsupported Data';
+    case 1005: return 'No Status Received';
+    case 1006: return 'Abnormal Closure';
+    case 1007: return 'Invalid Frame Payload Data';
+    case 1008: return 'Policy Violation';
+    case 1009: return 'Message Too Big';
+    case 1010: return 'Mandatory Extension';
+    case 1011: return 'Internal Server Error';
+    case 1012: return 'Service Restart';
+    case 1013: return 'Try Again Later';
+    case 1014: return 'Bad Gateway';
+    case 1015: return 'TLS Handshake';
+    default: return 'Unknown';
+  }
+}
+
 // Define what functionality our WebSocket context will provide
 interface WebSocketContextType {
   connected: boolean;
@@ -103,10 +125,43 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
 
         // Connection closed
         ws.addEventListener('close', (event) => {
-          console.log(`WebSocket connection closed: Code=${event.code}, Reason=${event.reason || 'Unknown'}, Clean=${event.wasClean}`);
+          // Log with improved error information
+          const codeMeaning = getWebSocketCloseCodeMeaning(event.code);
+          console.log(`WebSocket connection closed: Code=${event.code} (${codeMeaning}), Reason=${event.reason || 'Unknown'}, Clean=${event.wasClean}`);
           setConnected(false);
           
-          // Always attempt to reconnect with exponential backoff
+          // Determine reconnection strategy based on close code
+          const isAbnormalClosure = event.code === 1006;
+          const isNoStatusReceived = event.code === 1005;
+          
+          // For common Replit-specific connection issues, use a more aggressive reconnection strategy
+          if (isAbnormalClosure || isNoStatusReceived) {
+            console.log(`Detected common Replit WebSocket issue (code ${event.code}). Using optimized reconnection strategy.`);
+            
+            // For these specific error codes, use a faster reconnect with shorter initial delay
+            const fastReconnectDelay = Math.min(500 * Math.pow(1.5, reconnectAttempts), 5000);
+            
+            setTimeout(() => {
+              if (document.visibilityState !== 'hidden') {
+                console.log(`Fast reconnecting WebSocket after code ${event.code}...`);
+                initWebSocket();
+              } else {
+                // Same visibility handling as below, but with faster reconnect
+                const visibilityListener = () => {
+                  if (document.visibilityState === 'visible') {
+                    console.log('Page became visible, fast reconnecting WebSocket');
+                    document.removeEventListener('visibilitychange', visibilityListener);
+                    initWebSocket();
+                  }
+                };
+                document.addEventListener('visibilitychange', visibilityListener);
+              }
+            }, fastReconnectDelay);
+            
+            return; // Skip the standard reconnection logic
+          }
+          
+          // Standard reconnection logic with exponential backoff for other close codes
           if (reconnectAttempts < maxReconnectAttempts) {
             const delay = Math.min(1000 * Math.pow(2, reconnectAttempts), 10000); // Exponential backoff, max 10 seconds
             console.log(`Attempting to reconnect WebSocket in ${delay/1000} seconds... (attempt ${reconnectAttempts} of ${maxReconnectAttempts})`);
@@ -133,6 +188,8 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
             console.error('Maximum reconnection attempts reached. WebSocket connection failed permanently.');
           }
         });
+        
+        // Use the helper function defined outside this block
 
         // Listen for messages
         ws.addEventListener('message', (event) => {
@@ -510,11 +567,70 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
   const sendMessage = (message: WSMessage) => {
     if (!isBrowser) return; // Return early if not in browser
     
-    if (socket && connected) {
-      socket.send(JSON.stringify(message));
+    // Add timestamp to message if not present
+    const messageWithTimestamp = {
+      ...message,
+      timestamp: message.timestamp || Date.now()
+    };
+    
+    // Check if socket is ready to send
+    if (socket && socket.readyState === WebSocket.OPEN && connected) {
+      console.log('Sending WebSocket message:', messageWithTimestamp);
+      try {
+        socket.send(JSON.stringify(messageWithTimestamp));
+        return true; // Indicate success
+      } catch (error) {
+        console.error('Error sending WebSocket message:', error);
+        // Continue to queuing logic
+      }
     } else {
-      console.warn('Cannot send message, WebSocket not connected');
+      // More detailed logging about why we couldn't send
+      if (!socket) {
+        console.warn('Cannot send message: WebSocket not initialized');
+      } else if (socket.readyState !== WebSocket.OPEN) {
+        console.warn(`Cannot send message: WebSocket not in OPEN state (current state: ${
+          ['CONNECTING', 'OPEN', 'CLOSING', 'CLOSED'][socket.readyState]
+        })`);
+      } else if (!connected) {
+        console.warn('Cannot send message: WebSocket not marked as connected');
+      }
+      
+      // Queue message for when connection is restored (up to 3 retries)
+      let retryCount = 0;
+      const maxRetries = 3;
+      
+      const attemptSend = () => {
+        if (retryCount >= maxRetries) {
+          console.error(`Failed to send message after ${maxRetries} attempts`, messageWithTimestamp);
+          return;
+        }
+        
+        retryCount++;
+        const delay = 1000 * retryCount;
+        
+        console.log(`Queuing WebSocket message for retry in ${delay}ms (attempt ${retryCount}/${maxRetries})`, messageWithTimestamp);
+        
+        setTimeout(() => {
+          if (socket && socket.readyState === WebSocket.OPEN && connected) {
+            try {
+              socket.send(JSON.stringify(messageWithTimestamp));
+              console.log(`Successfully sent WebSocket message on retry ${retryCount}`);
+            } catch (error) {
+              console.error(`Error sending message on retry ${retryCount}:`, error);
+              attemptSend();
+            }
+          } else {
+            // Try again if still not connected
+            attemptSend();
+          }
+        }, delay);
+      };
+      
+      attemptSend();
+      return false; // Indicate that the message was queued
     }
+    
+    return true; // Default to assume success
   };
 
   // Provide the WebSocket context to children
