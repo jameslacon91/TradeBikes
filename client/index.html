@@ -1,26 +1,39 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="en" data-theme="tradebikes">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1"
+    />
     <title>TradeBikes - Motorcycle Trading Platform</title>
-    <meta name="description" content="A B2B digital platform facilitating real-time trading of used motorcycles between dealerships and traders" />
-    
+    <meta
+      name="description"
+      content="A B2B digital platform facilitating real-time trading of used motorcycles between dealerships and traders"
+    />
+
     <!-- PWA tags -->
     <link rel="manifest" href="/manifest.json" />
     <meta name="theme-color" content="#2c5282" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
     <meta name="apple-mobile-web-app-title" content="TradeBikes" />
     <link rel="apple-touch-icon" href="/icons/icon-152x152.png" />
     <link rel="icon" type="image/svg+xml" href="/icons/icon-512x512.svg" />
     <!-- Error handling script -->
     <script>
-      window.addEventListener('error', function(e) {
-        console.error('Global error caught:', e.error);
-        document.getElementById('error-info').innerHTML = 
-          '<strong>Error:</strong> ' + e.message + '<br/><pre>' + (e.error && e.error.stack || 'No stack trace') + '</pre>';
-        document.getElementById('error-info').style.display = 'block';
+      window.addEventListener("error", function (e) {
+        console.error("Global error caught:", e.error);
+        document.getElementById("error-info").innerHTML =
+          "<strong>Error:</strong> " +
+          e.message +
+          "<br/><pre>" +
+          ((e.error && e.error.stack) || "No stack trace") +
+          "</pre>";
+        document.getElementById("error-info").style.display = "block";
       });
     </script>
     <style>
@@ -39,12 +52,25 @@
         max-height: 50vh;
       }
     </style>
+    <!-- Global stylesheet -->
+    <link rel="stylesheet" href="/style.css" />
+
+    <!-- Inter font (optional but matches the CSS) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
   </head>
   <body>
     <div id="error-info"></div>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
     <!-- This is a replit script which adds a banner on the top of the page when opened in development mode outside the replit environment -->
-    <script type="text/javascript" src="https://replit.com/public/js/replit-dev-banner.js"></script>
+    <script
+      type="text/javascript"
+      src="https://replit.com/public/js/replit-dev-banner.js"
+    ></script>
   </body>
 </html>
