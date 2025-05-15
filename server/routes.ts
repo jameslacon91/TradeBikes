@@ -1179,7 +1179,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
-      // Send WebSocket notification to buyer
+      // Send WebSocket notification to buyer with enhanced data
       const wsMessage: WSMessage = {
         type: "collection_confirmed",
         data: {
@@ -1189,12 +1189,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
           bidderId: auction.winningBidderId,
           make: motorcycle?.make || '',
           model: motorcycle?.model || '',
-          year: motorcycle?.year || 0
+          year: motorcycle?.year || 0,
+          // Add additional data to assist UI updates
+          auction: {
+            id: updatedAuction.id,
+            status: 'completed',
+            collectionConfirmed: true,
+            completedAt: completionDate.toISOString()
+          },
+          motorcycle: {
+            id: motorcycle?.id,
+            status: 'sold',
+            soldDate: completionDate.toISOString()
+          },
+          // Special field for client-side cache updates
+          statusChange: {
+            entity: "auction",
+            id: auctionId,
+            newStatus: "completed",
+            entityName: `${motorcycle?.make} ${motorcycle?.model}`
+          }
         },
         timestamp: Date.now()
       };
       
       if (auction.winningBidderId) {
+        console.log(`Sending completion WebSocket message to winning bidder ${auction.winningBidderId}`);
         sendToUser(auction.winningBidderId, wsMessage);
         
         // Create notification for buyer
@@ -1213,6 +1233,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
           relatedId: auctionId
         });
       }
+      
+      // Also send the same notification to seller to ensure their UI is updated
+      sendToUser(auction.dealerId, wsMessage);
+      
+      // Broadcast a status update to all connected clients
+      broadcast({
+        type: "auction_status_changed",
+        data: {
+          auctionId: auctionId,
+          status: "completed"
+        },
+        timestamp: Date.now()
+      });
       
       // Create a notification for the seller as well
       await storage.createNotification({
