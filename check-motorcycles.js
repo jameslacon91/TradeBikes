@@ -1,56 +1,59 @@
-// Directly modify the motorcycle data for MikeTrader
-require('./server/index'); // This should initialize everything
+// Check the status of Mike's auctions and auto-fix any inconsistencies
+import { storage } from './server/storage.js';
 
-setTimeout(() => {
-  const storage = require('./server/storage').storage;
+async function checkMikesAuctions() {
+  console.log('Checking Mike\'s auctions and motorcycle statuses...');
   
-  // Check Mike's auctions
-  async function checkMikesAuctions() {
-    try {
-      console.log("Checking MikeTrader's auctions and bids");
+  try {
+    // Mike's trader ID is 4 based on the storage.ts file
+    const mikeId = 4;
+    
+    // Get Mike's auctions with bids
+    const mikesAuctions = await storage.getAuctionsWithBidsByDealer(mikeId);
+    console.log(`Mike has ${mikesAuctions.length} auctions with bids or as winner`);
+    
+    mikesAuctions.forEach(auction => {
+      console.log(`\nAuction ${auction.id} for ${auction.motorcycle.make} ${auction.motorcycle.model}:`);
+      console.log(`  Auction Status: ${auction.status}`);
+      console.log(`  Motorcycle Status: ${auction.motorcycle.status}`);
+      console.log(`  Bid Accepted: ${auction.bidAccepted}`);
+      console.log(`  Winner ID: ${auction.winningBidderId}`);
       
-      // Mike is ID 4
-      const mikeId = 4;
-      
-      // Get auctions where Mike placed bids
-      const auctionsWithBids = await storage.getAuctionsWithBidsByDealer(mikeId);
-      console.log(`Found ${auctionsWithBids.length} auctions where Mike placed bids`);
-      
-      for (const auction of auctionsWithBids) {
-        console.log(`\nAuction #${auction.id} for ${auction.motorcycle.make} ${auction.motorcycle.model}`);
-        console.log(`Status: ${auction.status}`);
-        console.log(`Motorcycle Status: ${auction.motorcycle.status}`);
-        console.log(`Bid Accepted: ${auction.bidAccepted}`);
-        console.log(`Winning Bidder ID: ${auction.winningBidderId}`);
-        console.log(`Deal Confirmed: ${auction.dealConfirmed}`);
-        console.log(`Collection Confirmed: ${auction.collectionConfirmed}`);
+      // Check if this is a won auction that should be in "pending_collection" status
+      if (auction.winningBidderId === mikeId && auction.bidAccepted) {
+        console.log(`  This is a won auction for Mike!`);
         
-        // Check Mike's bids on this auction
-        const mikesBids = auction.bids.filter(bid => bid.dealerId === mikeId);
-        console.log(`Mike placed ${mikesBids.length} bids on this auction`);
-        for (const bid of mikesBids) {
-          console.log(`Bid #${bid.id}: £${bid.amount}`);
+        // Check if the statuses are consistent
+        if (auction.status !== 'pending_collection' || auction.motorcycle.status !== 'pending_collection') {
+          console.log(`  ❌ Found inconsistency - fixing statuses to pending_collection`);
+          
+          // Fix auction status if needed
+          if (auction.status !== 'pending_collection') {
+            storage.updateAuction(auction.id, { status: 'pending_collection' });
+          }
+          
+          // Fix motorcycle status if needed
+          if (auction.motorcycle.status !== 'pending_collection') {
+            storage.updateMotorcycle(auction.motorcycle.id, { 
+              status: 'pending_collection',
+              soldDate: auction.motorcycle.soldDate || new Date().toISOString()
+            });
+          }
+          
+          console.log(`  ✅ Statuses corrected to pending_collection`);
+        } else {
+          console.log(`  ✅ Statuses are already consistent`);
         }
       }
-      
-      // Check notifications for Mike
-      const notifications = await storage.getNotificationsByUserId(mikeId);
-      console.log(`\nFound ${notifications.length} notifications for Mike`);
-      
-      for (const notification of notifications) {
-        console.log(`Notification #${notification.id}: ${notification.type}`);
-        console.log(`Content: ${notification.content}`);
-        console.log(`Read: ${notification.read}`);
-        console.log(`Created: ${notification.createdAt}`);
-        console.log(`---`);
-      }
-      
-      process.exit(0);
-    } catch (error) {
-      console.error('Error checking auctions:', error);
-      process.exit(1);
-    }
+    });
+    
+    console.log('\nDone checking Mike\'s auctions');
+    console.log('Please log in as miketrader (password: password123) to verify changes');
+    
+  } catch (error) {
+    console.error('Error checking motorcycle statuses:', error);
   }
-  
-  checkMikesAuctions();
-}, 2000); // Wait for initialization
+}
+
+// Run the function
+checkMikesAuctions();

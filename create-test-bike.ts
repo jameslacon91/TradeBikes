@@ -36,9 +36,13 @@ async function checkMotorcycleStatus() {
       console.log(`  Bid Accepted: ${auction.bidAccepted}, Winner: ${auction.winningBidderId}`);
     });
     
-    if (!johndealer || !miketrader) {
-      console.error('Could not find required user accounts!');
-      return;
+  } catch (error) {
+    console.error('Error checking motorcycle status:', error);
+  }
+}
+
+// Run the function
+checkMotorcycleStatus();
     }
     
     console.log(`Found johndealer (ID: ${johndealer.id}) and miketrader (ID: ${miketrader.id})`);
