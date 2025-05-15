@@ -98,6 +98,28 @@ export function NotificationsProvider({ children }: { children: ReactNode }) {
             icon: <ShoppingCart className="h-5 w-5" />
           });
           break;
+          
+        case 'bid_accepted':
+          // Notification for the bidder whose bid was accepted
+          addNotification({
+            title: 'Bid Accepted!',
+            message: `Your bid on ${message.data.make} ${message.data.model} (${message.data.year}) has been accepted. Please arrange collection.`,
+            type: 'success',
+            link: `/dashboard`,
+            icon: <ShoppingCart className="h-5 w-5" />
+          });
+          break;
+          
+        case 'bid_accepted_confirm':
+          // Notification for the seller who accepted a bid
+          addNotification({
+            title: 'Bid Acceptance Confirmed',
+            message: `You have accepted a bid on your ${message.data.motorcycle?.make} ${message.data.motorcycle?.model}. The buyer will arrange collection.`,
+            type: 'success',
+            link: `/dashboard`,
+            icon: <ShoppingCart className="h-5 w-5" />
+          });
+          break;
 
         case 'new_message':
           addNotification({

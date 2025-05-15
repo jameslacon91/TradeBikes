@@ -174,7 +174,21 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
       case 'bid_accepted':
       case 'bid_accepted_confirm':
         // For bid acceptance, invalidate everything to ensure all data is fresh
-        console.log('Bid accepted WebSocket event received - refreshing all data');
+        console.log('Bid accepted WebSocket event received - refreshing all data', message.data);
+        
+        // Immediately update local cache with the motorcycle status change
+        if (message.data.motorcycle && message.data.motorcycle.id) {
+          console.log(`Immediately updating motorcycle ${message.data.motorcycle.id} status to ${message.data.motorcycle.status}`);
+          
+          // Update motorcycle status in any existing queries
+          queryClient.setQueryData(
+            [`/api/motorcycles/${message.data.motorcycle.id}`], 
+            (oldData: any) => {
+              if (!oldData) return oldData;
+              return { ...oldData, status: message.data.motorcycle.status };
+            }
+          );
+        }
         
         // Invalidate specific auction data
         queryClient.invalidateQueries({ queryKey: [`/api/auctions/${message.data.auctionId}`] });
@@ -191,6 +205,11 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
         queryClient.invalidateQueries({ queryKey: ['/api/notifications'] });
         queryClient.invalidateQueries({ queryKey: ['/api/activity'] });
         
+        // Also invalidate any specific motorcycle data
+        if (message.data.motorcycleId) {
+          queryClient.invalidateQueries({ queryKey: [`/api/motorcycles/${message.data.motorcycleId}`] });
+        }
+        
         // Force a complete refetch of all auction data with this flag - this is more aggressive
         setTimeout(() => {
           console.log('Dispatching force-data-refresh event');
@@ -199,10 +218,49 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
         break;
         
       case 'auction_status_changed':
-        console.log(`Auction status changed to ${message.data.newStatus}`);
+        console.log(`Auction status changed to ${message.data.newStatus}`, message.data);
+        
+        // Immediately update motorcycle status in cache if available
+        if (message.data.motorcycle && message.data.motorcycle.id) {
+          console.log(`Directly updating motorcycle ${message.data.motorcycle.id} status to ${message.data.motorcycle.status}`);
+          
+          // Update motorcycle status in any existing queries
+          queryClient.setQueryData(
+            [`/api/motorcycles/${message.data.motorcycle.id}`], 
+            (oldData: any) => {
+              if (!oldData) return oldData;
+              return { ...oldData, status: message.data.motorcycle.status };
+            }
+          );
+          
+          // Also update it in any auction listings that might contain this motorcycle
+          queryClient.setQueriesData(
+            { queryKey: ['/api/auctions'] },
+            (oldData: any) => {
+              if (!oldData || !Array.isArray(oldData)) return oldData;
+              
+              return oldData.map((auction: any) => {
+                if (auction.motorcycle && auction.motorcycle.id === message.data.motorcycle.id) {
+                  return {
+                    ...auction,
+                    motorcycle: {
+                      ...auction.motorcycle,
+                      status: message.data.motorcycle.status
+                    },
+                    status: message.data.newStatus
+                  };
+                }
+                return auction;
+              });
+            }
+          );
+        }
+        
         // Invalidate relevant data
         queryClient.invalidateQueries({ queryKey: [`/api/auctions/${message.data.auctionId}`] });
         queryClient.invalidateQueries({ queryKey: ['/api/auctions'] });
+        queryClient.invalidateQueries({ queryKey: ['/api/auctions/dealer'] });
+        queryClient.invalidateQueries({ queryKey: ['/api/auctions/bids'] });
         
         // If motorcycle data included, update motorcycle status
         if (message.data.motorcycle) {
@@ -210,6 +268,11 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
           queryClient.invalidateQueries({ queryKey: ['/api/motorcycles'] });
           queryClient.invalidateQueries({ queryKey: [`/api/motorcycles/${message.data.motorcycle.id}`] });
         }
+        
+        // Also update dashboard data which might show this auction/motorcycle
+        queryClient.invalidateQueries({ queryKey: ['/api/dashboard'] });
+        queryClient.invalidateQueries({ queryKey: ['/api/dashboard/stats'] });
+        queryClient.invalidateQueries({ queryKey: ['/api/activity'] });
         break;
       case 'auction_completed':
       case 'underwrite_completed':

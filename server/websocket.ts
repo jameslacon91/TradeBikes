@@ -429,40 +429,55 @@ async function handleBidAccepted(message: WSMessage) {
       relatedId: auctionId
     });
 
-    // Send WebSocket notification to bidder
+    // Create updated motorcycle object with the new status - this ensures all clients have the same format
+    const updatedMotorcycleData = {
+      ...auction.motorcycle,
+      status: 'pending_collection'
+    };
+    
+    console.log('Sending detailed motorcycle data with status update:', updatedMotorcycleData);
+    
+    // Send WebSocket notification to bidder with detailed motorcycle info and proper status
     sendToUser(bidderId, {
       type: 'bid_accepted',
       data: {
         auctionId,
         dealerId,
-        motorcycle: auction.motorcycle,
-        amount: auction.currentBid
+        motorcycleId: auction.motorcycle.id,
+        motorcycle: updatedMotorcycleData,
+        amount: auction.currentBid,
+        make: auction.motorcycle.make,
+        model: auction.motorcycle.model,
+        year: auction.motorcycle.year
       },
       timestamp: Date.now()
     });
     
-    // Also notify the dealer (seller) to ensure their UI updates
+    // Also notify the dealer (seller) to ensure their UI updates with the same motorcycle data structure
     sendToUser(dealerId, {
       type: 'bid_accepted_confirm',
       data: {
         auctionId,
         bidderId,
-        motorcycle: auction.motorcycle,
-        amount: auction.currentBid
+        motorcycleId: auction.motorcycle.id,
+        motorcycle: updatedMotorcycleData,
+        amount: auction.currentBid,
+        auction: {
+          id: auctionId,
+          status: 'pending_collection'
+        }
       },
       timestamp: Date.now()
     });
     
-    // Broadcast status change to all users
+    // Broadcast status change to all users with complete motorcycle data
     broadcast({
       type: 'auction_status_changed',
       data: {
         auctionId,
         newStatus: 'pending_collection',
-        motorcycle: {
-          id: auction.motorcycle.id,
-          status: 'pending_collection'
-        }
+        motorcycleId: auction.motorcycle.id,
+        motorcycle: updatedMotorcycleData
       },
       timestamp: Date.now()
     });
