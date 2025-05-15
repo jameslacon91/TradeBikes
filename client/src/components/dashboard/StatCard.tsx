@@ -24,16 +24,20 @@ export default function StatCard({
   className = "" 
 }: StatCardProps) {
   return (
-    <div className={`card shadow-md hover:shadow-lg transition-all ${className}`}>
-      <div className={`card-body p-5 ${bgColor} text-white`}>
+    <div className={`card motorcycle-shadow transition-all rounded-lg overflow-hidden ${className}`}>
+      <div className={`p-5 ${bgColor} text-white relative`}>
+        {/* Chrome-like top accent bar */}
+        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-white/40 to-transparent"></div>
+        
         <div className="flex justify-between items-start">
-          <h2 className="card-title font-semibold text-white">{title}</h2>
-          <div className="text-white/90 badge badge-outline badge-lg">
+          <h2 className="font-semibold text-white text-lg">{title}</h2>
+          <div className="text-white/90 rounded-full p-2 bg-white/10 backdrop-blur-sm">
             {icon}
           </div>
         </div>
-        <div className="mt-3 flex items-end justify-between">
-          <div>
+        
+        <div className="mt-4 flex items-end justify-between">
+          <div className="speedometer">
             <p className="text-3xl font-bold text-white">{value}</p>
             {subtitle && (
               <p className="text-sm opacity-80 mt-1">{subtitle}</p>
@@ -41,16 +45,19 @@ export default function StatCard({
           </div>
           
           {trend && (
-            <div className={`badge ${trend.up ? 'badge-success' : 'badge-error'} flex items-center gap-1`}>
+            <div className={`badge badge-lg ${trend.up ? 'bg-success text-success-content' : 'bg-error text-error-content'} flex items-center gap-1 shadow-md`}>
               {trend.up ? (
-                <ArrowUp className="h-3 w-3" />
+                <ArrowUp className="h-4 w-4" />
               ) : (
-                <ArrowDown className="h-3 w-3" />
+                <ArrowDown className="h-4 w-4" />
               )}
               {trend.value}%
             </div>
           )}
         </div>
+        
+        {/* Bottom decorative speedometer line */}
+        <div className="absolute bottom-0 left-0 right-0 h-1 bg-black/20"></div>
       </div>
     </div>
   );

@@ -6,12 +6,29 @@
    TradeBikes – Motorcycle‑Themed Global Styles
    ========================================= */
 
+/* Motorcycle-themed animations */
+@keyframes revEngine {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-2px); }
+  75% { transform: translateX(2px); }
+}
+
+@keyframes turnSignal {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0.4; }
+}
+
+@keyframes speedometer {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
 :root {
   /* Brand colors */
-  --color-primary: #ff4500;          /* Blaze orange */
-  --color-primary-dark: #e03e00;
-  --color-secondary: #2c5282;        /* Steel blue */
-  --color-dark: #1a1a1a;             /* Charcoal */
+  --color-primary: #FF6B35;          /* Racing orange */
+  --color-primary-dark: #E94F24;
+  --color-secondary: #004E89;        /* Deep blue */
+  --color-dark: #2A2B2A;             /* Dark gray with hint of green */
   --color-light: #ffffff;
   --color-bg: #f3f4f6;               /* Light grey background */
   
@@ -20,9 +37,9 @@
   --transition: 0.25s ease;
   
   /* DaisyUI theme colors */
-  --primary: 14 100% 50%;            /* Blaze orange in HSL */
+  --primary: 16 100% 60%;            /* Racing orange in HSL */
   --primary-foreground: 0 0% 100%;
-  --secondary: 212 50% 34%;          /* Steel blue in HSL */
+  --secondary: 207 100% 27%;         /* Deep blue in HSL */
   --secondary-foreground: 0 0% 100%;
   --background: 220 13% 96%;
   --foreground: 0 0% 10%;
@@ -30,19 +47,19 @@
   --card-foreground: 0 0% 10%;
   --muted: 210 10% 90%;
   --muted-foreground: 215 10% 50%;
-  --accent: 14 100% 50%;
-  --accent-foreground: 0 0% 100%;
+  --accent: 44 82% 67%;              /* Vibrant yellow in HSL */
+  --accent-foreground: 0 0% 20%;
   --border: 210 20% 85%;
   --input: 210 20% 85%;
   --destructive: 0 85% 50%;
   --destructive-foreground: 0 0% 100%;
-  --ring: 14 100% 50%;
+  --ring: 16 100% 60%;
 }
 
 .light {
-  --primary: 14 100% 50%;
+  --primary: 16 100% 60%;            /* Racing orange in HSL */
   --primary-foreground: 0 0% 100%;
-  --secondary: 212 50% 34%;
+  --secondary: 207 100% 27%;         /* Deep blue in HSL */
   --secondary-foreground: 0 0% 100%;
   --background: 220 13% 96%;
   --foreground: 0 0% 10%;
@@ -50,13 +67,13 @@
   --card-foreground: 0 0% 10%;
   --muted: 210 10% 90%;
   --muted-foreground: 215 10% 50%;
-  --accent: 14 100% 50%;
-  --accent-foreground: 0 0% 100%;
+  --accent: 44 82% 67%;              /* Vibrant yellow in HSL */
+  --accent-foreground: 0 0% 20%;
   --border: 210 20% 85%;
   --input: 210 20% 85%;
   --destructive: 0 85% 50%;
   --destructive-foreground: 0 0% 100%;
-  --ring: 14 100% 50%;
+  --ring: 16 100% 60%;
 }
 
 @layer base {
@@ -120,5 +137,31 @@
   
   .card:hover {
     @apply translate-y-[-3px] shadow-lg;
+  }
+  
+  /* Motorcycle-themed utilities */
+  .rev-engine {
+    animation: revEngine 0.4s ease-in-out infinite;
+  }
+  
+  .turn-signal {
+    animation: turnSignal 1s ease-in-out infinite;
+  }
+  
+  .speedometer {
+    animation: speedometer 0.8s ease-out;
+  }
+  
+  .motorcycle-gradient {
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+  }
+  
+  .motorcycle-shadow {
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1), 0 6px 6px rgba(0, 0, 0, 0.06);
+  }
+  
+  .chrome-border {
+    border: 2px solid #e0e0e0;
+    box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.1);
   }
 }
