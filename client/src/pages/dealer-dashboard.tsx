@@ -228,6 +228,8 @@ export default function DealerDashboard() {
     
     // Then sort by availability date
     pendingCollection = filteredAuctions.sort((a, b) => {
+      
+    console.log(`Final pending collection list for ${user?.username}:`, pendingCollection.map(a => ({ id: a.id, status: a.status, bidAccepted: a.bidAccepted })));
       try {
         // Convert availability dates to comparable Date objects
         const getDate = (auction: AuctionWithDetails): Date => {
