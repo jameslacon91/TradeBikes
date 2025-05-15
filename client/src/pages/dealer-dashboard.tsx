@@ -185,9 +185,28 @@ export default function DealerDashboard() {
   // Get pending collection auctions (for both sellers and buyers)
   let pendingCollection: AuctionWithDetails[] = [];
   
-  if (activeAuctions) {
+  // DEBUG LOGGING
+  console.log(`DEBUG: activeAuctions for ${user?.username}:`, activeAuctions);
+  console.log(`DEBUG: biddedAuctions for ${user?.username}:`, biddedAuctions);
+  
+  // Create a combined list of auctions to check for pending collection (from both active and bidded lists)
+  // This is needed because we need to show pending collections for both dealers who listed AND dealers who won
+  const combinedAuctions = [...(activeAuctions || [])];
+  
+  // Add bidded auctions that aren't already in the active auctions list
+  if (biddedAuctions && biddedAuctions.length > 0) {
+    biddedAuctions.forEach(auction => {
+      if (!combinedAuctions.some(a => a.id === auction.id)) {
+        combinedAuctions.push(auction);
+      }
+    });
+  }
+  
+  console.log(`DEBUG: Combined auctions to check for pending collection:`, combinedAuctions);
+  
+  if (combinedAuctions.length > 0) {
     // First filter for pending collections and accepted bids (but exclude those that have been marked as completed)
-    const filteredAuctions = activeAuctions.filter(auction => {
+    const filteredAuctions = combinedAuctions.filter(auction => {
       console.log(`Checking auction ${auction.id} - status: ${auction.status}, bidAccepted: ${auction.bidAccepted}, collectionConfirmed: ${auction.collectionConfirmed}, dealerId: ${auction.dealerId}, winningBidderId: ${auction.winningBidderId}, currentUser: ${user?.id}`);
       
       // Include auctions that are explicitly in "pending_collection" status OR have bidAccepted=true 
