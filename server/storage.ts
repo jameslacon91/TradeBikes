@@ -1490,10 +1490,47 @@ export class MemStorage implements IStorage {
       }
     }
     
-    // Combine both lists, with pending collection auctions first
-    const combinedAuctions = [...pendingCollectionAuctions, ...regularBidAuctions];
+    // Now collect completed auctions separately
+    const completedAuctions: AuctionWithDetails[] = [];
     
-    console.log(`Returning ${combinedAuctions.length} auctions for dealer ${dealerId} (${pendingCollectionAuctions.length} pending collection, ${regularBidAuctions.length} regular bids)`);
+    // Find all auctions where this dealer is the winning bidder AND the auction is completed
+    for (const auction of allAuctions) {
+      if (auction.status === 'completed' && 
+          auction.winningBidderId === dealerId) {
+        
+        console.log(`Found completed auction ${auction.id} for dealer ${dealerId} - status: ${auction.status}, bidAccepted: ${auction.bidAccepted}`);
+        
+        const auctionDetails = await this.getAuctionWithDetails(auction.id);
+        if (auctionDetails) {
+          // Ensure motorcycle status is consistent with auction
+          const motorcycle = await this.getMotorcycle(auctionDetails.motorcycleId);
+          if (motorcycle && motorcycle.status !== 'sold') {
+            console.log(`Auto-correcting motorcycle ${auctionDetails.motorcycleId} status to sold`);
+            
+            await this.updateMotorcycle(auctionDetails.motorcycleId, { 
+              status: 'sold',
+              soldDate: motorcycle.soldDate || auctionDetails.completedAt || new Date().toISOString()
+            });
+            
+            // Update the motorcycle in the auction details to reflect the change
+            auctionDetails.motorcycle.status = 'sold';
+            auctionDetails.motorcycle.soldDate = motorcycle.soldDate || auctionDetails.completedAt || new Date().toISOString();
+          }
+          
+          // Add to completed auctions list
+          const alreadyAdded = completedAuctions.some(a => a.id === auction.id);
+          if (!alreadyAdded) {
+            console.log(`Adding auction ${auctionDetails.id} to completed auctions list`);
+            completedAuctions.push(auctionDetails);
+          }
+        }
+      }
+    }
+    
+    // Combine all lists, with pending collection and completed auctions before regular bids
+    const combinedAuctions = [...pendingCollectionAuctions, ...completedAuctions, ...regularBidAuctions];
+    
+    console.log(`Returning ${combinedAuctions.length} auctions for dealer ${dealerId} (${pendingCollectionAuctions.length} pending collection, ${completedAuctions.length} completed, ${regularBidAuctions.length} regular bids)`);
     return combinedAuctions;
   }
 
