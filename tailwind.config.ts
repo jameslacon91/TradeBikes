@@ -107,10 +107,10 @@ export default {
           "neutral": "#1A1A1A",       // Dark gray/black neutral
           "neutral-focus": "#121212", // Darker gray for focus states
           "neutral-content": "#FFFFFF", // White text on neutral
-          "base-100": "#FFFFFF",      // White for clean, modern feel
-          "base-200": "#F2F2F2",      // Very light gray for secondary surfaces
-          "base-300": "#E6E6E6",      // Light gray for tertiary surfaces
-          "base-content": "#1F1F1F",  // Near-black for text on base colors
+          "base-100": "#1A1A1A",      // Dark background for main surfaces
+          "base-200": "#121212",      // Darker gray for secondary surfaces
+          "base-300": "#0A0A0A",      // Darkest gray for tertiary surfaces
+          "base-content": "#FFFFFF",  // White text on base colors
           "info": "#3ABFF8",         // Standard info blue
           "success": "#36D399",      // Success green
           "warning": "#FBBD23",      // Warning yellow
@@ -126,7 +126,7 @@ export default {
         },
       },
     ],
-    darkTheme: "dark",
+    darkTheme: "tradebikes", // Set the dark theme to our tradebikes theme
     base: true,
     styled: true,
     utils: true,

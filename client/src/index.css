@@ -28,9 +28,9 @@
   --color-primary: #1D5D9B;          /* Deep blue primary */
   --color-primary-dark: #154980;
   --color-secondary: #121212;        /* Near black */
-  --color-dark: #1A1A1A;             /* Dark gray/black */
+  --color-dark: #0A0A0A;             /* Dark gray/black */
   --color-light: #ffffff;
-  --color-bg: #f3f4f6;               /* Light grey background */
+  --color-bg: #121212;               /* Dark background */
   
   /* Design tokens */
   --radius: 0.6rem;
@@ -41,16 +41,16 @@
   --primary-foreground: 0 0% 100%;
   --secondary: 0 0% 7%;              /* Near black in HSL */
   --secondary-foreground: 0 0% 100%;
-  --background: 220 13% 96%;
-  --foreground: 0 0% 10%;
-  --card: 0 0% 100%;
-  --card-foreground: 0 0% 10%;
-  --muted: 210 10% 90%;
-  --muted-foreground: 215 10% 50%;
+  --background: 0 0% 10%;            /* Dark background in HSL */
+  --foreground: 0 0% 100%;           /* White text in HSL */
+  --card: 0 0% 7%;                   /* Dark card in HSL */
+  --card-foreground: 0 0% 100%;      /* White text on card in HSL */
+  --muted: 210 10% 15%;              /* Darker muted in HSL */
+  --muted-foreground: 210 10% 80%;   /* Light muted text in HSL */
   --accent: 199 89% 71%;             /* Light blue in HSL */
   --accent-foreground: 0 0% 100%;
-  --border: 210 20% 85%;
-  --input: 210 20% 85%;
+  --border: 0 0% 20%;                /* Darker border in HSL */
+  --input: 0 0% 20%;                 /* Dark input in HSL */
   --destructive: 0 85% 50%;
   --destructive-foreground: 0 0% 100%;
   --ring: 212 68% 36%;
@@ -61,16 +61,16 @@
   --primary-foreground: 0 0% 100%;
   --secondary: 0 0% 7%;              /* Near black in HSL */
   --secondary-foreground: 0 0% 100%;
-  --background: 220 13% 96%;
-  --foreground: 0 0% 10%;
-  --card: 0 0% 100%;
-  --card-foreground: 0 0% 10%;
-  --muted: 210 10% 90%;
-  --muted-foreground: 215 10% 50%;
+  --background: 0 0% 10%;            /* Dark background in HSL */
+  --foreground: 0 0% 100%;           /* White text in HSL */
+  --card: 0 0% 7%;                   /* Dark card in HSL */
+  --card-foreground: 0 0% 100%;      /* White text on card in HSL */
+  --muted: 210 10% 15%;              /* Darker muted in HSL */
+  --muted-foreground: 210 10% 80%;   /* Light muted text in HSL */
   --accent: 199 89% 71%;             /* Light blue in HSL */
   --accent-foreground: 0 0% 100%;
-  --border: 210 20% 85%;
-  --input: 210 20% 85%;
+  --border: 0 0% 20%;                /* Darker border in HSL */
+  --input: 0 0% 20%;                 /* Dark input in HSL */
   --destructive: 0 85% 50%;
   --destructive-foreground: 0 0% 100%;
   --ring: 212 68% 36%;
