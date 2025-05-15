@@ -455,6 +455,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Update auction status to pending_collection
       console.log(`Accepting bid ${bidId} for auction ${auctionId} - Updating auction and motorcycle status to pending_collection`);
       
+      // First update motorcycle status to "pending_collection" for stronger consistency
+      const updatedMotorcycle = await storage.updateMotorcycle(auction.motorcycleId, {
+        status: "pending_collection"
+      });
+      
+      console.log(`Motorcycle ${auction.motorcycleId} status updated to: ${updatedMotorcycle?.status}`);
+      
+      // Verify motorcycle status was updated successfully before updating auction
+      if (!updatedMotorcycle || updatedMotorcycle.status !== 'pending_collection') {
+        console.error(`Failed to update motorcycle ${auction.motorcycleId} status! Current status: ${updatedMotorcycle?.status}`);
+        // Retry updating the motorcycle status
+        await storage.updateMotorcycle(auction.motorcycleId, {
+          status: "pending_collection"
+        });
+      }
+      
+      // Now update the auction
       const updatedAuction = await storage.updateAuction(auctionId, {
         bidAccepted: true,
         winningBidId: bidId,
@@ -462,16 +479,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
         status: "pending_collection"
       });
       
-      // Also update the motorcycle status to "pending_collection"
-      const updatedMotorcycle = await storage.updateMotorcycle(auction.motorcycleId, {
-        status: "pending_collection"
-      });
+      // Verify the entire state after updates
+      console.log(`Verifying updated state after bid acceptance:`);
+      const verifiedMotorcycle = await storage.getMotorcycle(auction.motorcycleId);
+      const verifiedAuction = await storage.getAuction(auctionId);
       
-      console.log(`Motorcycle ${auction.motorcycleId} status updated to: ${updatedMotorcycle?.status}`);
+      console.log(`Verified motorcycle status: ${verifiedMotorcycle?.status}`);
+      console.log(`Verified auction status: ${verifiedAuction?.status}, bidAccepted: ${verifiedAuction?.bidAccepted}`);
+      
+      // Final auto-correction if status is inconsistent
+      if (verifiedMotorcycle && verifiedMotorcycle.status !== 'pending_collection') {
+        console.log(`CRITICAL: Final auto-correction of motorcycle ${auction.motorcycleId} status to pending_collection`);
+        await storage.updateMotorcycle(auction.motorcycleId, {
+          status: "pending_collection"
+        });
+      }
       
       // Force synchronous DB update to ensure motorcycle status is saved immediately
       // and not lost on session change
       const verifyMotorcycle = await storage.getMotorcycle(auction.motorcycleId);
+      console.log(`Final motorcycle ${auction.motorcycleId} status verification: ${verifyMotorcycle?.status}`);
+      
+      // Ensure this update is really persisted in storage
+      if (verifyMotorcycle?.status !== 'pending_collection') {
+        console.error(`*** CRITICAL PERSISTENCE ERROR: Motorcycle status still not correct after multiple update attempts! ***`);
+        console.error(`Will attempt emergency direct update of motorcycle status`);
+        
+        // Force direct update of motorcycle in storage
+        const motorcycle = storage.motorcycles.get(auction.motorcycleId);
+        if (motorcycle) {
+          motorcycle.status = 'pending_collection';
+          storage.motorcycles.set(auction.motorcycleId, motorcycle);
+          console.log(`Emergency direct status update completed for motorcycle ${auction.motorcycleId}`);
+        }
+      }
       console.log(`Verified motorcycle ${auction.motorcycleId} status: ${verifyMotorcycle?.status}`);
 
       // Fetch updated motorcycle with potential availability date

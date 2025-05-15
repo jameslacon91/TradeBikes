@@ -937,7 +937,31 @@ export class MemStorage implements IStorage {
   }
   
   async getMotorcycle(id: number): Promise<Motorcycle | undefined> {
-    return this.motorcycles.get(id);
+    const motorcycle = this.motorcycles.get(id);
+    
+    if (!motorcycle) {
+      console.log(`getMotorcycle: Motorcycle with ID ${id} not found`);
+      return undefined;
+    }
+    
+    // Log motorcycle status for tracking
+    console.log(`getMotorcycle: Found motorcycle ${id} with status: ${motorcycle.status}`);
+    
+    // Special handling for motorcycles that should be in pending_collection
+    if (motorcycle.status !== 'pending_collection') {
+      // Check if there's an auction for this motorcycle that's in pending_collection state
+      for (const auction of this.auctions.values()) {
+        if (auction.motorcycleId === id && auction.status === 'pending_collection' && auction.bidAccepted) {
+          console.log(`Found inconsistency: Motorcycle ${id} has status ${motorcycle.status} but its auction ${auction.id} is in pending_collection state`);
+          console.log(`Auto-correcting motorcycle ${id} status to pending_collection`);
+          motorcycle.status = 'pending_collection';
+          this.motorcycles.set(id, motorcycle);
+          break;
+        }
+      }
+    }
+    
+    return motorcycle;
   }
   
   async getMotorcyclesByDealerId(dealerId: number): Promise<Motorcycle[]> {
@@ -952,10 +976,40 @@ export class MemStorage implements IStorage {
   
   async updateMotorcycle(id: number, motorcycleData: Partial<Motorcycle>): Promise<Motorcycle | undefined> {
     const motorcycle = this.motorcycles.get(id);
-    if (!motorcycle) return undefined;
+    if (!motorcycle) {
+      console.error(`Failed to update motorcycle with ID ${id}: Not found in storage`);
+      return undefined;
+    }
+    
+    // Log before update
+    if (motorcycleData.status) {
+      console.log(`Updating motorcycle ${id} status: ${motorcycle.status} -> ${motorcycleData.status}`);
+    }
     
     const updatedMotorcycle = { ...motorcycle, ...motorcycleData };
+    
+    // Ensure proper persistence of status changes
+    if (motorcycleData.status === 'pending_collection') {
+      console.log(`Setting motorcycle ${id} status to pending_collection - CRITICAL STATE CHANGE`);
+      // Force status to be updated explicitly to ensure it's set correctly
+      updatedMotorcycle.status = 'pending_collection';
+    }
+    
+    // Update the stored motorcycle
     this.motorcycles.set(id, updatedMotorcycle);
+    
+    // Verify update was successful
+    const verifyMotorcycle = this.motorcycles.get(id);
+    if (verifyMotorcycle && motorcycleData.status) {
+      console.log(`Verified motorcycle ${id} status after update: ${verifyMotorcycle.status}`);
+      if (verifyMotorcycle.status !== motorcycleData.status) {
+        console.error(`Status mismatch after update! Expected: ${motorcycleData.status}, Got: ${verifyMotorcycle.status}`);
+        // Try once more to ensure the status is set
+        verifyMotorcycle.status = motorcycleData.status;
+        this.motorcycles.set(id, verifyMotorcycle);
+      }
+    }
+    
     return updatedMotorcycle;
   }
 
@@ -987,10 +1041,27 @@ export class MemStorage implements IStorage {
   
   async getAuctionWithDetails(id: number): Promise<AuctionWithDetails | undefined> {
     const auction = this.auctions.get(id);
-    if (!auction) return undefined;
+    if (!auction) {
+      console.log(`getAuctionWithDetails: Auction with ID ${id} not found`);
+      return undefined;
+    }
+    
+    console.log(`getAuctionWithDetails: Found auction ${id} with status: ${auction.status}`);
     
     const motorcycle = this.motorcycles.get(auction.motorcycleId);
-    if (!motorcycle) return undefined;
+    if (!motorcycle) {
+      console.log(`getAuctionWithDetails: Could not find motorcycle ${auction.motorcycleId} for auction ${id}`);
+      return undefined;
+    }
+    
+    // Ensure motorcycle status is consistent with auction status when bid is accepted
+    if (auction.status === 'pending_collection' && auction.bidAccepted && motorcycle.status !== 'pending_collection') {
+      console.log(`Status inconsistency detected: Auction ${id} is pending_collection but motorcycle ${motorcycle.id} has status ${motorcycle.status}`);
+      console.log(`Auto-fixing motorcycle ${motorcycle.id} status to pending_collection`);
+      
+      motorcycle.status = 'pending_collection';
+      this.motorcycles.set(motorcycle.id, motorcycle);
+    }
     
     const bids = await this.getBidsByAuctionId(id);
     
