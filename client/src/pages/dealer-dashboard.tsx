@@ -177,10 +177,36 @@ export default function DealerDashboard() {
   
   // Filter auctions by status
   const activeListings = userAuctions.filter(a => a.status === 'active');
+  
+  // Create a combined set of auctions to check for completed listings (both user-created and bidded)
+  const allAuctionsToCheck = [...(userAuctions || [])];
+  
+  // Add bidded auctions that aren't already in the userAuctions list
+  if (biddedAuctions && biddedAuctions.length > 0) {
+    biddedAuctions.forEach(auction => {
+      if (!allAuctionsToCheck.some(a => a.id === auction.id)) {
+        allAuctionsToCheck.push(auction);
+      }
+    });
+  }
+  
   // Past listings should include completed auctions and collections that have been confirmed
-  const pastListings = userAuctions.filter(a => 
-    a.status === 'completed' || a.collectionConfirmed === true
-  );
+  // from both listings created by the user and auctions they've bid on and won
+  const pastListings = allAuctionsToCheck.filter(a => {
+    // Include any completed auctions or where collection is confirmed
+    const isCompleted = a.status === 'completed' || a.collectionConfirmed === true;
+    
+    // For bidding user, check if they were the winning bidder
+    const userIsWinner = a.winningBidderId === user?.id;
+    
+    // For selling user, check if they were the seller
+    const userIsSeller = a.dealerId === user?.id;
+    
+    console.log(`Checking past listing ${a.id}: completed=${isCompleted}, userIsWinner=${userIsWinner}, userIsSeller=${userIsSeller}`);
+    
+    // Include in past listings if it's completed AND the user was either the seller or winning bidder
+    return isCompleted && (userIsSeller || userIsWinner);
+  });
   
   // Get pending collection auctions (for both sellers and buyers)
   let pendingCollection: AuctionWithDetails[] = [];
