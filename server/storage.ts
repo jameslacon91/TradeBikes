@@ -193,8 +193,10 @@ export class MemStorage implements IStorage {
     // Create bidder accounts (all users are dealers now, but these were originally traders)
     const bidderPassword = await hashPassword('password123');
     
+    // IMPORTANT: Mike's ID is hardcoded to 4 in several places, so we force it here
+    const mikeId = 4;
     const trader1: User = {
-      id: this.userId++,
+      id: mikeId, // Fixed the ID to 4 since several records reference this
       username: 'miketrader',
       password: bidderPassword,
       email: 'mike@example.com',
@@ -208,6 +210,10 @@ export class MemStorage implements IStorage {
       totalRatings: 8,
       favoriteDealers: [1, 3], // Favorite dealer1 and dealer3
       createdAt: new Date()
+    };
+    // Make sure user ID counter is advanced appropriately
+    if (this.userId <= mikeId) {
+      this.userId = mikeId + 1;
     };
     this.users.set(trader1.id, trader1);
     
@@ -874,6 +880,148 @@ export class MemStorage implements IStorage {
       createdAt: new Date(now.getTime() - oneDay * 1) // 1 day ago
     };
     this.notifications.set(notificationCollection.id, notificationCollection);
+    
+    // Add two more motorcycles in pending_collection status for Mike
+    // Motorcycle 2 for Mike - Kawasaki Ninja 650
+    const mikeMotorcycle1: Motorcycle = {
+      id: this.motorcycleId++,
+      dealerId: dealer2.id,
+      make: 'Kawasaki',
+      model: 'Ninja 650',
+      year: 2020,
+      mileage: 12500,
+      color: 'Green',
+      condition: 'Very good',
+      engineSize: '649cc',
+      serviceHistory: 'Full Kawasaki dealer service history',
+      tyreCondition: 'Good - approximately 60% remaining',
+      description: 'Nice Kawasaki Ninja 650 with full service history. Great starter or commuter bike.',
+      dateAvailable: 'Immediate',
+      regNumber: 'LK20 KAW',
+      price: 8500,
+      auctionDuration: '3days',
+      status: 'pending_collection',
+      soldDate: new Date().toISOString(),
+      images: [
+        'https://images.unsplash.com/photo-1583137264599-cb8c87e93afb'
+      ],
+      createdAt: new Date()
+    };
+    this.motorcycles.set(mikeMotorcycle1.id, mikeMotorcycle1);
+    
+    // Auction for Mike Motorcycle 1
+    const mikeAuction1: Auction = { 
+      id: this.auctionId++,
+      motorcycleId: mikeMotorcycle1.id,
+      dealerId: dealer2.id,
+      startTime: new Date(now.getTime() - oneDay * 5), // 5 days ago
+      endTime: new Date(now.getTime() - oneDay * 1), // 1 day ago
+      status: 'pending_collection',
+      winningBidId: this.bidId, // Will be created next
+      winningBidderId: trader1.id, // Mike's ID (trader1)
+      bidAccepted: true, // CRITICAL: This must be true for Mike to see it!
+      dealConfirmed: true,
+      collectionConfirmed: false, 
+      collectionDate: new Date(now.getTime() + oneDay * 3).toISOString(), // 3 days from now
+      highestBidderId: trader1.id,
+      visibilityType: 'all',
+      visibilityRadius: null,
+      createdAt: new Date(now.getTime() - oneDay * 5),
+      completedAt: new Date(now.getTime() - oneDay * 1).toISOString()
+    };
+    this.auctions.set(mikeAuction1.id, mikeAuction1);
+    
+    // Mike's winning bid
+    const mikeBid1: Bid = { 
+      id: this.bidId++,
+      auctionId: mikeAuction1.id,
+      dealerId: trader1.id, // Mike's ID
+      amount: 8500,
+      createdAt: new Date(now.getTime() - oneDay * 2) // 2 days ago
+    };
+    this.bids.set(mikeBid1.id, mikeBid1);
+    
+    // Motorcycle 3 for Mike - Suzuki GSX-R750
+    const mikeMotorcycle2: Motorcycle = {
+      id: this.motorcycleId++,
+      dealerId: dealer3.id,
+      make: 'Suzuki',
+      model: 'GSX-R750',
+      year: 2019,
+      mileage: 15700,
+      color: 'Blue/White',
+      condition: 'Excellent',
+      engineSize: '750cc',
+      serviceHistory: 'Full service history',
+      tyreCondition: 'Excellent - recently replaced',
+      description: 'Suzuki GSX-R750 in excellent condition. Includes Yoshimura exhaust and frame sliders.',
+      dateAvailable: 'Available next week',
+      regNumber: 'LJ19 SUZ',
+      price: 9200,
+      auctionDuration: '1week',
+      status: 'pending_collection', 
+      soldDate: new Date().toISOString(),
+      images: [
+        'https://images.unsplash.com/photo-1552509040-032a10b77ded'
+      ],
+      createdAt: new Date()
+    };
+    this.motorcycles.set(mikeMotorcycle2.id, mikeMotorcycle2);
+    
+    // Auction for Mike Motorcycle 2
+    const mikeAuction2: Auction = { 
+      id: this.auctionId++,
+      motorcycleId: mikeMotorcycle2.id,
+      dealerId: dealer3.id,
+      startTime: new Date(now.getTime() - oneDay * 7), // 7 days ago
+      endTime: new Date(now.getTime() - oneDay * 2), // 2 days ago
+      status: 'pending_collection',
+      winningBidId: this.bidId, // Will be created next
+      winningBidderId: trader1.id, // Mike's ID (trader1)
+      bidAccepted: true, // CRITICAL: This must be true for Mike to see it!
+      dealConfirmed: true,
+      collectionConfirmed: false,
+      collectionDate: new Date(now.getTime() + oneDay * 4).toISOString(), // 4 days from now
+      highestBidderId: trader1.id,
+      visibilityType: 'all',
+      visibilityRadius: null,
+      createdAt: new Date(now.getTime() - oneDay * 7),
+      completedAt: new Date(now.getTime() - oneDay * 2).toISOString()
+    };
+    this.auctions.set(mikeAuction2.id, mikeAuction2);
+    
+    // Mike's winning bid
+    const mikeBid2: Bid = { 
+      id: this.bidId++,
+      auctionId: mikeAuction2.id,
+      dealerId: trader1.id, // Mike's ID
+      amount: 9200,
+      createdAt: new Date(now.getTime() - oneDay * 3) // 3 days ago
+    };
+    this.bids.set(mikeBid2.id, mikeBid2);
+    
+    // Add notifications for Mike
+    const mikeNotification1: Notification = {
+      id: this.notificationId++,
+      userId: trader1.id, // Mike's ID
+      type: 'bid_accepted',
+      content: 'Your bid of £8,500 for Kawasaki Ninja 650 has been accepted by the dealer',
+      relatedId: mikeAuction1.id,
+      read: false,
+      createdAt: new Date(now.getTime() - oneDay * 1) // 1 day ago
+    };
+    this.notifications.set(mikeNotification1.id, mikeNotification1);
+    
+    const mikeNotification2: Notification = {
+      id: this.notificationId++,
+      userId: trader1.id, // Mike's ID
+      type: 'bid_accepted',
+      content: 'Your bid of £9,200 for Suzuki GSX-R750 has been accepted by the dealer',
+      relatedId: mikeAuction2.id,
+      read: false,
+      createdAt: new Date(now.getTime() - oneDay * 2) // 2 days ago
+    };
+    this.notifications.set(mikeNotification2.id, mikeNotification2);
     
     console.log('Sample data has been seeded successfully');
   }
