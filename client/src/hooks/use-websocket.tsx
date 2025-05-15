@@ -73,21 +73,33 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
         console.log('Initializing WebSocket connection...');
         reconnectAttempts++;
         
-        // Build the WebSocket URL, ensuring it works in both development and production
+        // Build the WebSocket URL, ensuring it works in all environments
         let wsUrl = '';
         
         try {
+          // Dynamically detect the protocol (wss for https, ws for http)
           const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
           const host = window.location.host;
           
-          // Use current host (supports Replit deployment domains)
+          // Build the WebSocket URL using current host (works for all domains)
           wsUrl = `${protocol}//${host}/ws`;
           
-          console.log(`WebSocket connecting to: ${wsUrl} (using protocol: ${protocol}, host: ${host})`);
+          // Log detailed connection information
+          console.log('WebSocket connection details:');
+          console.log(`  Protocol: ${protocol} (from ${window.location.protocol})`);
+          console.log(`  Host: ${host}`);
+          console.log(`  Full URL: ${wsUrl}`);
+          console.log(`  Connection attempt: ${reconnectAttempts}/${maxReconnectAttempts}`);
         } catch (e) {
-          // Fallback URL in case of errors
-          wsUrl = 'ws://localhost:5000/ws';
-          console.warn('Error creating WebSocket URL, using fallback:', e);
+          // Provide fallbacks for different environments
+          if (window.location.hostname.includes('replit.app')) {
+            wsUrl = 'wss://trade-bikes-jameslacon1.replit.app/ws';
+          } else if (window.location.hostname.includes('repl.co')) {
+            wsUrl = 'wss://trade-bikes-jameslacon1.repl.co/ws';
+          } else {
+            wsUrl = 'ws://localhost:5000/ws';
+          }
+          console.warn(`Error creating WebSocket URL, using fallback (${wsUrl}):`, e);
         }
         
         console.log(`WebSocket URL: ${wsUrl}, attempt: ${reconnectAttempts}`);
