@@ -1,14 +1,44 @@
 // Check the status of Mike's auctions and auto-fix any inconsistencies
-const { storage } = require('./server/storage');
+import { storage } from './server/storage';
 
 async function checkMikesAuctions() {
   console.log('Checking Mike\'s auctions and motorcycle statuses...');
   
   try {
-    // Verify Mike's user account
-    const mike = await storage.getUserByUsername('miketrader');
+    // First, list all users to find Mike
+    console.log('\n--- ALL USERS IN SYSTEM ---');
+    const allUsers = Array.from(storage.getAllUsers().values());
+    
+    allUsers.forEach(user => {
+      console.log(`User ${user.id}: ${user.username} (${user.role})`);
+    });
+    
+    // Try different possible Mike usernames
+    const possibleMikeUsernames = ['miketrader', 'mike', 'MikeTrader', 'Mike', 'trader5'];
+    let mike = null;
+    
+    for (const username of possibleMikeUsernames) {
+      console.log(`Looking for user with case-insensitive username: ${username}`);
+      mike = await storage.getUserByUsername(username);
+      if (mike) {
+        console.log(`✅ Found mike user with username: ${username}`);
+        break;
+      } else {
+        console.log(`No user found with username: ${username}`);
+      }
+    }
+    
+    // If we still couldn't find Mike, look for a user with role='trader'
     if (!mike) {
-      console.error('Could not find miketrader user in the database!');
+      const traders = allUsers.filter(user => user.role === 'trader');
+      if (traders.length > 0) {
+        mike = traders[0]; // Use the first trader as Mike
+        console.log(`Using first trader user as Mike: ${mike.username} (ID: ${mike.id})`);
+      }
+    }
+    
+    if (!mike) {
+      console.error('Could not find a suitable user to use as Mike!');
       return;
     }
     
@@ -90,7 +120,14 @@ async function checkMikesAuctions() {
     
     // Check what motorcycles would show in the pending collection tab on the dashboard
     console.log('\n--- SIMULATING PENDING COLLECTION FILTER ---');
-    const pendingCollectionFilter = mikesAuctions.filter(auction => {
+    
+    // First check all active auctions
+    console.log('Getting all active auctions from storage...');
+    const allActiveAuctions = await storage.getActiveAuctions(mikeId);
+    console.log(`Found ${allActiveAuctions.length} active auctions overall`);
+    
+    // Then apply the filter from the dashboard
+    const pendingCollectionFilter = allActiveAuctions.filter(auction => {
       const isPendingCollection = auction.status === 'pending_collection' || auction.bidAccepted;
       const notCollected = !auction.collectionConfirmed;
       const userInvolved = auction.dealerId === mikeId || auction.winningBidderId === mikeId;
