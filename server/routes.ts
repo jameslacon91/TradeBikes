@@ -449,6 +449,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Update auction status to pending_collection
+      console.log(`Accepting bid ${bidId} for auction ${auctionId} - Updating auction and motorcycle status to pending_collection`);
+      
       const updatedAuction = await storage.updateAuction(auctionId, {
         bidAccepted: true,
         winningBidId: bidId,
@@ -457,9 +459,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
       
       // Also update the motorcycle status to "pending_collection"
-      await storage.updateMotorcycle(auction.motorcycleId, {
+      const updatedMotorcycle = await storage.updateMotorcycle(auction.motorcycleId, {
         status: "pending_collection"
       });
+      
+      console.log(`Motorcycle ${auction.motorcycleId} status updated to: ${updatedMotorcycle?.status}`);
+      
+      // Force synchronous DB update to ensure motorcycle status is saved immediately
+      // and not lost on session change
+      const verifyMotorcycle = await storage.getMotorcycle(auction.motorcycleId);
+      console.log(`Verified motorcycle ${auction.motorcycleId} status: ${verifyMotorcycle?.status}`);
 
       // Fetch updated motorcycle with potential availability date
       const motorcycle = await storage.getMotorcycle(auction.motorcycleId);
@@ -509,6 +518,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         },
         timestamp: Date.now()
       };
+      
+      // Enhance WebSocket message with explicit motorcycleId for better traceability
+      wsMessage.data.motorcycleId = motorcycle?.id;
+      bidAcceptedConfirmMessage.data.motorcycleId = motorcycle?.id;
+      
+      console.log('Sending bid accepted WebSocket messages with enhanced data:');
+      console.log('- To bidder:', JSON.stringify(wsMessage.data));
+      console.log('- To seller:', JSON.stringify(bidAcceptedConfirmMessage.data));
       
       // Send WebSocket notification to both seller and winning bidder
       sendToUser(bid.dealerId, wsMessage);

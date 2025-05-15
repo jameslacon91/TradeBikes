@@ -411,10 +411,10 @@ async function handleAuctionCreated(message: WSMessage) {
 
 // Handle bid accepted event
 async function handleBidAccepted(message: WSMessage) {
-  const { auctionId, dealerId, bidderId } = message.data;
+  const { auctionId, dealerId, bidderId, motorcycleId } = message.data;
   
   try {
-    console.log(`Processing bid acceptance for auction ${auctionId}, from dealer ${dealerId} to bidder ${bidderId}`);
+    console.log(`Processing bid acceptance for auction ${auctionId}, from dealer ${dealerId} to bidder ${bidderId}, motorcycle ${motorcycleId}`);
     
     const auction = await storage.getAuctionWithDetails(auctionId);
     if (!auction) {
@@ -422,15 +422,39 @@ async function handleBidAccepted(message: WSMessage) {
       return;
     }
     
+    // Get motorcycle ID from message or auction
+    const motoId = motorcycleId || auction.motorcycle.id;
+    
+    // Double check the motorcycle exists
+    const currentMotorcycle = await storage.getMotorcycle(motoId);
+    if (!currentMotorcycle) {
+      console.error(`Cannot find motorcycle with ID ${motoId} for bid acceptance`);
+      return;
+    }
+    
+    console.log(`Motorcycle ${motoId} current status: ${currentMotorcycle.status}`);
+    
     // Update motorcycle status to pending collection
-    const updatedMotorcycle = await storage.updateMotorcycle(auction.motorcycle.id, {
+    const updatedMotorcycle = await storage.updateMotorcycle(motoId, {
       status: 'pending_collection'
     });
     
     if (!updatedMotorcycle) {
-      console.error(`Failed to update motorcycle ${auction.motorcycle.id} status for bid acceptance`);
+      console.error(`Failed to update motorcycle ${motoId} status for bid acceptance`);
     } else {
-      console.log(`Updated motorcycle ${auction.motorcycle.id} status to 'pending_collection'`);
+      console.log(`Updated motorcycle ${motoId} status to 'pending_collection'`);
+    }
+    
+    // Verify the status was updated
+    const verifiedMotorcycle = await storage.getMotorcycle(motoId);
+    console.log(`Verified motorcycle ${motoId} status after update: ${verifiedMotorcycle?.status}`);
+    
+    // If for some reason the status wasn't updated properly, try again
+    if (verifiedMotorcycle && verifiedMotorcycle.status !== 'pending_collection') {
+      console.log(`Retrying motorcycle ${motoId} status update - current status: ${verifiedMotorcycle.status}`);
+      await storage.updateMotorcycle(motoId, {
+        status: 'pending_collection'
+      });
     }
     
     // Update auction status to pending collection if not already
