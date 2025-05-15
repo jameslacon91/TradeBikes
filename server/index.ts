@@ -11,16 +11,31 @@ const app = express();
 // Must come before any other middleware that might set headers
 app.use(cors({
   origin: function(origin, callback) {
-    // Allow any origin in development
-    // In production, this should be restricted to known domains
-    console.log(`CORS request from origin: ${origin || 'same-origin'}`);
+    // In deployment, we need to specifically allow the replit.app domain and our development domain
+    const allowedOrigins = [
+      'https://trade-bikes-jameslacon1.replit.app',
+      'https://trade-bikes.jameslacon1.repl.co',
+      'http://localhost:5000',
+      'http://127.0.0.1:5000'
+    ];
+    
+    // If no origin (like a direct request) or our origin is in the allowed list, allow it
+    const originToCheck = origin || 'same-origin';
+    const allowed = !origin || allowedOrigins.includes(origin);
+    
+    console.log(`CORS request from origin: ${originToCheck}, allowed: ${allowed}`);
+    
+    // Allow any origin for now to facilitate debugging
     callback(null, true);
+    
+    // Once debug is complete, switch to this line to enforce origin rules:
+    // callback(allowed ? null : new Error('Not allowed by CORS'), allowed);
   },
   credentials: true, // Allow cookies to be sent
   exposedHeaders: ['set-cookie'],
   optionsSuccessStatus: 200, // For legacy browser support
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept']
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'X-XSRF-TOKEN']
 }));
 
 app.use(express.json());

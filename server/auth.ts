@@ -60,16 +60,21 @@ export function setupAuth(app: Express) {
     path: '/'                    // Send for all paths
   };
   
-  console.log('Using enhanced cookie settings for production compatibility');
+  // In Replit deployment, we need specific cookie settings for proper cross-domain auth
+  if (isProduction) {
+    console.log('Using production cookie settings for Replit deployment');
+    cookieSettings.sameSite = 'none';  // Required for cross-origin cookies
+    cookieSettings.secure = true;      // Always use secure in production
+  } else {
+    console.log('Using development cookie settings');
+    cookieSettings.sameSite = 'lax';   // Better for local development
+    cookieSettings.secure = false;     // No HTTPS in development
+  }
   
-  // In Replit environment, we need these settings for cross-domain auth
-  cookieSettings.sameSite = 'none';  // Required for cross-origin cookies
-  
-  // We need secure cookies in production, but this may cause issues in dev
-  cookieSettings.secure = false; // Will be set to true by express if HTTPS is detected
-  
-  // Force this setting for Replit deployment
+  // These settings help with TLS issues in various environments
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+  
+  console.log(`Cookie settings: sameSite=${cookieSettings.sameSite}, secure=${cookieSettings.secure}`);
 
   const sessionSettings: session.SessionOptions = {
     secret: sessionSecret,
@@ -206,11 +211,13 @@ export function setupAuth(app: Express) {
         debugSession(req);
         
         // Set a cookie header to help with cross-domain issues
+        // Using the same cookie settings as the session for consistency
         res.cookie('loggedIn', 'true', {
           httpOnly: false, // Readable by browser
           maxAge: 24 * 60 * 60 * 1000, // 24 hours
-          sameSite: 'none',
-          secure: false, // Will be true in production
+          sameSite: cookieSettings.sameSite,
+          secure: cookieSettings.secure,
+          path: '/'
         });
         
         res.status(201).json(userData);
