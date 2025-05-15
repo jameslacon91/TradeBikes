@@ -353,7 +353,7 @@ export default function DealerDashboard() {
               <TabsTrigger value="dashboard">Overview</TabsTrigger>
               <TabsTrigger value="active-listings">Active Listings</TabsTrigger>
               <TabsTrigger value="placed-bids">Placed Bids</TabsTrigger>
-              <TabsTrigger value="past-listings">Completed Deals</TabsTrigger>
+              <TabsTrigger value="completed-deals">Completed Deals</TabsTrigger>
               <TabsTrigger value="pending-completion">Pending Completion</TabsTrigger>
             </TabsList>
             
@@ -389,7 +389,7 @@ export default function DealerDashboard() {
                 <div onClick={() => setActiveTab("placed-bids")}>
                   <StatCard 
                     title="Placed Bids" 
-                    value={statsLoading || bidsLoading ? "Loading..." : allBidsPlaced.length}
+                    value={statsLoading || bidsLoading ? "Loading..." : placedBids.length}
                     subtitle={statsLoading || bidsLoading ? "" : totalBidAmount > 0 ? `Total: £${totalBidAmount.toLocaleString()}` : "No bids"}
                     icon={<Gavel className="h-6 w-6 text-white" />}
                     bgColor="bg-blue-500"
@@ -409,7 +409,7 @@ export default function DealerDashboard() {
                 </div>
 
                 {/* Completed Deals */}
-                <div onClick={() => setActiveTab("past-listings")}>
+                <div onClick={() => setActiveTab("completed-deals")}>
                   <StatCard 
                     title="Completed Deals" 
                     value={statsLoading || auctionsLoading ? "Loading..." : completedDeals.length}
