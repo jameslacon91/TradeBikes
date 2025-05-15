@@ -3,6 +3,8 @@ import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import cors from "cors";
 
+// Deployment trigger - May 15, 2025 - Latest version with WebSocket improvements
+
 const app = express();
 
 // Configure CORS for cross-site requests
