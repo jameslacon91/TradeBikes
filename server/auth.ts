@@ -239,7 +239,10 @@ export function setupAuth(app: Express) {
         };
         
         // Set a cookie header to help with cross-domain issues
-        res.cookie('loggedIn', 'true', cookieConfig.browser);
+        res.cookie('loggedIn', 'true', {
+          ...cookieConfig.browser,
+          sameSite: cookieConfig.browser.sameSite as 'none' | 'lax' | 'strict'
+        });
         
         return res.status(200).json(userData);
       });

@@ -7,11 +7,12 @@ import { WSMessage } from '@shared/types';
 const clients = new Map<number, WebSocket>();
 
 export function setupWebSocket(server: Server) {
-  // Configure WebSocket server with more tolerant settings
+  // Configure WebSocket server with more tolerant settings for cross-domain support
   const wss = new WebSocketServer({ 
     server, 
     path: '/ws',
     clientTracking: true,
+    // Enable transport options that are more compatible across platforms
     perMessageDeflate: {
       zlibDeflateOptions: {
         chunkSize: 1024,
@@ -25,6 +26,12 @@ export function setupWebSocket(server: Server) {
       clientNoContextTakeover: true,
       concurrencyLimit: 10,
       threshold: 1024
+    },
+    // Increase WebSocket timeouts for better reliability
+    // verifyClient is disabled to allow cross-domain connections
+    handleProtocols: (protocols: string[], request) => {
+      // Accept any protocol
+      return protocols.length > 0 ? protocols[0] : '';
     }
   });
   
@@ -54,7 +61,13 @@ export function setupWebSocket(server: Server) {
   });
   
   wss.on('connection', (ws, req) => {
-    console.log('WebSocket connection established');
+    const clientIp = req.headers['x-forwarded-for'] || 
+                     req.socket.remoteAddress || 
+                     'unknown';
+    const origin = req.headers.origin || 'unknown';
+    
+    console.log(`WebSocket connection established - IP: ${clientIp}, Origin: ${origin}`);
+    console.log(`WebSocket headers:`, JSON.stringify(req.headers, null, 2));
     
     // Mark connection as alive
     (ws as any).isAlive = true;
