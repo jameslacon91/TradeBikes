@@ -141,16 +141,24 @@ export default function DealerDashboard() {
     staleTime: 0 // Always refetch when query key changes
   });
   
-  // Filter to only show active bids that haven't been accepted yet
+  // Filter to show ALL auctions where the current user has placed a bid
+  // The stat card should match the total number of bids placed, not the filtered view
   console.log('Filtering placed bids from these auctions:', biddedAuctions);
   
+  // Store the total number of bids placed for stats (this is the raw count that appears in the stats card)
+  const allBidsPlaced = biddedAuctions;
+
+  // Then create a filtered view for the UI that excludes pending collection items
   const placedBids = biddedAuctions.filter(auction => {
-    const isPendingCollection = auction.status === 'pending_collection' || auction.bidAccepted;
+    // This auction already has an accepted bid and is pending collection
+    const isPendingCollection = auction.status === 'pending_collection' || auction.bidAccepted === true;
+    // User is the winning bidder
     const isWinningBidder = auction.winningBidderId === user?.id;
     
     console.log(`Auction ${auction.id} - isPendingCollection: ${isPendingCollection}, isWinningBidder: ${isWinningBidder}, status: ${auction.status}, bidAccepted: ${auction.bidAccepted}`);
     
-    // Include in "Placed Bids" only if NOT pending collection OR user is not winning bidder
+    // Show in "Placed Bids" ONLY IF it's not pending collection OR the user is not the winning bidder
+    // This ensures items don't appear in both Placed Bids and Pending Collection tabs
     return !isPendingCollection || !isWinningBidder;
   });
   
@@ -177,9 +185,9 @@ export default function DealerDashboard() {
   // Get pending collection auctions (for both sellers and buyers)
   let pendingCollection: AuctionWithDetails[] = [];
   
-  if (biddedAuctions) {
+  if (activeAuctions) {
     // First filter for pending collections and accepted bids (but exclude those that have been marked as completed)
-    const filteredAuctions = biddedAuctions.filter(auction => {
+    const filteredAuctions = activeAuctions.filter(auction => {
       console.log(`Checking auction ${auction.id} - status: ${auction.status}, bidAccepted: ${auction.bidAccepted}, collectionConfirmed: ${auction.collectionConfirmed}, dealerId: ${auction.dealerId}, winningBidderId: ${auction.winningBidderId}, currentUser: ${user?.id}`);
       
       // Include auctions that are explicitly in "pending_collection" status OR have bidAccepted=true 
@@ -188,11 +196,11 @@ export default function DealerDashboard() {
       // Collection is not yet confirmed
       const notCollected = auction.collectionConfirmed !== true;
       
-      // User must be the winning bidder
-      const isWinningBidder = auction.winningBidderId === user?.id;
+      // User is either the seller or the winning bidder
+      const userInvolved = auction.dealerId === user?.id || auction.winningBidderId === user?.id;
       
-      // Only include auctions in "pending collection" section if current user is the winning bidder
-      const shouldInclude = isPendingCollection && notCollected && isWinningBidder;
+      // Only include auctions in "pending collection" section if they are pending collection and user is involved
+      const shouldInclude = isPendingCollection && notCollected && userInvolved;
       
       console.log(`Auction ${auction.id} - Including in pending collection? ${shouldInclude}`);
       
@@ -308,7 +316,7 @@ export default function DealerDashboard() {
                 <div onClick={() => setActiveTab("placed-bids")}>
                   <StatCard 
                     title="Placed Bids" 
-                    value={statsLoading || bidsLoading ? "Loading..." : biddedAuctions.length}
+                    value={statsLoading || bidsLoading ? "Loading..." : allBidsPlaced.length}
                     subtitle={statsLoading || bidsLoading ? "" : totalBidAmount > 0 ? `Total: £${totalBidAmount.toLocaleString()}` : "No bids"}
                     icon={<Gavel className="h-6 w-6 text-white" />}
                     bgColor="bg-blue-500"
