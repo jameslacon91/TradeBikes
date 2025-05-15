@@ -476,15 +476,45 @@ export async function registerRoutes(app: Express): Promise<Server> {
           make: motorcycle?.make || '',
           model: motorcycle?.model || '',
           year: motorcycle?.year || 0,
-          status: "pending_collection" // Include status in message data
+          auction: {
+            id: updatedAuction.id,
+            status: updatedAuction.status,
+            bidAccepted: true,
+            winningBidId: bidId
+          },
+          motorcycle: {
+            id: motorcycle?.id,
+            status: "pending_collection"
+          }
+        },
+        timestamp: Date.now()
+      };
+      
+      // Also send a confirmation to the seller with the same information
+      const bidAcceptedConfirmMessage: WSMessage = {
+        type: "bid_accepted_confirm",
+        data: {
+          auctionId: auctionId,
+          motorcycleId: auction.motorcycleId,
+          sellerId: auction.dealerId,
+          bidderId: bid.dealerId,
+          auction: {
+            id: updatedAuction.id,
+            status: updatedAuction.status
+          },
+          motorcycle: {
+            id: motorcycle?.id,
+            status: "pending_collection"
+          }
         },
         timestamp: Date.now()
       };
       
       // Send WebSocket notification to both seller and winning bidder
       sendToUser(bid.dealerId, wsMessage);
+      sendToUser(auction.dealerId, bidAcceptedConfirmMessage);
       
-      // Also send the same notification to other bidders to refresh their data
+      // Also send the notification to other bidders to refresh their data
       broadcast(wsMessage, bid.dealerId);
       
       // Create a notification record with availability info
@@ -520,9 +550,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Not authorized to confirm this deal" });
       }
       
+      // Update auction status to confirmed
       const updatedAuction = await storage.updateAuction(auctionId, {
-        dealConfirmed: true
+        dealConfirmed: true,
+        status: 'pending_collection'
       });
+      
+      // Also update the motorcycle status if it isn't already set
+      const motorcycle = await storage.getMotorcycle(auction.motorcycleId);
+      if (motorcycle && motorcycle.status !== 'pending_collection') {
+        console.log(`Updating motorcycle ${motorcycle.id} status to pending_collection during deal confirmation`);
+        await storage.updateMotorcycle(motorcycle.id, {
+          status: 'pending_collection'
+        });
+      }
 
       // Send notification via WebSocket to the seller
       const wsMessage: WSMessage = {
@@ -531,7 +572,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
           auctionId: auctionId,
           motorcycleId: auction.motorcycleId,
           sellerId: auction.dealerId,
-          bidderId: req.user.id
+          bidderId: req.user.id,
+          motorcycle: {
+            id: motorcycle?.id,
+            status: 'pending_collection'
+          },
+          auction: {
+            id: updatedAuction.id,
+            status: updatedAuction.status
+          }
         },
         timestamp: Date.now()
       };

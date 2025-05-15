@@ -162,20 +162,28 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
     
     // Handle based on message type
     switch (message.type) {
+      case 'register_confirmed':
+        console.log(`WebSocket registration confirmed for user ID: ${message.data.userId}`);
+        break;
+      case 'pong':
+        console.log('Received pong response from server');
+        break;
       case 'new_bid':
         queryClient.invalidateQueries({ queryKey: [`/api/auctions/${message.data.auctionId}`] });
         break;
       case 'bid_accepted':
+      case 'bid_accepted_confirm':
         // For bid acceptance, invalidate everything to ensure all data is fresh
         console.log('Bid accepted WebSocket event received - refreshing all data');
         
         // Invalidate specific auction data
         queryClient.invalidateQueries({ queryKey: [`/api/auctions/${message.data.auctionId}`] });
         
-        // Invalidate all auction-related queries
+        // Invalidate all auction and motorcycle related queries
         queryClient.invalidateQueries({ queryKey: ['/api/auctions'] });
         queryClient.invalidateQueries({ queryKey: ['/api/auctions/bids'] });
         queryClient.invalidateQueries({ queryKey: ['/api/auctions/dealer'] });
+        queryClient.invalidateQueries({ queryKey: ['/api/motorcycles'] });
         
         // Invalidate dashboard and notifications
         queryClient.invalidateQueries({ queryKey: ['/api/dashboard'] });
@@ -185,27 +193,92 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
         
         // Force a complete refetch of all auction data with this flag - this is more aggressive
         setTimeout(() => {
+          console.log('Dispatching force-data-refresh event');
           window.dispatchEvent(new CustomEvent('force-data-refresh'));
         }, 500);
         break;
-      case 'auction_completed':
+        
+      case 'auction_status_changed':
+        console.log(`Auction status changed to ${message.data.newStatus}`);
+        // Invalidate relevant data
         queryClient.invalidateQueries({ queryKey: [`/api/auctions/${message.data.auctionId}`] });
-        queryClient.invalidateQueries({ queryKey: ['/api/dashboard'] });
+        queryClient.invalidateQueries({ queryKey: ['/api/auctions'] });
+        
+        // If motorcycle data included, update motorcycle status
+        if (message.data.motorcycle) {
+          console.log(`Updating motorcycle ${message.data.motorcycle.id} status to ${message.data.motorcycle.status}`);
+          queryClient.invalidateQueries({ queryKey: ['/api/motorcycles'] });
+          queryClient.invalidateQueries({ queryKey: [`/api/motorcycles/${message.data.motorcycle.id}`] });
+        }
         break;
+      case 'auction_completed':
+      case 'underwrite_completed':
+        console.log(`Auction/underwrite ${message.data.auctionId} completed`);
+        queryClient.invalidateQueries({ queryKey: [`/api/auctions/${message.data.auctionId}`] });
+        queryClient.invalidateQueries({ queryKey: ['/api/auctions'] });
+        queryClient.invalidateQueries({ queryKey: ['/api/dashboard'] });
+        queryClient.invalidateQueries({ queryKey: ['/api/dashboard/stats'] });
+        queryClient.invalidateQueries({ queryKey: ['/api/activity'] });
+        break;
+        
       case 'new_message':
+        console.log('New message received');
         queryClient.invalidateQueries({ queryKey: ['/api/notifications'] });
         queryClient.invalidateQueries({ queryKey: ['/api/messages'] });
         break;
+        
       case 'auction_created':
+      case 'underwrite_created':
+        console.log(`New auction/underwrite created: ${message.data.auction?.id}`);
         queryClient.invalidateQueries({ queryKey: ['/api/auctions'] });
+        queryClient.invalidateQueries({ queryKey: ['/api/dashboard'] });
         break;
+        
       case 'deal_confirmed':
-      case 'collection_scheduled':
-      case 'collection_confirmed':
+        console.log(`Deal confirmed for auction ${message.data.auctionId}`);
         // Invalidate all auction-related queries
+        queryClient.invalidateQueries({ queryKey: [`/api/auctions/${message.data.auctionId}`] });
+        queryClient.invalidateQueries({ queryKey: ['/api/auctions'] });
+        queryClient.invalidateQueries({ queryKey: ['/api/auctions/bids'] });
+        queryClient.invalidateQueries({ queryKey: ['/api/motorcycles'] });
+        queryClient.invalidateQueries({ queryKey: ['/api/dashboard'] });
+        queryClient.invalidateQueries({ queryKey: ['/api/activity'] });
+        break;
+        
+      case 'collection_scheduled':
+        console.log(`Collection scheduled for auction ${message.data.auctionId} on ${new Date(message.data.collectionDate).toLocaleDateString()}`);
+        queryClient.invalidateQueries({ queryKey: [`/api/auctions/${message.data.auctionId}`] });
         queryClient.invalidateQueries({ queryKey: ['/api/auctions'] });
         queryClient.invalidateQueries({ queryKey: ['/api/auctions/bids'] });
         queryClient.invalidateQueries({ queryKey: ['/api/dashboard'] });
+        break;
+        
+      case 'collection_confirmed':
+        console.log(`Collection confirmed for auction ${message.data.auctionId}`);
+        queryClient.invalidateQueries({ queryKey: [`/api/auctions/${message.data.auctionId}`] });
+        queryClient.invalidateQueries({ queryKey: ['/api/auctions'] });
+        queryClient.invalidateQueries({ queryKey: ['/api/auctions/bids'] });
+        queryClient.invalidateQueries({ queryKey: ['/api/motorcycles'] });
+        queryClient.invalidateQueries({ queryKey: ['/api/dashboard'] });
+        queryClient.invalidateQueries({ queryKey: ['/api/dashboard/stats'] });
+        queryClient.invalidateQueries({ queryKey: ['/api/activity'] });
+        break;
+        
+      case 'date_extended':
+        console.log(`Date extended for auction ${message.data.auctionId} to ${new Date(message.data.newAvailabilityDate).toLocaleDateString()}`);
+        queryClient.invalidateQueries({ queryKey: [`/api/auctions/${message.data.auctionId}`] });
+        queryClient.invalidateQueries({ queryKey: ['/api/auctions'] });
+        break;
+        
+      case 'force_data_refresh':
+        console.log('Force data refresh requested');
+        // Clear the entire cache and refetch everything
+        queryClient.invalidateQueries();
+        break;
+        
+      case 'refresh_stats':
+        console.log('Refreshing dashboard stats');
+        queryClient.invalidateQueries({ queryKey: ['/api/dashboard/stats'] });
         break;
     }
   };
