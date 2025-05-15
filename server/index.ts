@@ -12,20 +12,47 @@ const app = express();
 // Must come before any other middleware that might set headers
 app.use(cors({
   origin: function(origin, callback) {
-    // Using the list from our centralized configuration
+    // If no origin (like a direct request), allow it
+    if (!origin) {
+      console.log(`CORS request from same-origin, allowed: true`);
+      callback(null, true);
+      return;
+    }
+    
+    // Check against our allowedOrigins list
     const allowedOrigins = corsConfig.allowedOrigins;
     
-    // If no origin (like a direct request) or our origin is in the allowed list, allow it
-    const originToCheck = origin || 'same-origin';
-    const allowed = !origin || allowedOrigins.includes(origin);
+    // First check exact matches
+    if (allowedOrigins.includes(origin)) {
+      console.log(`CORS request from origin: ${origin}, allowed: true (exact match)`);
+      callback(null, true);
+      return;
+    }
     
-    console.log(`CORS request from origin: ${originToCheck}, allowed: ${allowed}`);
+    // Then check pattern matches (for RegExp entries)
+    const matchesPattern = allowedOrigins.some(allowedOrigin => {
+      if (allowedOrigin instanceof RegExp) {
+        return allowedOrigin.test(origin);
+      }
+      return false;
+    });
     
-    // Allow any origin for now to facilitate debugging
-    callback(null, true);
+    if (matchesPattern) {
+      console.log(`CORS request from origin: ${origin}, allowed: true (pattern match)`);
+      callback(null, true);
+      return;
+    }
     
-    // Once debug is complete, switch to this line to enforce origin rules:
-    // callback(allowed ? null : new Error('Not allowed by CORS'), allowed);
+    console.log(`CORS request from origin: ${origin}, allowed: false`);
+    
+    // In development, allow all origins for easier debugging
+    if (process.env.NODE_ENV !== 'production') {
+      callback(null, true);
+      return;
+    }
+    
+    // In production, enforce CORS rules
+    callback(new Error(`Origin ${origin} not allowed by CORS policy`), false);
   },
   credentials: corsConfig.credentials, // Allow cookies to be sent
   exposedHeaders: corsConfig.exposedHeaders,

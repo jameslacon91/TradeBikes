@@ -34,7 +34,9 @@ export const corsConfig = {
     'https://trade-bikes-jameslacon1.replit.app',
     'https://trade-bikes.jameslacon1.repl.co',
     'http://localhost:5000',
-    'http://127.0.0.1:5000'
+    'http://127.0.0.1:5000',
+    // Replit Janeway domains
+    /^https:\/\/[a-f0-9-]+-[a-z0-9]+\.janeway\.replit\.dev$/
   ],
   
   // Other CORS options
@@ -62,4 +64,9 @@ export const getAppBaseUrl = (): string => {
   return 'http://localhost:5000';
 };
 
+// Print deployment information at startup
 console.log(`Application environment: ${isProduction ? 'PRODUCTION' : 'DEVELOPMENT'}`);
+console.log(`Cookie settings: sameSite=${cookieConfig.session.sameSite}, secure=${cookieConfig.session.secure}`);
+console.log(`Allowed origins:`, corsConfig.allowedOrigins.map(origin => 
+  origin instanceof RegExp ? origin.toString() : origin
+).join(', '));

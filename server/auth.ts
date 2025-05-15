@@ -45,9 +45,8 @@ export function setupAuth(app: Express) {
 
   const sessionSecret = process.env.SESSION_SECRET || 'tradebikes-secret-key';
   
-  console.log(`Server environment: ${isProduction ? 'PRODUCTION' : 'DEVELOPMENT'}`);
+  // Log Node environment for debugging
   console.log(`NODE_ENV: ${process.env.NODE_ENV || 'not set'}`);
-  console.log(`Cookie settings: sameSite=${cookieConfig.session.sameSite}, secure=${cookieConfig.session.secure}`);
   
   // These settings help with TLS issues in various environments
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
@@ -57,7 +56,11 @@ export function setupAuth(app: Express) {
     resave: true, // Changed to true to ensure session is saved on every request
     saveUninitialized: true, // Set to true for better compatibility with browser refreshes
     store: sessionStore,
-    cookie: cookieConfig.session,
+    cookie: {
+      ...cookieConfig.session,
+      // Explicitly cast the sameSite value for TypeScript
+      sameSite: cookieConfig.session.sameSite as 'none' | 'lax' | 'strict' | boolean
+    },
     // For Replit deployment, allow sessions without full security in dev
     proxy: true,
     name: 'tradebikes.sid', // Custom session name to avoid conflicts
@@ -72,7 +75,7 @@ export function setupAuth(app: Express) {
   app.use((req, res, next) => {
     res.cookie('XSRF-TOKEN', crypto.randomUUID(), {
       httpOnly: false, // Must be readable by JavaScript
-      sameSite: isProduction ? 'none' : 'lax',
+      sameSite: isProduction ? 'none' as const : 'lax' as const,
       secure: isProduction,
       path: '/'
     });
@@ -188,7 +191,10 @@ export function setupAuth(app: Express) {
         debugSession(req);
         
         // Set a cookie header to help with cross-domain issues
-        res.cookie('loggedIn', 'true', cookieConfig.browser);
+        res.cookie('loggedIn', 'true', {
+          ...cookieConfig.browser,
+          sameSite: cookieConfig.browser.sameSite as 'none' | 'lax' | 'strict'
+        });
         
         res.status(201).json(userData);
       });
