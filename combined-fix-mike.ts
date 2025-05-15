@@ -1,10 +1,12 @@
 // Combined script to fix Mike's pending motorcycles
 import { storage } from './server/storage';
-import { User, Motorcycle, Auction } from './shared/schema';
+import { User, Motorcycle, Auction, Bid, Notification } from './shared/schema';
 import { scrypt, randomBytes, timingSafeEqual } from "crypto";
 import { promisify } from "util";
 
 const scryptAsync = promisify(scrypt);
+
+// CRITICAL: Make sure this script properly sets the bidAccepted flag to true
 
 // Function to hash passwords
 async function hashPassword(password: string): Promise<string> {
