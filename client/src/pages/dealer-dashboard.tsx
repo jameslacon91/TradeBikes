@@ -1,6 +1,7 @@
 import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { useAuth } from '@/hooks/use-auth';
 import { useQuery } from '@tanstack/react-query';
+import { queryClient } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -61,6 +62,46 @@ export default function DealerDashboard() {
       refetchBids();
     }
   }, [user?.id, refetchStats, refetchDealerAuctions, refetchActivity, refetchBids]);
+  
+  // Listen for the force-data-refresh event from WebSocket notifications
+  useEffect(() => {
+    const handleForceDataRefresh = () => {
+      console.log("Force data refresh event received, refetching all dashboard data");
+      
+      // Only refetch if we have a user
+      if (user) {
+        // Manually refetch everything to avoid stale data
+        queryClient.invalidateQueries({ queryKey: ['/api/auctions'] });
+        queryClient.invalidateQueries({ queryKey: ['/api/auctions/bids'] });
+        queryClient.invalidateQueries({ queryKey: ['/api/auctions/dealer'] });
+        queryClient.invalidateQueries({ queryKey: ['/api/dashboard'] });
+        queryClient.invalidateQueries({ queryKey: ['/api/dashboard/stats'] });
+        
+        // Ensure we trigger fresh fetches
+        setTimeout(() => {
+          refetchStats();
+          refetchDealerAuctions();
+          refetchActivity();
+          refetchBids();
+          
+          // Provide a visual cue that data is refreshing
+          toast({
+            title: "Data refreshed",
+            description: "Dashboard data has been updated with the latest changes",
+            variant: "default",
+          });
+        }, 300);
+      }
+    };
+    
+    // Add event listener for the force refresh
+    window.addEventListener('force-data-refresh', handleForceDataRefresh);
+    
+    // Clean up
+    return () => {
+      window.removeEventListener('force-data-refresh', handleForceDataRefresh);
+    };
+  }, [user, refetchStats, refetchDealerAuctions, refetchActivity, refetchBids, toast]);
   
   // Fetch dashboard stats
   const { data: stats, isLoading: statsLoading } = useQuery<DashboardStats>({

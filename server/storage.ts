@@ -1187,7 +1187,28 @@ export class MemStorage implements IStorage {
     for (const auctionId of auctionIds) {
       const auctionDetails = await this.getAuctionWithDetails(auctionId);
       if (auctionDetails) {
-        auctions.push(auctionDetails);
+        // Additionally check if the dealer has won this auction
+        if (auctionDetails.winningBidderId === dealerId) {
+          // If the dealer is the winning bidder, ensure we include it regardless of other criteria
+          auctions.push(auctionDetails);
+        } else {
+          // For other auctions where the dealer has placed bids
+          auctions.push(auctionDetails);
+        }
+      }
+    }
+    
+    // Also add any auctions where this dealer is explicitly set as the winning bidder
+    // even if we don't have their bid record
+    for (const auction of this.auctions.values()) {
+      if (auction.winningBidderId === dealerId) {
+        const auctionAlreadyAdded = auctions.some(a => a.id === auction.id);
+        if (!auctionAlreadyAdded) {
+          const auctionDetails = await this.getAuctionWithDetails(auction.id);
+          if (auctionDetails) {
+            auctions.push(auctionDetails);
+          }
+        }
       }
     }
     

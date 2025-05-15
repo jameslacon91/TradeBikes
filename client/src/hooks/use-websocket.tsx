@@ -145,12 +145,27 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
         queryClient.invalidateQueries({ queryKey: [`/api/auctions/${message.data.auctionId}`] });
         break;
       case 'bid_accepted':
-        // Invalidate all queries that might show the auction
+        // For bid acceptance, invalidate everything to ensure all data is fresh
+        console.log('Bid accepted WebSocket event received - refreshing all data');
+        
+        // Invalidate specific auction data
+        queryClient.invalidateQueries({ queryKey: [`/api/auctions/${message.data.auctionId}`] });
+        
+        // Invalidate all auction-related queries
         queryClient.invalidateQueries({ queryKey: ['/api/auctions'] });
         queryClient.invalidateQueries({ queryKey: ['/api/auctions/bids'] });
-        queryClient.invalidateQueries({ queryKey: [`/api/auctions/${message.data.auctionId}`] });
+        queryClient.invalidateQueries({ queryKey: ['/api/auctions/dealer'] });
+        
+        // Invalidate dashboard and notifications
         queryClient.invalidateQueries({ queryKey: ['/api/dashboard'] });
+        queryClient.invalidateQueries({ queryKey: ['/api/dashboard/stats'] });
         queryClient.invalidateQueries({ queryKey: ['/api/notifications'] });
+        queryClient.invalidateQueries({ queryKey: ['/api/activity'] });
+        
+        // Force a complete refetch of all auction data with this flag - this is more aggressive
+        setTimeout(() => {
+          window.dispatchEvent(new CustomEvent('force-data-refresh'));
+        }, 500);
         break;
       case 'auction_completed':
         queryClient.invalidateQueries({ queryKey: [`/api/auctions/${message.data.auctionId}`] });
