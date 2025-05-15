@@ -192,7 +192,7 @@ export default function DealerDashboard() {
   
   // Past listings should include completed auctions and collections that have been confirmed
   // from both listings created by the user and auctions they've bid on and won
-  const pastListings = allAuctionsToCheck.filter(a => {
+  const completedDeals = allAuctionsToCheck.filter(a => {
     // Include any completed auctions or where collection is confirmed
     const isCompleted = a.status === 'completed' || a.collectionConfirmed === true;
     
@@ -303,7 +303,7 @@ export default function DealerDashboard() {
   }
   
   // Filter completed deals - count as completed if the user either created it or won it
-  const completedDeals = allAuctionsForStats.filter(a => {
+  const completedDealsForStats = allAuctionsForStats.filter(a => {
     const isCompleted = a.status === 'completed';
     const userIsWinner = a.winningBidderId === user?.id; 
     const userIsSeller = a.dealerId === user?.id;
@@ -312,7 +312,7 @@ export default function DealerDashboard() {
     return isCompleted && (userIsSeller || userIsWinner);
   });
   
-  console.log("Completed deals for stat card:", completedDeals.map(a => ({
+  console.log("Completed deals for stat card:", completedDealsForStats.map(a => ({
     id: a.id, 
     isWinner: a.winningBidderId === user?.id,
     isSeller: a.dealerId === user?.id
@@ -412,7 +412,7 @@ export default function DealerDashboard() {
                 <div onClick={() => setActiveTab("completed-deals")}>
                   <StatCard 
                     title="Completed Deals" 
-                    value={statsLoading || auctionsLoading ? "Loading..." : completedDeals.length}
+                    value={statsLoading || auctionsLoading ? "Loading..." : completedDealsForStats.length}
                     icon={<CheckCircle className="h-6 w-6 text-white" />}
                     bgColor="bg-green-500"
                     className="cursor-pointer transition-transform hover:translate-y-[-5px]"
@@ -635,14 +635,14 @@ export default function DealerDashboard() {
                       </div>
                     ))}
                   </div>
-                ) : pastListings.length === 0 ? (
+                ) : completedDeals.length === 0 ? (
                   <div className="text-center py-12 border rounded-lg">
                     <Clock className="h-12 w-12 mx-auto text-muted-foreground/50 mb-4" />
                     <h3 className="text-lg font-medium mb-2">You don't have any completed deals.</h3>
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {pastListings.map(auction => (
+                    {completedDeals.map(auction => (
                       <AuctionCard 
                         key={auction.id}
                         auction={auction}
