@@ -7,21 +7,28 @@ async function checkMikesAuctions() {
   try {
     // First, list all users to find Mike
     console.log('\n--- ALL USERS IN SYSTEM ---');
-    const allUsers = Array.from(storage.getAllUsers().values());
+    const users = storage.getAllUsers();
+    console.log(`Found ${users.size} users in the system`);
     
-    allUsers.forEach(user => {
+    // Convert the map to array for easier iteration
+    const allUsers = Array.from(users.values());
+    
+    console.log(`User count: ${allUsers.length}`);
+    
+    for (const user of allUsers) {
       console.log(`User ${user.id}: ${user.username} (${user.role})`);
-    });
+    }
     
     // Try different possible Mike usernames
     const possibleMikeUsernames = ['miketrader', 'mike', 'MikeTrader', 'Mike', 'trader5'];
     let mike = null;
     
+    // First look for a trader explicitly named Mike
     for (const username of possibleMikeUsernames) {
-      console.log(`Looking for user with case-insensitive username: ${username}`);
-      mike = await storage.getUserByUsername(username);
+      console.log(`Looking for user with username: ${username}`);
+      mike = allUsers.find(u => u.username && u.username.toLowerCase() === username.toLowerCase());
       if (mike) {
-        console.log(`✅ Found mike user with username: ${username}`);
+        console.log(`✅ Found mike user with username: ${mike.username}`);
         break;
       } else {
         console.log(`No user found with username: ${username}`);

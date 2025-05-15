@@ -66,6 +66,9 @@ export interface IStorage {
   getNotificationsByUserId(userId: number): Promise<Notification[]>;
   markNotificationAsRead(id: number): Promise<Notification | undefined>;
   
+  // Data management methods
+  resetIds(): void;
+  
   // Helper methods
   comparePasswords(supplied: string, stored: string): Promise<boolean>;
   
