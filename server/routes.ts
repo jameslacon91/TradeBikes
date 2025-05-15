@@ -675,9 +675,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Not authorized to confirm collection for this auction" });
       }
       
+      // Update auction status to completed
       const updatedAuction = await storage.updateAuction(auctionId, {
-        collectionConfirmed: true
+        collectionConfirmed: true,
+        status: 'completed'
       });
+      
+      // Update the motorcycle status to sold
+      const motorcycle = await storage.getMotorcycle(auction.motorcycleId);
+      if (motorcycle) {
+        console.log(`Updating motorcycle ${motorcycle.id} status to sold during collection confirmation`);
+        await storage.updateMotorcycle(motorcycle.id, {
+          status: 'sold',
+          soldDate: new Date().toISOString()
+        });
+      }
 
       // Send notification via WebSocket to the seller
       const wsMessage: WSMessage = {
@@ -686,12 +698,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
           auctionId: auctionId,
           motorcycleId: auction.motorcycleId,
           sellerId: auction.dealerId,
-          bidderId: req.user.id
+          bidderId: req.user.id,
+          auction: {
+            id: updatedAuction.id,
+            status: 'completed',
+            collectionConfirmed: true
+          },
+          motorcycle: {
+            id: motorcycle?.id,
+            status: 'sold'
+          }
         },
         timestamp: Date.now()
       };
       
+      // Send to both seller and winning bidder to ensure both UIs are updated
       sendToUser(auction.dealerId, wsMessage);
+      sendToUser(auction.winningBidderId, wsMessage);
+      
+      // Also broadcast to other dealers to refresh their data
+      broadcast({
+        type: "auction_status_changed",
+        data: {
+          auctionId: auctionId,
+          newStatus: 'completed',
+          motorcycle: {
+            id: motorcycle?.id,
+            status: 'sold'
+          }
+        },
+        timestamp: Date.now()
+      });
       
       // Create a notification record
       await storage.createNotification({
