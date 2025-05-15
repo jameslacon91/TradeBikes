@@ -3,6 +3,7 @@ import { useToast } from './use-toast';
 import { Bell, AlertCircle, Tag, ShoppingCart, Clock } from 'lucide-react';
 import { useWebSocket } from './use-websocket';
 import { WSMessage } from '@shared/types';
+import { queryClient } from '@/lib/queryClient';
 
 // Types for notifications
 interface Notification {

@@ -297,6 +297,8 @@ export class MemStorage implements IStorage {
       dateAvailable: 'Immediate',
       regNumber: 'LP21 KFG',
       auctionDuration: '1day',
+      status: 'pending_collection', // Change status to pending_collection for MikeTrader to see
+      soldDate: new Date().toISOString(), // Add sold date
       images: [
         'https://images.unsplash.com/photo-1568772585407-9361f9bf3a87'
       ],
@@ -485,19 +487,20 @@ export class MemStorage implements IStorage {
       id: this.auctionId++,
       motorcycleId: motorcycle1.id,
       dealerId: dealer1.id,
-      startTime: new Date(now.getTime() - oneHour * 5), // 5 hours ago
-      endTime: oneDayFromNow,
-      status: 'active',
-      winningBidId: null,
-      winningBidderId: null,
-      bidAccepted: false,
-      dealConfirmed: false,
+      startTime: new Date(now.getTime() - oneHour * 12), // 12 hours ago
+      endTime: new Date(now.getTime() - oneHour * 3), // 3 hours ago (auction ended)
+      status: 'deal_confirmed',
+      winningBidId: 1, // Bid ID 1
+      winningBidderId: trader1.id, // MikeTrader
+      bidAccepted: true,
+      dealConfirmed: true,
       collectionConfirmed: false,
-      collectionDate: null,
-      highestBidderId: null,
+      collectionDate: new Date(now.getTime() + oneDay * 2).toISOString(), // 2 days from now
+      highestBidderId: trader1.id, // MikeTrader
       visibilityType: 'all',
       visibilityRadius: null,
-      createdAt: new Date(now.getTime() - oneHour * 5)
+      createdAt: new Date(now.getTime() - oneHour * 12),
+      completedAt: new Date(now.getTime() - oneHour * 3).toISOString()
     };
     this.auctions.set(auction1.id, auction1);
     
