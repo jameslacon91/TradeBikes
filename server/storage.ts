@@ -491,12 +491,12 @@ export class MemStorage implements IStorage {
       endTime: new Date(now.getTime() - oneHour * 3), // 3 hours ago (auction ended)
       status: 'deal_confirmed',
       winningBidId: 1, // Bid ID 1
-      winningBidderId: trader1.id, // MikeTrader
+      winningBidderId: 4, // MikeTrader is ID 4
       bidAccepted: true,
       dealConfirmed: true,
       collectionConfirmed: false,
       collectionDate: new Date(now.getTime() + oneDay * 2).toISOString(), // 2 days from now
-      highestBidderId: trader1.id, // MikeTrader
+      highestBidderId: 4, // MikeTrader is ID 4
       visibilityType: 'all',
       visibilityRadius: null,
       createdAt: new Date(now.getTime() - oneHour * 12),
