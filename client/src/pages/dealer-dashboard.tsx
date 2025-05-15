@@ -114,7 +114,7 @@ export default function DealerDashboard() {
   const { data: activeAuctions, isLoading: auctionsLoading } = useQuery<AuctionWithDetails[]>({
     queryKey: ['/api/auctions/dealer', user?.id],
     enabled: (activeTab === 'active-listings' || activeTab === 'dashboard' || activeTab === 'pending-completion' || 
-              activeTab === 'past-listings' || activeTab === 'placed-bids') && !!user,
+              activeTab === 'completed-deals' || activeTab === 'placed-bids') && !!user,
     staleTime: 0 // Always refetch when query key changes
   });
   
@@ -615,11 +615,11 @@ export default function DealerDashboard() {
               </div>
             </TabsContent>
             
-            {/* Past Listings Tab */}
-            <TabsContent value="past-listings" className="space-y-6">
+            {/* Completed Deals Tab */}
+            <TabsContent value="completed-deals" className="space-y-6">
               <div className="space-y-4">
-                <h2 className="text-xl font-semibold">Past Listings</h2>
-                <p className="text-muted-foreground">View your completed listings.</p>
+                <h2 className="text-xl font-semibold">Completed Deals</h2>
+                <p className="text-muted-foreground">View your completed motorcycle deals.</p>
                 
                 {auctionsLoading ? (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -638,7 +638,7 @@ export default function DealerDashboard() {
                 ) : pastListings.length === 0 ? (
                   <div className="text-center py-12 border rounded-lg">
                     <Clock className="h-12 w-12 mx-auto text-muted-foreground/50 mb-4" />
-                    <h3 className="text-lg font-medium mb-2">You don't have any completed listings.</h3>
+                    <h3 className="text-lg font-medium mb-2">You don't have any completed deals.</h3>
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
