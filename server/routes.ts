@@ -286,7 +286,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Messages
   app.post("/api/messages", isAuthenticated, async (req, res, next) => {
     try {
-      const validationResult = insertMessageSchema.safeParse(req.body);
+      // Create a merged object with the sender ID from the authenticated user
+      const messageData = {
+        ...req.body,
+        senderId: req.user!.id // Use the non-null assertion operator
+      };
+      
+      const validationResult = insertMessageSchema.safeParse(messageData);
       if (!validationResult.success) {
         return res.status(400).json({ message: "Invalid message data", errors: validationResult.error.format() });
       }
@@ -295,7 +301,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Create message
       const message = await storage.createMessage({
-        senderId: req.user.id,
+        senderId: req.user!.id,
         receiverId: receiverId,
         content: content,
         auctionId: auctionId || null
@@ -305,7 +311,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const wsMessage: WSMessage = {
         type: "new_message",
         data: { 
-          senderId: req.user.id, 
+          senderId: req.user!.id, 
           receiverId,
           content,
           auctionId,
