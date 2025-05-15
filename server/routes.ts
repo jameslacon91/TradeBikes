@@ -469,12 +469,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
           availabilityDate: motorcycle?.dateAvailable || null,
           make: motorcycle?.make || '',
           model: motorcycle?.model || '',
-          year: motorcycle?.year || 0
+          year: motorcycle?.year || 0,
+          status: "pending_collection" // Include status in message data
         },
         timestamp: Date.now()
       };
       
+      // Send WebSocket notification to both seller and winning bidder
       sendToUser(bid.dealerId, wsMessage);
+      
+      // Also send the same notification to other bidders to refresh their data
+      broadcast(wsMessage, bid.dealerId);
       
       // Create a notification record with availability info
       const availabilityInfo = motorcycle?.dateAvailable 
