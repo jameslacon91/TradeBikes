@@ -2,22 +2,18 @@ import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import cors from "cors";
+import { corsConfig } from "./deployment-config";
 
-// DEPLOYMENT_VERSION: May 15, 2025 - 12:15 PM - Latest version with WebSocket improvements and motorcycle status transitions
+// DEPLOYMENT_VERSION: May 15, 2025 - 7:30 PM - Latest version with centralized deployment configuration
 
 const app = express();
 
-// Configure CORS for cross-site requests
+// Configure CORS for cross-site requests using centralized config
 // Must come before any other middleware that might set headers
 app.use(cors({
   origin: function(origin, callback) {
-    // In deployment, we need to specifically allow the replit.app domain and our development domain
-    const allowedOrigins = [
-      'https://trade-bikes-jameslacon1.replit.app',
-      'https://trade-bikes.jameslacon1.repl.co',
-      'http://localhost:5000',
-      'http://127.0.0.1:5000'
-    ];
+    // Using the list from our centralized configuration
+    const allowedOrigins = corsConfig.allowedOrigins;
     
     // If no origin (like a direct request) or our origin is in the allowed list, allow it
     const originToCheck = origin || 'same-origin';
@@ -31,10 +27,10 @@ app.use(cors({
     // Once debug is complete, switch to this line to enforce origin rules:
     // callback(allowed ? null : new Error('Not allowed by CORS'), allowed);
   },
-  credentials: true, // Allow cookies to be sent
-  exposedHeaders: ['set-cookie'],
-  optionsSuccessStatus: 200, // For legacy browser support
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+  credentials: corsConfig.credentials, // Allow cookies to be sent
+  exposedHeaders: corsConfig.exposedHeaders,
+  optionsSuccessStatus: corsConfig.optionsSuccessStatus, // For legacy browser support
+  methods: corsConfig.methods,
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'X-XSRF-TOKEN']
 }));
 

@@ -13,7 +13,7 @@ export const cookieConfig = {
     httpOnly: true,
     maxAge: 24 * 60 * 60 * 1000, // 24 hours
     path: '/',
-    sameSite: isProduction ? 'none' : 'lax',
+    sameSite: isProduction ? 'none' as const : 'lax' as const,
     secure: isProduction // true in production, false in development
   },
   
@@ -22,7 +22,7 @@ export const cookieConfig = {
     httpOnly: false, // Readable by JavaScript
     maxAge: 24 * 60 * 60 * 1000, // 24 hours
     path: '/',
-    sameSite: isProduction ? 'none' : 'lax',
+    sameSite: isProduction ? 'none' as const : 'lax' as const,
     secure: isProduction // true in production, false in development
   }
 };

@@ -72,8 +72,9 @@ export function setupAuth(app: Express) {
   app.use((req, res, next) => {
     res.cookie('XSRF-TOKEN', crypto.randomUUID(), {
       httpOnly: false, // Must be readable by JavaScript
-      sameSite: 'lax',
-      secure: false // Set to true in production with HTTPS
+      sameSite: isProduction ? 'none' : 'lax',
+      secure: isProduction,
+      path: '/'
     });
     next();
   });
@@ -187,14 +188,7 @@ export function setupAuth(app: Express) {
         debugSession(req);
         
         // Set a cookie header to help with cross-domain issues
-        // Using the same cookie settings as the session for consistency
-        res.cookie('loggedIn', 'true', {
-          httpOnly: false, // Readable by browser
-          maxAge: 24 * 60 * 60 * 1000, // 24 hours
-          sameSite: cookieSettings.sameSite,
-          secure: cookieSettings.secure,
-          path: '/'
-        });
+        res.cookie('loggedIn', 'true', cookieConfig.browser);
         
         res.status(201).json(userData);
       });
@@ -239,14 +233,7 @@ export function setupAuth(app: Express) {
         };
         
         // Set a cookie header to help with cross-domain issues
-        // Using the same cookie settings as the session for consistency
-        res.cookie('loggedIn', 'true', {
-          httpOnly: false, // Readable by browser
-          maxAge: 24 * 60 * 60 * 1000, // 24 hours
-          sameSite: cookieSettings.sameSite,
-          secure: cookieSettings.secure,
-          path: '/'
-        });
+        res.cookie('loggedIn', 'true', cookieConfig.browser);
         
         return res.status(200).json(userData);
       });
