@@ -142,11 +142,17 @@ export default function DealerDashboard() {
   });
   
   // Filter to only show active bids that haven't been accepted yet
-  const placedBids = biddedAuctions.filter(auction => 
-    auction.status !== 'pending_collection' &&
-    !auction.bidAccepted &&
-    auction.winningBidderId !== user?.id
-  );
+  console.log('Filtering placed bids from these auctions:', biddedAuctions);
+  
+  const placedBids = biddedAuctions.filter(auction => {
+    const isPendingCollection = auction.status === 'pending_collection' || auction.bidAccepted;
+    const isWinningBidder = auction.winningBidderId === user?.id;
+    
+    console.log(`Auction ${auction.id} - isPendingCollection: ${isPendingCollection}, isWinningBidder: ${isWinningBidder}, status: ${auction.status}, bidAccepted: ${auction.bidAccepted}`);
+    
+    // Include in "Placed Bids" only if NOT pending collection OR user is not winning bidder
+    return !isPendingCollection || !isWinningBidder;
+  });
   
   // Calculate total bid amount for the user
   const totalBidAmount = biddedAuctions.reduce((total, auction) => {
@@ -171,21 +177,26 @@ export default function DealerDashboard() {
   // Get pending collection auctions (for both sellers and buyers)
   let pendingCollection: AuctionWithDetails[] = [];
   
-  if (activeAuctions) {
+  if (biddedAuctions) {
     // First filter for pending collections and accepted bids (but exclude those that have been marked as completed)
-    const filteredAuctions = activeAuctions.filter(auction => {
+    const filteredAuctions = biddedAuctions.filter(auction => {
       console.log(`Checking auction ${auction.id} - status: ${auction.status}, bidAccepted: ${auction.bidAccepted}, collectionConfirmed: ${auction.collectionConfirmed}, dealerId: ${auction.dealerId}, winningBidderId: ${auction.winningBidderId}, currentUser: ${user?.id}`);
       
       // Include auctions that are explicitly in "pending_collection" status OR have bidAccepted=true 
-      const isPendingCollection = auction.status === 'pending_collection' || auction.bidAccepted;
+      const isPendingCollection = auction.status === 'pending_collection' || auction.bidAccepted === true;
       
       // Collection is not yet confirmed
-      const notCollected = !auction.collectionConfirmed;
+      const notCollected = auction.collectionConfirmed !== true;
       
-      // User is either the seller or the winning bidder
-      const userInvolved = auction.dealerId === user?.id || auction.winningBidderId === user?.id;
+      // User must be the winning bidder
+      const isWinningBidder = auction.winningBidderId === user?.id;
       
-      return isPendingCollection && notCollected && userInvolved;
+      // Only include auctions in "pending collection" section if current user is the winning bidder
+      const shouldInclude = isPendingCollection && notCollected && isWinningBidder;
+      
+      console.log(`Auction ${auction.id} - Including in pending collection? ${shouldInclude}`);
+      
+      return shouldInclude;
     });
     
     // Then sort by availability date
