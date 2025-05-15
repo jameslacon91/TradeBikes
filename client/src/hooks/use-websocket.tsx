@@ -34,52 +34,73 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
     if (!isBrowser) return; // Return early if not in browser
     
     let ws: WebSocket | null = null;
+    let reconnectAttempts = 0;
+    const maxReconnectAttempts = 5;
     
-    try {
-      const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-      const wsUrl = `${protocol}//${window.location.host}/ws`;
-      ws = new WebSocket(wsUrl);
-
-      // Connection opened
-      ws.addEventListener('open', () => {
-        console.log('WebSocket connection established');
-        setConnected(true);
+    function initWebSocket() {
+      try {
+        console.log('Initializing WebSocket connection...');
+        reconnectAttempts++;
         
-        // If user is already authenticated, register them
-        if (userId && ws && ws.readyState === WebSocket.OPEN) {
-          ws.send(JSON.stringify({
-            type: 'register',
-            data: { userId },
-            timestamp: Date.now()
-          }));
-        }
-      });
+        const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+        const wsUrl = `${protocol}//${window.location.host}/ws`;
+        console.log(`WebSocket URL: ${wsUrl}, attempt: ${reconnectAttempts}`);
+        
+        ws = new WebSocket(wsUrl);
 
-      // Connection closed
-      ws.addEventListener('close', () => {
-        console.log('WebSocket connection closed');
-        setConnected(false);
-      });
+        // Connection opened
+        ws.addEventListener('open', () => {
+          console.log('WebSocket connection established');
+          setConnected(true);
+          
+          // If user is already authenticated, register them
+          if (userId && ws && ws.readyState === WebSocket.OPEN) {
+            ws.send(JSON.stringify({
+              type: 'register',
+              data: { userId },
+              timestamp: Date.now()
+            }));
+          }
+        });
 
-      // Listen for messages
-      ws.addEventListener('message', (event) => {
-        try {
-          const message = JSON.parse(event.data) as WSMessage;
-          processWebSocketMessage(message);
-        } catch (error) {
-          console.error('Error parsing WebSocket message:', error);
-        }
-      });
+        // Connection closed
+        ws.addEventListener('close', (event) => {
+          console.log(`WebSocket connection closed: Code=${event.code}, Reason=${event.reason || 'Unknown'}, Clean=${event.wasClean}`);
+          setConnected(false);
+          
+          // Attempt to reconnect if not clean close
+          if (!event.wasClean && reconnectAttempts < maxReconnectAttempts) {
+            console.log('Attempting to reconnect WebSocket in 3 seconds...');
+            setTimeout(() => {
+              initWebSocket();
+            }, 3000);
+          }
+        });
 
-      // Error handler
-      ws.addEventListener('error', (error) => {
-        console.error('WebSocket error:', error);
-      });
+        // Listen for messages
+        ws.addEventListener('message', (event) => {
+          try {
+            console.log('WebSocket message received:', event.data);
+            const message = JSON.parse(event.data) as WSMessage;
+            processWebSocketMessage(message);
+          } catch (error) {
+            console.error('Error parsing WebSocket message:', error);
+          }
+        });
 
-      setSocket(ws);
-    } catch (error) {
-      console.error('Error establishing WebSocket connection:', error);
+        // Error handler
+        ws.addEventListener('error', (error) => {
+          console.error('WebSocket error:', error);
+        });
+
+        setSocket(ws);
+      } catch (error) {
+        console.error('Error establishing WebSocket connection:', error);
+      }
     }
+    
+    // Initialize WebSocket connection
+    initWebSocket();
 
     // Cleanup on unmount
     return () => {

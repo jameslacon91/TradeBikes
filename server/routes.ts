@@ -448,10 +448,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
+      // Update auction status to pending_collection
       const updatedAuction = await storage.updateAuction(auctionId, {
         bidAccepted: true,
         winningBidId: bidId,
         winningBidderId: bid.dealerId,
+        status: "pending_collection"
+      });
+      
+      // Also update the motorcycle status to "pending_collection"
+      await storage.updateMotorcycle(auction.motorcycleId, {
         status: "pending_collection"
       });
 

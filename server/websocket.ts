@@ -9,18 +9,49 @@ const clients = new Map<number, WebSocket>();
 export function setupWebSocket(server: Server) {
   const wss = new WebSocketServer({ server, path: '/ws' });
   
+  // Add isAlive property to WebSocket
+  function heartbeat(this: WebSocket) {
+    (this as any).isAlive = true;
+  }
+  
+  // Set up interval for checking connections
+  const interval = setInterval(() => {
+    console.log(`Checking WebSocket connections (active: ${clients.size})`);
+    wss.clients.forEach((ws) => {
+      if ((ws as any).isAlive === false) {
+        console.log("Terminating inactive WebSocket connection");
+        return ws.terminate();
+      }
+      
+      (ws as any).isAlive = false;
+      ws.ping();
+    });
+  }, 30000); // Check every 30 seconds
+  
+  // Clean up interval on close
+  wss.on('close', () => {
+    clearInterval(interval);
+  });
+  
   wss.on('connection', (ws, req) => {
     console.log('WebSocket connection established');
+    
+    // Mark connection as alive
+    (ws as any).isAlive = true;
+    ws.on('pong', heartbeat);
     
     // Handle incoming messages
     ws.on('message', async (message) => {
       try {
         const data = JSON.parse(message.toString()) as WSMessage;
+        console.log('Received WebSocket message:', data.type);
+        
         const userId = data.data?.userId;
         
         // Store connection if user ID is provided
         if (userId) {
           clients.set(userId, ws);
+          console.log(`User ${userId} connection stored`);
         }
         
         // Process message based on type
@@ -30,7 +61,22 @@ export function setupWebSocket(server: Server) {
             if (data.data?.userId) {
               clients.set(data.data.userId, ws);
               console.log(`User ${data.data.userId} registered with WebSocket`);
+              
+              // Send a confirmation message back
+              ws.send(JSON.stringify({
+                type: 'register_confirmed',
+                data: { userId: data.data.userId },
+                timestamp: Date.now()
+              }));
             }
+            break;
+          case 'ping':
+            // Handle ping requests with a pong response
+            ws.send(JSON.stringify({
+              type: 'pong',
+              data: {},
+              timestamp: Date.now()
+            }));
             break;
           case 'new_bid':
             await handleNewBid(data);
@@ -68,15 +114,21 @@ export function setupWebSocket(server: Server) {
       }
     });
     
+    // Handle errors
+    ws.on('error', (error) => {
+      console.error('WebSocket error:', error);
+    });
+    
     // Handle disconnection
-    ws.on('close', () => {
+    ws.on('close', (code, reason) => {
       // Remove client from map
       Array.from(clients.entries()).forEach(([userId, client]) => {
         if (client === ws) {
           clients.delete(userId);
+          console.log(`User ${userId} disconnected from WebSocket`);
         }
       });
-      console.log('WebSocket connection closed');
+      console.log(`WebSocket connection closed: code=${code}, reason=${reason || 'unknown'}`);
     });
   });
   
@@ -342,8 +394,32 @@ async function handleBidAccepted(message: WSMessage) {
   const { auctionId, dealerId, bidderId } = message.data;
   
   try {
+    console.log(`Processing bid acceptance for auction ${auctionId}, from dealer ${dealerId} to bidder ${bidderId}`);
+    
     const auction = await storage.getAuctionWithDetails(auctionId);
-    if (!auction) return;
+    if (!auction) {
+      console.error(`Cannot find auction with ID ${auctionId} for bid acceptance`);
+      return;
+    }
+    
+    // Update motorcycle status to pending collection
+    const updatedMotorcycle = await storage.updateMotorcycle(auction.motorcycle.id, {
+      status: 'pending_collection'
+    });
+    
+    if (!updatedMotorcycle) {
+      console.error(`Failed to update motorcycle ${auction.motorcycle.id} status for bid acceptance`);
+    } else {
+      console.log(`Updated motorcycle ${auction.motorcycle.id} status to 'pending_collection'`);
+    }
+    
+    // Update auction status to pending collection if not already
+    if (auction.status !== 'pending_collection') {
+      await storage.updateAuction(auctionId, {
+        status: 'pending_collection'
+      });
+      console.log(`Updated auction ${auctionId} status to 'pending_collection'`);
+    }
     
     // Notify the bidder
     await storage.createNotification({
@@ -353,6 +429,7 @@ async function handleBidAccepted(message: WSMessage) {
       relatedId: auctionId
     });
 
+    // Send WebSocket notification to bidder
     sendToUser(bidderId, {
       type: 'bid_accepted',
       data: {
@@ -363,6 +440,34 @@ async function handleBidAccepted(message: WSMessage) {
       },
       timestamp: Date.now()
     });
+    
+    // Also notify the dealer (seller) to ensure their UI updates
+    sendToUser(dealerId, {
+      type: 'bid_accepted_confirm',
+      data: {
+        auctionId,
+        bidderId,
+        motorcycle: auction.motorcycle,
+        amount: auction.currentBid
+      },
+      timestamp: Date.now()
+    });
+    
+    // Broadcast status change to all users
+    broadcast({
+      type: 'auction_status_changed',
+      data: {
+        auctionId,
+        newStatus: 'pending_collection',
+        motorcycle: {
+          id: auction.motorcycle.id,
+          status: 'pending_collection'
+        }
+      },
+      timestamp: Date.now()
+    });
+    
+    console.log(`Bid acceptance processed successfully for auction ${auctionId}`);
   } catch (error) {
     console.error('Error handling bid accepted:', error);
   }

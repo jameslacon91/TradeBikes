@@ -39,22 +39,37 @@ export interface DashboardStats {
 
 // WebSocket message types
 export type WSMessageType = 
+  // Connection & system messages
   'register' |
+  'register_confirmed' |
+  'ping' |
+  'pong' |
+  
+  // Bid-related messages
   'new_bid' | 
   'bid_placed' |
+  'bid_accepted' | 
+  'bid_accepted_confirm' |
+  
+  // Auction/Underwrite messages
   'auction_ending' | 
   'auction_completed' | 
   'underwrite_completed' |
-  'new_message' | 
   'auction_created' |
   'auction_updated' |
   'underwrite_created' |
-  'bid_accepted' | 
+  'auction_status_changed' |
+  
+  // Transaction flow messages
   'deal_confirmed' | 
   'collection_scheduled' |
   'collection_confirmed' |
   'date_extended' |
-  'refresh_stats';
+  
+  // Communication & notifications
+  'new_message' |
+  'refresh_stats' |
+  'force_data_refresh';
 
 export interface WSMessage {
   type: WSMessageType;

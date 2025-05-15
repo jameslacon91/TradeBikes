@@ -173,11 +173,20 @@ export default function DealerDashboard() {
   
   if (activeAuctions) {
     // First filter for pending collections and accepted bids (but exclude those that have been marked as completed)
-    const filteredAuctions = activeAuctions.filter(auction => 
-      (auction.status === 'pending_collection' || auction.bidAccepted) && 
-      !auction.collectionConfirmed && // Exclude completed collections
-      (auction.dealerId === user?.id || auction.winningBidderId === user?.id)
-    );
+    const filteredAuctions = activeAuctions.filter(auction => {
+      console.log(`Checking auction ${auction.id} - status: ${auction.status}, bidAccepted: ${auction.bidAccepted}, collectionConfirmed: ${auction.collectionConfirmed}, dealerId: ${auction.dealerId}, winningBidderId: ${auction.winningBidderId}, currentUser: ${user?.id}`);
+      
+      // Include auctions that are explicitly in "pending_collection" status OR have bidAccepted=true 
+      const isPendingCollection = auction.status === 'pending_collection' || auction.bidAccepted;
+      
+      // Collection is not yet confirmed
+      const notCollected = !auction.collectionConfirmed;
+      
+      // User is either the seller or the winning bidder
+      const userInvolved = auction.dealerId === user?.id || auction.winningBidderId === user?.id;
+      
+      return isPendingCollection && notCollected && userInvolved;
+    });
     
     // Then sort by availability date
     pendingCollection = filteredAuctions.sort((a, b) => {
