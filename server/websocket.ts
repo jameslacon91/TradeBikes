@@ -7,16 +7,36 @@ import { WSMessage } from '@shared/types';
 const clients = new Map<number, WebSocket>();
 
 export function setupWebSocket(server: Server) {
-  const wss = new WebSocketServer({ server, path: '/ws' });
+  // Configure WebSocket server with more tolerant settings
+  const wss = new WebSocketServer({ 
+    server, 
+    path: '/ws',
+    clientTracking: true,
+    perMessageDeflate: {
+      zlibDeflateOptions: {
+        chunkSize: 1024,
+        memLevel: 7,
+        level: 3
+      },
+      zlibInflateOptions: {
+        chunkSize: 10 * 1024
+      },
+      serverNoContextTakeover: true,
+      clientNoContextTakeover: true,
+      concurrencyLimit: 10,
+      threshold: 1024
+    }
+  });
   
   // Add isAlive property to WebSocket
   function heartbeat(this: WebSocket) {
+    console.log('WebSocket heartbeat received');
     (this as any).isAlive = true;
   }
   
   // Set up interval for checking connections
   const interval = setInterval(() => {
-    console.log(`Checking WebSocket connections (active: ${clients.size})`);
+    console.log(`Checking WebSocket connections (active: ${clients.size}, total: ${wss.clients.size})`);
     wss.clients.forEach((ws) => {
       if ((ws as any).isAlive === false) {
         console.log("Terminating inactive WebSocket connection");
@@ -24,9 +44,9 @@ export function setupWebSocket(server: Server) {
       }
       
       (ws as any).isAlive = false;
-      ws.ping();
+      ws.ping(() => {}); // Add empty callback to prevent errors
     });
-  }, 30000); // Check every 30 seconds
+  }, 20000); // Check more frequently
   
   // Clean up interval on close
   wss.on('close', () => {

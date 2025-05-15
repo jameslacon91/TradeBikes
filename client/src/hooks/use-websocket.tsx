@@ -39,19 +39,52 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
     
     function initWebSocket() {
       try {
+        // Reset previous connection if it exists
+        if (ws) {
+          try {
+            ws.close();
+          } catch (e) {
+            console.error('Error closing previous WebSocket connection:', e);
+          }
+        }
+        
         console.log('Initializing WebSocket connection...');
         reconnectAttempts++;
         
-        const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-        const wsUrl = `${protocol}//${window.location.host}/ws`;
+        // Build the WebSocket URL, ensuring it works in both development and production
+        let wsUrl = '';
+        
+        try {
+          const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+          wsUrl = `${protocol}//${window.location.host}/ws`;
+        } catch (e) {
+          // Fallback URL in case of errors
+          wsUrl = 'ws://localhost:5000/ws';
+          console.warn('Error creating WebSocket URL, using fallback:', e);
+        }
+        
         console.log(`WebSocket URL: ${wsUrl}, attempt: ${reconnectAttempts}`);
         
-        ws = new WebSocket(wsUrl);
+        // Create new WebSocket with error handling
+        try {
+          ws = new WebSocket(wsUrl);
+        } catch (e) {
+          console.error('Error creating WebSocket connection:', e);
+          
+          // Try again after a delay if within retry limit
+          if (reconnectAttempts < maxReconnectAttempts) {
+            setTimeout(() => {
+              initWebSocket();
+            }, 5000);
+          }
+          return;
+        }
 
         // Connection opened
         ws.addEventListener('open', () => {
           console.log('WebSocket connection established');
           setConnected(true);
+          reconnectAttempts = 0; // Reset the counter on successful connection
           
           // If user is already authenticated, register them
           if (userId && ws && ws.readyState === WebSocket.OPEN) {
@@ -68,29 +101,73 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
           console.log(`WebSocket connection closed: Code=${event.code}, Reason=${event.reason || 'Unknown'}, Clean=${event.wasClean}`);
           setConnected(false);
           
-          // Attempt to reconnect if not clean close
-          if (!event.wasClean && reconnectAttempts < maxReconnectAttempts) {
-            console.log('Attempting to reconnect WebSocket in 3 seconds...');
+          // Always attempt to reconnect with exponential backoff
+          if (reconnectAttempts < maxReconnectAttempts) {
+            const delay = Math.min(1000 * Math.pow(2, reconnectAttempts), 10000); // Exponential backoff, max 10 seconds
+            console.log(`Attempting to reconnect WebSocket in ${delay/1000} seconds... (attempt ${reconnectAttempts} of ${maxReconnectAttempts})`);
+            
             setTimeout(() => {
-              initWebSocket();
-            }, 3000);
+              // Check if we should still reconnect
+              if (document.visibilityState !== 'hidden') {
+                console.log('Reconnecting WebSocket...');
+                initWebSocket();
+              } else {
+                console.log('Page not visible, delaying reconnect until page becomes visible');
+                // Set up a one-time visibility change listener
+                const visibilityListener = () => {
+                  if (document.visibilityState === 'visible') {
+                    console.log('Page became visible, reconnecting WebSocket');
+                    document.removeEventListener('visibilitychange', visibilityListener);
+                    initWebSocket();
+                  }
+                };
+                document.addEventListener('visibilitychange', visibilityListener);
+              }
+            }, delay);
+          } else {
+            console.error('Maximum reconnection attempts reached. WebSocket connection failed permanently.');
           }
         });
 
         // Listen for messages
         ws.addEventListener('message', (event) => {
           try {
-            console.log('WebSocket message received:', event.data);
+            // Log the raw data for debugging
+            if (typeof event.data === 'string' && event.data.length > 1000) {
+              console.log('WebSocket message received (large data):', event.data.substring(0, 100) + '... [truncated]');
+            } else {
+              console.log('WebSocket message received:', event.data);
+            }
+            
+            // Parse and process the message
             const message = JSON.parse(event.data) as WSMessage;
+            
+            // Add timestamp if missing
+            if (!message.timestamp) {
+              message.timestamp = Date.now();
+            }
+            
+            // Process the message
             processWebSocketMessage(message);
           } catch (error) {
             console.error('Error parsing WebSocket message:', error);
+            console.error('Raw message data:', typeof event.data === 'string' ? 
+              (event.data.length > 200 ? event.data.substring(0, 200) + '... [truncated]' : event.data) : 
+              'Non-string data');
           }
         });
 
-        // Error handler
+        // Error handler with better logging
         ws.addEventListener('error', (error) => {
           console.error('WebSocket error:', error);
+          
+          // Automatically try to reconnect on error
+          if (reconnectAttempts < maxReconnectAttempts) {
+            setTimeout(() => {
+              console.log('Reconnecting after WebSocket error...');
+              initWebSocket();
+            }, 3000);
+          }
         });
 
         setSocket(ws);

@@ -74,12 +74,13 @@ export function setupAuth(app: Express) {
   const sessionSettings: session.SessionOptions = {
     secret: sessionSecret,
     resave: true, // Changed to true to ensure session is saved on every request
-    saveUninitialized: false, // Set to false for login sessions
+    saveUninitialized: true, // Set to true for better compatibility with browser refreshes
     store: sessionStore,
     cookie: cookieSettings,
     // For Replit deployment, allow sessions without full security in dev
     proxy: true,
-    name: 'tradebikes.sid' // Custom session name to avoid conflicts
+    name: 'tradebikes.sid', // Custom session name to avoid conflicts
+    rolling: true // Extends session lifetime on each request
   };
 
   // Trust proxy is required for secure cookies over HTTPS connections on Replit
@@ -180,9 +181,8 @@ export function setupAuth(app: Express) {
         city,
         postcode,
         // Set default values for new users
-        rating: 0,
-        totalRatings: 0,
         favoriteDealers: []
+        // Note: rating and totalRatings are managed internally by the storage system
       });
       
       console.log(`User created successfully: ${username} (ID: ${user.id})`);
@@ -224,7 +224,7 @@ export function setupAuth(app: Express) {
   app.post("/api/login", (req, res, next) => {
     console.log(`Login attempt for username: ${req.body.username}`);
     
-    passport.authenticate("local", (err, user, info) => {
+    passport.authenticate("local", (err: any, user: Express.User | false, info: { message?: string } = {}) => {
       if (err) {
         console.error("Login authentication error:", err);
         return next(err);
