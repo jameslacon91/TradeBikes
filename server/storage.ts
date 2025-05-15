@@ -1425,7 +1425,7 @@ export class MemStorage implements IStorage {
     
     console.log(`Found ${dealerBids.length} bids from dealer ${dealerId} on ${bidAuctionIds.size} auctions`);
     
-    // Get all auctions where this dealer has placed a bid
+    // Get all auctions from the database
     const allAuctions = Array.from(this.auctions.values());
     
     // First collect all regular bid auctions (where user has placed a bid but may not be the winner)
@@ -1435,12 +1435,20 @@ export class MemStorage implements IStorage {
     for (const auctionId of bidAuctionIds) {
       const auctionDetails = await this.getAuctionWithDetails(auctionId);
       if (auctionDetails) {
+        console.log(`Checking bid auction ${auctionDetails.id} - status: ${auctionDetails.status}, bidAccepted: ${auctionDetails.bidAccepted}, winningBidderId: ${auctionDetails.winningBidderId}`);
+        
         // Only add if this is NOT a pending collection auction that the user has won
         // This prevents counting the same auction in both "Pending Collection" and "Placed Bids"
         if (!(auctionDetails.status === 'pending_collection' && 
-              auctionDetails.bidAccepted && 
+              auctionDetails.bidAccepted === true && 
               auctionDetails.winningBidderId === dealerId)) {
-          regularBidAuctions.push(auctionDetails);
+          
+          // Add it to regular bids only if user has placed bids on it
+          const hasBids = auctionDetails.bids.some(bid => bid.dealerId === dealerId);
+          if (hasBids) {
+            console.log(`Adding auction ${auctionDetails.id} to regular bids list (user ${dealerId} has placed bids)`);
+            regularBidAuctions.push(auctionDetails);
+          }
         }
       }
     }
@@ -1450,11 +1458,10 @@ export class MemStorage implements IStorage {
     
     // Find all auctions where this dealer is the winning bidder AND the bid is accepted
     for (const auction of allAuctions) {
-      if (auction.status === 'pending_collection' && 
-          auction.winningBidderId === dealerId && 
-          auction.bidAccepted) {
+      if ((auction.status === 'pending_collection' || auction.bidAccepted === true) && 
+          auction.winningBidderId === dealerId) {
         
-        console.log(`Found pending collection auction ${auction.id} for dealer ${dealerId}`);
+        console.log(`Found pending collection auction ${auction.id} for dealer ${dealerId} - status: ${auction.status}, bidAccepted: ${auction.bidAccepted}`);
         
         const auctionDetails = await this.getAuctionWithDetails(auction.id);
         if (auctionDetails) {
@@ -1476,6 +1483,7 @@ export class MemStorage implements IStorage {
           // Add to pending collection list
           const alreadyAdded = pendingCollectionAuctions.some(a => a.id === auction.id);
           if (!alreadyAdded) {
+            console.log(`Adding auction ${auctionDetails.id} to pending collection list`);
             pendingCollectionAuctions.push(auctionDetails);
           }
         }
