@@ -518,7 +518,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Fetch updated motorcycle with potential availability date
       const motorcycle = await storage.getMotorcycle(auction.motorcycleId);
       
-      // Send notification via WebSocket to the winning bidder
+      // Send enhanced notification via WebSocket to the winning bidder
+      // With explicit instructions to update motorcycle status in client state
       const wsMessage: WSMessage = {
         type: "bid_accepted",
         data: {
@@ -530,15 +531,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
           make: motorcycle?.make || '',
           model: motorcycle?.model || '',
           year: motorcycle?.year || 0,
+          forceStatusUpdate: true, // Flag to force client-side status update
+          updatePriority: "high", // Indicates critical status update
           auction: {
             id: updatedAuction.id,
-            status: updatedAuction.status,
+            status: "pending_collection", // Explicit status
             bidAccepted: true,
             winningBidId: bidId
           },
           motorcycle: {
             id: motorcycle?.id,
-            status: "pending_collection"
+            status: "pending_collection", // Explicit motorcycle status
+            originalStatus: motorcycle?.status || "unknown",
+            updateRequired: true
+          },
+          // Special field for client-side cache updates
+          statusChange: {
+            entity: "motorcycle",
+            id: motorcycle?.id,
+            newStatus: "pending_collection",
+            entityName: `${motorcycle?.make} ${motorcycle?.model}`
           }
         },
         timestamp: Date.now()
