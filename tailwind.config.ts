@@ -95,17 +95,17 @@ export default {
     themes: [
       {
         tradebikes: {
-          "primary": "#FF6B35",      // Racing orange for energy and speed
-          "primary-focus": "#E94F24", // Darker orange for focus states
+          "primary": "#1D5D9B",      // Deep blue primary
+          "primary-focus": "#154980", // Darker blue for focus states
           "primary-content": "#FFFFFF", // White text on primary
-          "secondary": "#004E89",    // Deep blue, reminiscent of classic motorcycles
-          "secondary-focus": "#003B6B", // Darker blue for focus states
+          "secondary": "#121212",    // Near black for secondary elements
+          "secondary-focus": "#0A0A0A", // Darker black for focus states
           "secondary-content": "#FFFFFF", // White text on secondary
-          "accent": "#F4D160",       // Vibrant yellow for accents/highlights
-          "accent-focus": "#EABB3F",  // Slightly darker yellow for focus
-          "accent-content": "#333333", // Dark text on accent
-          "neutral": "#2A2B2A",       // Dark gray with hint of green (motorcycle frame)
-          "neutral-focus": "#212221", // Darker gray for focus states
+          "accent": "#75C2F6",       // Light blue accent
+          "accent-focus": "#5EB7F4",  // Slightly darker accent for focus
+          "accent-content": "#FFFFFF", // White text on accent
+          "neutral": "#1A1A1A",       // Dark gray/black neutral
+          "neutral-focus": "#121212", // Darker gray for focus states
           "neutral-content": "#FFFFFF", // White text on neutral
           "base-100": "#FFFFFF",      // White for clean, modern feel
           "base-200": "#F2F2F2",      // Very light gray for secondary surfaces
@@ -119,7 +119,7 @@ export default {
           // Custom properties
           "--rounded-box": "0.5rem",   // Border radius for larger elements
           "--rounded-btn": "0.25rem",  // Border radius for buttons
-          "--btn-text-case": "uppercase", // Uppercase text for buttons like motorcycle branding
+          "--btn-text-case": "uppercase", // Uppercase text for buttons
           "--border-btn": "1px",      // Border width for buttons
           "--tab-border": "2px",      // Border width for tabs
           "--tab-radius": "0.5rem",   // Border radius for tabs

@@ -25,10 +25,10 @@
 
 :root {
   /* Brand colors */
-  --color-primary: #FF6B35;          /* Racing orange */
-  --color-primary-dark: #E94F24;
-  --color-secondary: #004E89;        /* Deep blue */
-  --color-dark: #2A2B2A;             /* Dark gray with hint of green */
+  --color-primary: #1D5D9B;          /* Deep blue primary */
+  --color-primary-dark: #154980;
+  --color-secondary: #121212;        /* Near black */
+  --color-dark: #1A1A1A;             /* Dark gray/black */
   --color-light: #ffffff;
   --color-bg: #f3f4f6;               /* Light grey background */
   
@@ -37,9 +37,9 @@
   --transition: 0.25s ease;
   
   /* DaisyUI theme colors */
-  --primary: 16 100% 60%;            /* Racing orange in HSL */
+  --primary: 212 68% 36%;            /* Deep blue in HSL */
   --primary-foreground: 0 0% 100%;
-  --secondary: 207 100% 27%;         /* Deep blue in HSL */
+  --secondary: 0 0% 7%;              /* Near black in HSL */
   --secondary-foreground: 0 0% 100%;
   --background: 220 13% 96%;
   --foreground: 0 0% 10%;
@@ -47,19 +47,19 @@
   --card-foreground: 0 0% 10%;
   --muted: 210 10% 90%;
   --muted-foreground: 215 10% 50%;
-  --accent: 44 82% 67%;              /* Vibrant yellow in HSL */
-  --accent-foreground: 0 0% 20%;
+  --accent: 199 89% 71%;             /* Light blue in HSL */
+  --accent-foreground: 0 0% 100%;
   --border: 210 20% 85%;
   --input: 210 20% 85%;
   --destructive: 0 85% 50%;
   --destructive-foreground: 0 0% 100%;
-  --ring: 16 100% 60%;
+  --ring: 212 68% 36%;
 }
 
 .light {
-  --primary: 16 100% 60%;            /* Racing orange in HSL */
+  --primary: 212 68% 36%;            /* Deep blue in HSL */
   --primary-foreground: 0 0% 100%;
-  --secondary: 207 100% 27%;         /* Deep blue in HSL */
+  --secondary: 0 0% 7%;              /* Near black in HSL */
   --secondary-foreground: 0 0% 100%;
   --background: 220 13% 96%;
   --foreground: 0 0% 10%;
@@ -67,13 +67,13 @@
   --card-foreground: 0 0% 10%;
   --muted: 210 10% 90%;
   --muted-foreground: 215 10% 50%;
-  --accent: 44 82% 67%;              /* Vibrant yellow in HSL */
-  --accent-foreground: 0 0% 20%;
+  --accent: 199 89% 71%;             /* Light blue in HSL */
+  --accent-foreground: 0 0% 100%;
   --border: 210 20% 85%;
   --input: 210 20% 85%;
   --destructive: 0 85% 50%;
   --destructive-foreground: 0 0% 100%;
-  --ring: 16 100% 60%;
+  --ring: 212 68% 36%;
 }
 
 @layer base {
