@@ -86,12 +86,13 @@ export interface AuctionWithDetails extends Auction {
 
 // Memory storage implementation
 export class MemStorage implements IStorage {
-  private users: Map<number, User>;
-  private motorcycles: Map<number, Motorcycle>;
-  private auctions: Map<number, Auction>;
-  private bids: Map<number, Bid>;
-  private messages: Map<number, Message>;
-  private notifications: Map<number, Notification>;
+  // Make maps public so they can be accessed directly by diagnostic scripts
+  public users: Map<number, User>;
+  public motorcycles: Map<number, Motorcycle>;
+  public auctions: Map<number, Auction>;
+  public bids: Map<number, Bid>;
+  public messages: Map<number, Message>;
+  public notifications: Map<number, Notification>;
   
   readonly sessionStore: session.Store;
   
@@ -1449,6 +1450,17 @@ export class MemStorage implements IStorage {
     
     notification.read = true;
     return notification;
+  }
+
+  // Data management methods
+  resetIds(): void {
+    this.userId = 1;
+    this.motorcycleId = 1;
+    this.auctionId = 1;
+    this.bidId = 1;
+    this.messageId = 1;
+    this.notificationId = 1;
+    console.log('All ID counters have been reset to 1');
   }
 
   // Helper methods
