@@ -16,7 +16,7 @@ import { Request, Response, NextFunction } from "express";
 
 // Authentication middleware
 const isAuthenticated = (req: Request, res: Response, next: NextFunction) => {
-  if (req.isAuthenticated()) {
+  if (req.isAuthenticated() && req.user) {
     return next();
   }
   res.status(401).json({ message: "Not authenticated" });
@@ -25,6 +25,10 @@ const isAuthenticated = (req: Request, res: Response, next: NextFunction) => {
 // Role-based authorization middleware
 // Since all users are dealers now, this simply passes through, but is kept for future role differentiation
 const hasRole = (role: string) => (req: Request, res: Response, next: NextFunction) => {
+  if (!req.user) {
+    return res.status(401).json({ message: "Not authenticated" });
+  }
+  
   // All users are dealers in the current implementation
   return next();
   
@@ -102,12 +106,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // This bypasses the Zod schema validation that's causing issues with date types
       const auction = await storage.createAuction({
         motorcycleId: parseInt(req.body.motorcycleId, 10),
-        dealerId: req.user.id,
+        dealerId: req.user!.id, // Assert that user is defined
         startTime: new Date(req.body.startTime),
         endTime: new Date(req.body.endTime),
         visibilityType: req.body.visibilityType || "all",
-        visibilityRadius: req.body.visibilityType === 'radius' ? parseInt(req.body.visibilityRadius, 10) : null,
-        status: "active" // Ensure the status is set to active for it to appear in listings
+        visibilityRadius: req.body.visibilityType === 'radius' ? parseInt(req.body.visibilityRadius, 10) : null
+        // Status is handled by the storage system automatically
       });
       
       console.log("Auction created successfully:", auction);
