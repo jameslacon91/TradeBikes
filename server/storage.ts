@@ -1243,6 +1243,8 @@ export class MemStorage implements IStorage {
   }
   
   async getAuctionsWithBidsByDealer(dealerId: number): Promise<AuctionWithDetails[]> {
+    console.log(`Getting auctions with bids for dealer ${dealerId}`);
+    
     // Get all bids placed by this dealer
     const dealerBids = await this.getBidsByDealerId(dealerId);
     
@@ -1252,20 +1254,43 @@ export class MemStorage implements IStorage {
       auctionIds.add(bid.auctionId);
     }
     
+    console.log(`Found ${dealerBids.length} bids from dealer ${dealerId} on ${auctionIds.size} auctions`);
+    
     // Get detailed auction data for each auction with bids
     const auctions: AuctionWithDetails[] = [];
     
+    // First process auctions where dealer placed bids
     for (const auctionId of auctionIds) {
       const auctionDetails = await this.getAuctionWithDetails(auctionId);
       if (auctionDetails) {
-        // Additionally check if the dealer has won this auction
+        console.log(`Auction ${auctionId} details: status=${auctionDetails.status}, bidAccepted=${auctionDetails.bidAccepted}, winningBidderId=${auctionDetails.winningBidderId}`);
+        
+        // Check if this dealer has won this auction
         if (auctionDetails.winningBidderId === dealerId) {
-          // If the dealer is the winning bidder, ensure we include it regardless of other criteria
-          auctions.push(auctionDetails);
-        } else {
-          // For other auctions where the dealer has placed bids
-          auctions.push(auctionDetails);
+          console.log(`Dealer ${dealerId} is the winning bidder for auction ${auctionId}`);
+          
+          // If bid is accepted, ensure the motorcycle status is consistent
+          if (auctionDetails.bidAccepted) {
+            console.log(`Dealer ${dealerId}'s bid was accepted for auction ${auctionId}`);
+            
+            // Make sure motorcycle status matches auction status
+            const motorcycle = await this.getMotorcycle(auctionDetails.motorcycleId);
+            if (motorcycle && motorcycle.status !== 'pending_collection' && auctionDetails.status === 'pending_collection') {
+              console.log(`Found inconsistency: Motorcycle ${auctionDetails.motorcycleId} has status ${motorcycle.status}, but auction ${auctionId} is pending_collection`);
+              console.log(`Auto-correcting motorcycle ${auctionDetails.motorcycleId} status to pending_collection`);
+              
+              // Auto-correct the motorcycle status
+              await this.updateMotorcycle(auctionDetails.motorcycleId, { 
+                status: 'pending_collection' 
+              });
+              
+              // Update the motorcycle in the auction details to reflect the change
+              auctionDetails.motorcycle.status = 'pending_collection';
+            }
+          }
         }
+        
+        auctions.push(auctionDetails);
       }
     }
     
@@ -1275,14 +1300,34 @@ export class MemStorage implements IStorage {
       if (auction.winningBidderId === dealerId) {
         const auctionAlreadyAdded = auctions.some(a => a.id === auction.id);
         if (!auctionAlreadyAdded) {
+          console.log(`Dealer ${dealerId} is winning bidder on auction ${auction.id}, adding to results`);
           const auctionDetails = await this.getAuctionWithDetails(auction.id);
           if (auctionDetails) {
+            // If bid is accepted, ensure the motorcycle status is consistent
+            if (auctionDetails.bidAccepted) {
+              // Make sure motorcycle status matches auction status
+              const motorcycle = await this.getMotorcycle(auctionDetails.motorcycleId);
+              if (motorcycle && motorcycle.status !== 'pending_collection' && auctionDetails.status === 'pending_collection') {
+                console.log(`Found inconsistency: Motorcycle ${auctionDetails.motorcycleId} has status ${motorcycle.status}, but auction ${auction.id} is pending_collection`);
+                console.log(`Auto-correcting motorcycle ${auctionDetails.motorcycleId} status to pending_collection`);
+                
+                // Auto-correct the motorcycle status
+                await this.updateMotorcycle(auctionDetails.motorcycleId, { 
+                  status: 'pending_collection' 
+                });
+                
+                // Update the motorcycle in the auction details to reflect the change
+                auctionDetails.motorcycle.status = 'pending_collection';
+              }
+            }
+            
             auctions.push(auctionDetails);
           }
         }
       }
     }
     
+    console.log(`Returning ${auctions.length} auctions for dealer ${dealerId}`);
     return auctions;
   }
 
