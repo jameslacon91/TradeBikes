@@ -353,7 +353,7 @@ export default function DealerDashboard() {
               <TabsTrigger value="dashboard">Overview</TabsTrigger>
               <TabsTrigger value="active-listings">Active Listings</TabsTrigger>
               <TabsTrigger value="placed-bids">Placed Bids</TabsTrigger>
-              <TabsTrigger value="past-listings">Past Listings</TabsTrigger>
+              <TabsTrigger value="past-listings">Completed Deals</TabsTrigger>
               <TabsTrigger value="pending-completion">Pending Completion</TabsTrigger>
             </TabsList>
             
