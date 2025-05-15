@@ -526,7 +526,7 @@ export default function DealerDashboard() {
                             <Skeleton className="h-16 w-full rounded" />
                           </div>
                         }>
-                          <BidAcceptance />
+                          <BidAcceptance auctions={userAuctions || []} />
                         </Suspense>
                       </CardContent>
                     </Card>

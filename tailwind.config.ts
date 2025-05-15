@@ -95,15 +95,34 @@ export default {
     themes: [
       {
         tradebikes: {
-          "primary": "#1D5D9B",
-          "secondary": "#75C2F6",
-          "accent": "#F4D160",
-          "neutral": "#F5F5F5",
-          "base-100": "#FFFFFF",
-          "info": "#3ABFF8",
-          "success": "#36D399",
-          "warning": "#FBBD23",
-          "error": "#F87272",
+          "primary": "#FF6B35",      // Racing orange for energy and speed
+          "primary-focus": "#E94F24", // Darker orange for focus states
+          "primary-content": "#FFFFFF", // White text on primary
+          "secondary": "#004E89",    // Deep blue, reminiscent of classic motorcycles
+          "secondary-focus": "#003B6B", // Darker blue for focus states
+          "secondary-content": "#FFFFFF", // White text on secondary
+          "accent": "#F4D160",       // Vibrant yellow for accents/highlights
+          "accent-focus": "#EABB3F",  // Slightly darker yellow for focus
+          "accent-content": "#333333", // Dark text on accent
+          "neutral": "#2A2B2A",       // Dark gray with hint of green (motorcycle frame)
+          "neutral-focus": "#212221", // Darker gray for focus states
+          "neutral-content": "#FFFFFF", // White text on neutral
+          "base-100": "#FFFFFF",      // White for clean, modern feel
+          "base-200": "#F2F2F2",      // Very light gray for secondary surfaces
+          "base-300": "#E6E6E6",      // Light gray for tertiary surfaces
+          "base-content": "#1F1F1F",  // Near-black for text on base colors
+          "info": "#3ABFF8",         // Standard info blue
+          "success": "#36D399",      // Success green
+          "warning": "#FBBD23",      // Warning yellow
+          "error": "#F87272",        // Error red
+          
+          // Custom properties
+          "--rounded-box": "0.5rem",   // Border radius for larger elements
+          "--rounded-btn": "0.25rem",  // Border radius for buttons
+          "--btn-text-case": "uppercase", // Uppercase text for buttons like motorcycle branding
+          "--border-btn": "1px",      // Border width for buttons
+          "--tab-border": "2px",      // Border width for tabs
+          "--tab-radius": "0.5rem",   // Border radius for tabs
         },
       },
     ],
