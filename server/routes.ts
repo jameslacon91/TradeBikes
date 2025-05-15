@@ -156,9 +156,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/auctions/bids", isAuthenticated, hasRole("dealer"), async (req, res, next) => {
     try {
       const dealerId = req.user.id;
+      console.log(`DEBUG: Getting auctions with bids for dealer ${dealerId} (username: ${req.user.username})`);
+      
+      // Get all bids by this user to log and debug
+      const dealerBids = await storage.getBidsByDealerId(dealerId);
+      console.log(`DEBUG: User ${dealerId} has ${dealerBids.length} bids`);
+      dealerBids.forEach(bid => {
+        console.log(`DEBUG: Bid ID ${bid.id} for auction ${bid.auctionId} - Amount: ${bid.amount}`);
+      });
+      
+      // Get pending collection auctions
+      const allAuctions = Array.from((storage as any).auctions.values());
+      const pendingCollectionAuctions = allAuctions.filter(auction => 
+        auction.status === 'pending_collection' && 
+        auction.winningBidderId === dealerId);
+      
+      console.log(`DEBUG: User ${dealerId} has ${pendingCollectionAuctions.length} pending collection auctions`);
+      pendingCollectionAuctions.forEach(auction => {
+        console.log(`DEBUG: Pending collection auction ${auction.id} - Motorcycle ${auction.motorcycleId}`);
+      });
+      
+      // Get regular auction data
       const auctions = await storage.getAuctionsWithBidsByDealer(dealerId);
+      console.log(`DEBUG: getAuctionsWithBidsByDealer returned ${auctions.length} auctions for user ${dealerId}`);
+      auctions.forEach(auction => {
+        console.log(`DEBUG: Auction ${auction.id} - Status ${auction.status}, Motorcycle ${auction.motorcycleId}`);
+        console.log(`DEBUG: Auction ${auction.id} - WinningBidderId: ${auction.winningBidderId}, BidAccepted: ${auction.bidAccepted}`);
+      });
+      
       res.json(auctions);
     } catch (error) {
+      console.error('Error in /api/auctions/bids:', error);
       next(error);
     }
   });
