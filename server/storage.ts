@@ -490,7 +490,7 @@ export class MemStorage implements IStorage {
       startTime: new Date(now.getTime() - oneHour * 12), // 12 hours ago
       endTime: new Date(now.getTime() - oneHour * 3), // 3 hours ago (auction ended)
       status: 'deal_confirmed',
-      winningBidId: 1, // Bid ID 1
+      winningBidId: 3, // Bid ID 3 - the highest bid
       winningBidderId: 4, // MikeTrader is ID 4
       bidAccepted: true,
       dealConfirmed: true,
@@ -644,7 +644,7 @@ export class MemStorage implements IStorage {
     const bid1: Bid = { 
       id: this.bidId++,
       auctionId: auction1.id,
-      dealerId: trader1.id,
+      dealerId: 4, // miketrader ID hardcoded
       amount: 6500,
       createdAt: new Date(now.getTime() - oneHour * 4) // 4 hours ago
     };
@@ -662,8 +662,8 @@ export class MemStorage implements IStorage {
     const bid3: Bid = { 
       id: this.bidId++,
       auctionId: auction1.id,
-      dealerId: trader1.id,
-      amount: 7000,
+      dealerId: 4, // miketrader ID hardcoded
+      amount: 7200, // winning bid - increased amount
       createdAt: new Date(now.getTime() - oneHour * 2) // 2 hours ago
     };
     this.bids.set(bid3.id, bid3);
@@ -737,6 +737,18 @@ export class MemStorage implements IStorage {
       createdAt: new Date(now.getTime() - oneHour * 2) // 2 hours ago
     };
     this.notifications.set(notification2.id, notification2);
+    
+    // Add explicit notification for pending collection for MikeTrader
+    const notificationPendingCollection: Notification = {
+      id: this.notificationId++,
+      userId: 4, // MikeTrader ID 4
+      type: 'collection_pending',
+      content: 'Your winning bid for Honda CBR650R has been accepted. The motorcycle is ready for collection.',
+      relatedId: auction1.id,
+      read: false,
+      createdAt: new Date(now.getTime() - oneHour * 1) // 1 hour ago
+    };
+    this.notifications.set(notificationPendingCollection.id, notificationPendingCollection);
     
     const notification3: Notification = {
       id: this.notificationId++,
