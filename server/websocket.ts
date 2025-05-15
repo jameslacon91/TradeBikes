@@ -12,11 +12,10 @@ export function setupWebSocket(server: Server) {
     server, 
     path: '/ws',
     clientTracking: true,
-    // Enable transport options that are more compatible across platforms
+    // Use simpler configuration for better cross-domain support
     perMessageDeflate: {
       zlibDeflateOptions: {
         chunkSize: 1024,
-        memLevel: 7,
         level: 3
       },
       zlibInflateOptions: {
@@ -24,14 +23,7 @@ export function setupWebSocket(server: Server) {
       },
       serverNoContextTakeover: true,
       clientNoContextTakeover: true,
-      concurrencyLimit: 10,
       threshold: 1024
-    },
-    // Increase WebSocket timeouts for better reliability
-    // verifyClient is disabled to allow cross-domain connections
-    handleProtocols: (protocols: string[], request) => {
-      // Accept any protocol
-      return protocols.length > 0 ? protocols[0] : '';
     }
   });
   
@@ -58,6 +50,11 @@ export function setupWebSocket(server: Server) {
   // Clean up interval on close
   wss.on('close', () => {
     clearInterval(interval);
+    console.log('WebSocket server closed');
+  });
+  
+  wss.on('error', (error) => {
+    console.error('WebSocket server error:', error);
   });
   
   wss.on('connection', (ws, req) => {
@@ -68,6 +65,18 @@ export function setupWebSocket(server: Server) {
     
     console.log(`WebSocket connection established - IP: ${clientIp}, Origin: ${origin}`);
     console.log(`WebSocket headers:`, JSON.stringify(req.headers, null, 2));
+    
+    // Send immediate welcome message to verify connection
+    try {
+      ws.send(JSON.stringify({
+        type: 'CONNECTED',
+        data: { message: 'Connected to TradeBikes WebSocket server' },
+        timestamp: Date.now()
+      }));
+      console.log('Sent welcome message to client');
+    } catch (e) {
+      console.error('Error sending welcome message:', e);
+    }
     
     // Mark connection as alive
     (ws as any).isAlive = true;
@@ -152,8 +161,32 @@ export function setupWebSocket(server: Server) {
       console.error('WebSocket error:', error);
     });
     
-    // Handle disconnection
+    // Handle disconnection with improved debugging
     ws.on('close', (code, reason) => {
+      // Log detailed close information
+      console.log(`WebSocket connection closed: code=${code}, reason=${reason || 'unknown'}, clean=${code === 1000 || code === 1001}`);
+      
+      // Provide code meaning
+      let codeMeaning = 'Unknown';
+      switch (code) {
+        case 1000: codeMeaning = 'Normal Closure'; break;
+        case 1001: codeMeaning = 'Going Away'; break;
+        case 1002: codeMeaning = 'Protocol Error'; break;
+        case 1003: codeMeaning = 'Unsupported Data'; break;
+        case 1005: codeMeaning = 'No Status Received'; break;
+        case 1006: codeMeaning = 'Abnormal Closure'; break;
+        case 1007: codeMeaning = 'Invalid Frame Payload Data'; break;
+        case 1008: codeMeaning = 'Policy Violation'; break;
+        case 1009: codeMeaning = 'Message Too Big'; break;
+        case 1010: codeMeaning = 'Mandatory Extension'; break;
+        case 1011: codeMeaning = 'Internal Server Error'; break;
+        case 1012: codeMeaning = 'Service Restart'; break;
+        case 1013: codeMeaning = 'Try Again Later'; break;
+        case 1014: codeMeaning = 'Bad Gateway'; break;
+        case 1015: codeMeaning = 'TLS Handshake'; break;
+      }
+      console.log(`WebSocket close code ${code} meaning: ${codeMeaning}`);
+      
       // Remove client from map
       Array.from(clients.entries()).forEach(([userId, client]) => {
         if (client === ws) {
@@ -161,7 +194,6 @@ export function setupWebSocket(server: Server) {
           console.log(`User ${userId} disconnected from WebSocket`);
         }
       });
-      console.log(`WebSocket connection closed: code=${code}, reason=${reason || 'unknown'}`);
     });
   });
   

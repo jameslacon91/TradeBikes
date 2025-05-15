@@ -56,7 +56,12 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
         
         try {
           const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-          wsUrl = `${protocol}//${window.location.host}/ws`;
+          const host = window.location.host;
+          
+          // Use current host (supports Replit deployment domains)
+          wsUrl = `${protocol}//${host}/ws`;
+          
+          console.log(`WebSocket connecting to: ${wsUrl} (using protocol: ${protocol}, host: ${host})`);
         } catch (e) {
           // Fallback URL in case of errors
           wsUrl = 'ws://localhost:5000/ws';
