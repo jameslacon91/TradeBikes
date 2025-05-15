@@ -100,25 +100,51 @@ export function NotificationsProvider({ children }: { children: ReactNode }) {
           break;
           
         case 'bid_accepted':
-          // Notification for the bidder whose bid was accepted
+          // Enhanced notification for the bidder whose bid was accepted
+          // Also trigger a status update for the relevant queries
+          
+          // If we have the motorcycle status change info, use it in the notification
+          const statusInfo = message.data.motorcycle?.status === 'pending_collection' 
+            ? 'The motorcycle is now pending collection.' 
+            : '';
+            
+          const makeModel = message.data.make && message.data.model 
+            ? `${message.data.make} ${message.data.model}` 
+            : message.data.motorcycle?.make && message.data.motorcycle?.model
+              ? `${message.data.motorcycle.make} ${message.data.motorcycle.model}`
+              : 'this motorcycle';
+              
+          const year = message.data.year || message.data.motorcycle?.year || '';
+          const yearInfo = year ? `(${year})` : '';
+          
           addNotification({
-            title: 'Bid Accepted!',
-            message: `Your bid on ${message.data.make} ${message.data.model} (${message.data.year}) has been accepted. Please arrange collection.`,
+            title: '🎉 Bid Accepted!',
+            message: `Your bid on ${makeModel} ${yearInfo} has been accepted. ${statusInfo} Please arrange collection with the seller.`,
             type: 'success',
             link: `/dashboard`,
             icon: <ShoppingCart className="h-5 w-5" />
           });
+          
+          // Force refresh queries to ensure status changes are reflected
+          queryClient.invalidateQueries({ queryKey: ['/api/auctions/bids'] });
           break;
           
         case 'bid_accepted_confirm':
-          // Notification for the seller who accepted a bid
+          // Enhanced notification for the seller who accepted a bid
+          const motorcycleName = message.data.motorcycle?.make && message.data.motorcycle?.model
+            ? `${message.data.motorcycle.make} ${message.data.motorcycle.model}`
+            : 'this motorcycle';
+            
           addNotification({
-            title: 'Bid Acceptance Confirmed',
-            message: `You have accepted a bid on your ${message.data.motorcycle?.make} ${message.data.motorcycle?.model}. The buyer will arrange collection.`,
+            title: '✅ Bid Acceptance Confirmed',
+            message: `You have accepted a bid on your ${motorcycleName}. The motorcycle status is now "pending collection". The buyer will arrange collection.`,
             type: 'success',
             link: `/dashboard`,
             icon: <ShoppingCart className="h-5 w-5" />
           });
+          
+          // Force refresh queries for the seller too
+          queryClient.invalidateQueries({ queryKey: ['/api/auctions/dealer'] });
           break;
 
         case 'new_message':

@@ -250,23 +250,101 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
         break;
       case 'bid_accepted':
       case 'bid_accepted_confirm':
-        // For bid acceptance, invalidate everything to ensure all data is fresh
-        console.log('Bid accepted WebSocket event received - refreshing all data', message.data);
+        // For bid acceptance, handle with high priority and aggressively update
+        console.log('🚨 Bid accepted WebSocket event received - refreshing all data with priority', message.data);
         
-        // Immediately update local cache with the motorcycle status change
+        // Check for the force update flag
+        const forceUpdate = message.data.forceStatusUpdate === true;
+        const updatePriority = message.data.updatePriority === 'high';
+        
+        if (forceUpdate) {
+          console.log('Force status update flag detected - aggressive cache update will be performed');
+        }
+        
+        // Enhanced motorcycle status update with more robust cache handling
         if (message.data.motorcycle && message.data.motorcycle.id) {
-          console.log(`Immediately updating motorcycle ${message.data.motorcycle.id} status to ${message.data.motorcycle.status}`);
+          const motorcycleId = message.data.motorcycle.id;
+          const newStatus = message.data.motorcycle.status;
           
-          // Update motorcycle status in any existing queries
+          console.log(`🔄 Immediately updating motorcycle ${motorcycleId} status to "${newStatus}"`);
+          
+          // Update individual motorcycle data
           queryClient.setQueryData(
-            [`/api/motorcycles/${message.data.motorcycle.id}`], 
+            [`/api/motorcycles/${motorcycleId}`], 
             (oldData: any) => {
               if (!oldData) return oldData;
-              return { ...oldData, status: message.data.motorcycle.status };
+              console.log(`Updated single motorcycle cache for ID ${motorcycleId}`);
+              return { ...oldData, status: newStatus };
+            }
+          );
+          
+          // Also update any motorcycle lists that might contain this motorcycle
+          queryClient.setQueriesData(
+            { queryKey: ['/api/motorcycles'] },
+            (oldData: any) => {
+              if (!oldData || !Array.isArray(oldData)) return oldData;
+              
+              console.log(`Checking motorcycles list cache for ID ${motorcycleId}`);
+              return oldData.map((motorcycle: any) => 
+                motorcycle.id === motorcycleId 
+                  ? { ...motorcycle, status: newStatus }
+                  : motorcycle
+              );
+            }
+          );
+          
+          // Also update motorcycle info inside auction details
+          if (message.data.auctionId) {
+            queryClient.setQueriesData(
+              { queryKey: [`/api/auctions/${message.data.auctionId}`] },
+              (oldData: any) => {
+                if (!oldData) return oldData;
+                
+                console.log(`Updating auction ${message.data.auctionId} with motorcycle status ${newStatus}`);
+                return {
+                  ...oldData,
+                  status: message.data.auction?.status || oldData.status,
+                  motorcycle: oldData.motorcycle ? {
+                    ...oldData.motorcycle,
+                    status: newStatus
+                  } : oldData.motorcycle
+                };
+              }
+            );
+          }
+          
+          // Also update motorcycle in bidder's auctions list
+          queryClient.setQueriesData(
+            { queryKey: ['/api/auctions/bids'] },
+            (oldData: any) => {
+              if (!oldData || !Array.isArray(oldData)) return oldData;
+              
+              console.log('Updating motorcycle status in bidder auctions list');
+              return oldData.map((auction: any) => {
+                if (auction.motorcycleId === motorcycleId || auction.motorcycle?.id === motorcycleId) {
+                  return {
+                    ...auction,
+                    status: message.data.auction?.status || auction.status,
+                    bidAccepted: true,
+                    motorcycle: auction.motorcycle ? {
+                      ...auction.motorcycle,
+                      status: newStatus
+                    } : auction.motorcycle
+                  };
+                }
+                return auction;
+              });
             }
           );
         }
         
+        // Handle status change object if present
+        if (message.data.statusChange) {
+          console.log('Status change notification received:', message.data.statusChange);
+          // Consider additional logic here if needed
+        }
+        
+        // Now invalidate queries to ensure fresh data from server
         // Invalidate specific auction data
         queryClient.invalidateQueries({ queryKey: [`/api/auctions/${message.data.auctionId}`] });
         
