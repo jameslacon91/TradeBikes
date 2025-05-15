@@ -489,7 +489,7 @@ export class MemStorage implements IStorage {
       dealerId: dealer1.id,
       startTime: new Date(now.getTime() - oneHour * 12), // 12 hours ago
       endTime: new Date(now.getTime() - oneHour * 3), // 3 hours ago (auction ended)
-      status: 'deal_confirmed',
+      status: 'pending_collection',
       winningBidId: 3, // Bid ID 3 - the highest bid
       winningBidderId: 4, // MikeTrader is ID 4
       bidAccepted: true,
@@ -800,6 +800,8 @@ export class MemStorage implements IStorage {
       dateAvailable: 'End of the week',
       regNumber: 'AB21 YMH',
       auctionDuration: '1week',
+      status: 'completed', // Add status for consistency
+      soldDate: new Date(now.getTime() - oneDay * 5).toISOString(), // Add sold date 5 days ago
       images: [
         'https://images.unsplash.com/photo-1635073910167-20261559f0b3'
       ],
