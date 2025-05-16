@@ -83,12 +83,54 @@
 
   html {
     scroll-behavior: smooth;
+    height: 100%;
   }
 
   body {
     @apply font-sans antialiased bg-background text-foreground;
     line-height: 1.6;
     min-height: 100vh;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Cross-platform optimizations for all devices */
+  @media (max-width: 768px) {
+    /* Optimize touch targets for mobile */
+    button, .btn, a, [role="button"] {
+      min-height: 44px;
+      padding: 0.5rem 1rem;
+      touch-action: manipulation;
+    }
+    
+    /* Safe area insets for modern iOS devices */
+    .safe-area-inset {
+      padding-left: env(safe-area-inset-left);
+      padding-right: env(safe-area-inset-right);
+      padding-bottom: env(safe-area-inset-bottom);
+      padding-top: env(safe-area-inset-top);
+    }
+    
+    /* Disable native browser behaviors that can cause issues on mobile apps */
+    body {
+      overscroll-behavior-y: none;
+    }
+    
+    /* Fix input zooming on iOS */
+    input, select, textarea {
+      font-size: 16px !important;
+    }
+    
+    /* Optimize for mobile dashboard */
+    .dashboard-grid {
+      grid-template-columns: 1fr !important;
+    }
+    
+    /* Adjustments for tab interfaces on small screens */
+    .tabs-list {
+      overflow-x: auto !important;
+      flex-wrap: nowrap !important;
+      margin-bottom: 1rem !important;
+    }
   }
 
   img, picture, video, canvas, svg {
