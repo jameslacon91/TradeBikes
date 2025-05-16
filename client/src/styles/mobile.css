@@ -1,0 +1,133 @@
+/* Mobile-specific styles for TradeBikes */
+
+/* Base mobile optimizations */
+html, body {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  touch-action: manipulation;
+  overscroll-behavior-y: none;
+}
+
+/* Safe area insets for notched devices (iOS) */
+@supports (padding: max(0px)) {
+  body {
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  .mobile-bottom-nav {
+    padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
+  }
+}
+
+/* Bottom navigation for mobile */
+.mobile-bottom-nav {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .mobile-bottom-nav {
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: hsl(var(--background));
+    border-top: 1px solid hsl(var(--border));
+    z-index: 50;
+    justify-content: space-around;
+    padding: 0.5rem 1rem;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .mobile-bottom-nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem;
+    flex: 1;
+    color: hsl(var(--muted-foreground));
+    font-size: 0.75rem;
+    transition: all 0.2s ease;
+  }
+  
+  .mobile-bottom-nav-item.active {
+    color: hsl(var(--primary));
+  }
+  
+  .mobile-bottom-nav-item svg {
+    width: 1.5rem;
+    height: 1.5rem;
+    margin-bottom: 0.25rem;
+  }
+  
+  /* Add padding to main content to prevent overlap with bottom nav */
+  main {
+    padding-bottom: 4.5rem;
+  }
+  
+  /* Optimize button spacing for touch */
+  button, 
+  .btn,
+  [role="button"] {
+    min-height: 2.75rem;
+    min-width: 2.75rem;
+  }
+  
+  /* Optimize form elements for touch */
+  input, 
+  select, 
+  textarea {
+    font-size: 16px !important; /* Prevents iOS zoom on focus */
+  }
+  
+  /* Improve card layouts on small screens */
+  .card {
+    margin-bottom: 1rem;
+  }
+  
+  /* Optimize scrolling areas */
+  .scroll-container {
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* iOS native appearance */
+.ios-style .button {
+  border-radius: 8px;
+}
+
+.ios-style .card {
+  border-radius: 10px;
+}
+
+/* Android native appearance */
+.android-style .button {
+  border-radius: 4px;
+}
+
+.android-style .card {
+  border-radius: 8px;
+}
+
+/* Mobile orientation specific styles */
+@media screen and (orientation: portrait) {
+  .orientation-specific-content.landscape {
+    display: none;
+  }
+}
+
+@media screen and (orientation: landscape) {
+  .orientation-specific-content.portrait {
+    display: none;
+  }
+  
+  /* Optimize bottom nav for landscape */
+  .mobile-bottom-nav {
+    height: auto;
+    padding: 0.25rem 0.5rem;
+  }
+}
