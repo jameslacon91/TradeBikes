@@ -368,16 +368,16 @@ export default function DealerDashboard() {
               Placed Bids
             </button>
             <button 
-              className={`tab ${activeTab === "completed-deals" ? "tab-active bg-primary text-white" : ""}`}
-              onClick={() => setActiveTab("completed-deals")}
-            >
-              Completed Deals
-            </button>
-            <button 
               className={`tab ${activeTab === "pending-completion" ? "tab-active bg-primary text-white" : ""}`}
               onClick={() => setActiveTab("pending-completion")}
             >
               Pending Completion
+            </button>
+            <button 
+              className={`tab ${activeTab === "completed-deals" ? "tab-active bg-primary text-white" : ""}`}
+              onClick={() => setActiveTab("completed-deals")}
+            >
+              Completed Deals
             </button>
           </div>
           
