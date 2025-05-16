@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { User } from '@shared/schema';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -17,41 +17,54 @@ const FavoriteDealers = () => {
   const [isUpdating, setIsUpdating] = useState(false);
   const [showAllDealers, setShowAllDealers] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [availableDealers, setAvailableDealers] = useState<User[]>([]);
+  const [filteredDealers, setFilteredDealers] = useState<User[]>([]);
+  
+  const queryClient = queryClient;
 
   // Get all dealers that can be favorites
-  const { data: allDealers = [], isLoading: dealersLoading } = useQuery<User[]>({
+  const { data: allDealers = [], isLoading: dealersLoading } = useQuery({
     queryKey: ['/api/dealers'],
-    enabled: !!user,
-    onError: (error: Error) => {
-      toast({
-        title: "Failed to load dealers",
-        description: error.message,
-        variant: "destructive",
-      });
-    }
+    enabled: !!user
   });
 
   // Get user's favorite dealers
-  const { data: favoriteDealers = [], isLoading: favoritesLoading } = useQuery<User[]>({
+  const { data: favoriteDealers = [], isLoading: favoritesLoading } = useQuery({
     queryKey: ['/api/user/favorites'],
-    enabled: !!user,
-    onError: (error: Error) => {
-      toast({
-        title: "Failed to load favorite dealers",
-        description: error.message,
-        variant: "destructive",
-      });
-    }
+    enabled: !!user
   });
 
   const isLoading = dealersLoading || favoritesLoading;
+
+  // Update filtered dealers whenever dependencies change
+  useEffect(() => {
+    if (Array.isArray(allDealers) && Array.isArray(favoriteDealers) && user) {
+      // Filter out current user and already favorited dealers
+      const available = allDealers.filter(dealer => 
+        dealer.id !== user.id && 
+        !favoriteDealers.some(fav => fav.id === dealer.id)
+      );
+      setAvailableDealers(available);
+
+      // Apply search filter if needed
+      if (searchTerm) {
+        const filtered = available.filter(dealer => 
+          (dealer.companyName && dealer.companyName.toLowerCase().includes(searchTerm.toLowerCase())) ||
+          dealer.username.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+        setFilteredDealers(filtered);
+      } else {
+        setFilteredDealers(available);
+      }
+    }
+  }, [allDealers, favoriteDealers, user, searchTerm]);
 
   const toggleFavorite = async (dealerId: number) => {
     if (!user) return;
     
     setIsUpdating(true);
     try {
-      const isFavorite = favoriteDealers?.find(d => d.id === dealerId);
+      const isFavorite = favoriteDealers.some(d => d.id === dealerId);
       const endpoint = isFavorite ? '/api/user/favorites/remove' : '/api/user/favorites/add';
       
       await apiRequest('POST', endpoint, { dealerId });
@@ -73,32 +86,13 @@ const FavoriteDealers = () => {
       });
     } finally {
       setIsUpdating(false);
+      
+      // Close the add dealers view if we're adding a dealer
+      if (!showAllDealers) {
+        setShowAllDealers(false);
+      }
     }
   };
-
-  const getFavoriteStatus = (dealerId: number) => {
-    return favoriteDealers?.some(dealer => dealer.id === dealerId) ?? false;
-  };
-  
-  // Filter dealers based on search term and exclude existing favorites
-  const filteredDealers = allDealers?.filter(dealer => {
-    // Don't filter by role, as we're already getting just dealers from the API
-    // Exclude current user
-    if (dealer.id === user?.id) return false;
-    
-    // Exclude dealers already in favorites
-    if (favoriteDealers?.some(fav => fav.id === dealer.id)) return false;
-    
-    // Apply search filter if there's a search term
-    if (searchTerm) {
-      return (
-        (dealer.companyName && dealer.companyName.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        dealer.username.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    }
-    
-    return true;
-  }) || [];
 
   return (
     <Card>
