@@ -43,7 +43,7 @@ export default function HomePage() {
             </div>
             
             <div className="flex flex-wrap gap-4 justify-center">
-              <Link href="/auth">
+              <Link href="/register">
                 <Button size="lg" className="bg-white text-primary hover:bg-gray-100 shadow-lg hover:shadow-xl transition-all duration-300 text-lg px-8">
                   Register Now
                 </Button>
