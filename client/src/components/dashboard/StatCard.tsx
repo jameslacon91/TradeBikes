@@ -24,23 +24,23 @@ export default function StatCard({
   className = "" 
 }: StatCardProps) {
   return (
-    <div className={`card motorcycle-shadow transition-all rounded-lg overflow-hidden ${className}`}>
-      <div className={`p-5 ${bgColor} text-white relative`}>
+    <div className={`card motorcycle-shadow transition-all rounded-lg overflow-hidden cursor-pointer active:opacity-90 ${className}`}>
+      <div className={`p-4 sm:p-5 ${bgColor} text-white relative`}>
         {/* Chrome-like top accent bar */}
         <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-white/40 to-transparent"></div>
         
         <div className="flex justify-between items-start">
-          <h2 className="font-semibold text-white text-lg">{title}</h2>
+          <h2 className="font-semibold text-white text-base sm:text-lg">{title}</h2>
           <div className="text-white/90 rounded-full p-2 bg-white/10 backdrop-blur-sm">
             {icon}
           </div>
         </div>
         
-        <div className="mt-4 flex items-end justify-between">
+        <div className="mt-3 sm:mt-4 flex items-end justify-between">
           <div className="speedometer">
-            <p className="text-3xl font-bold text-white">{value}</p>
+            <p className="text-2xl sm:text-3xl font-bold text-white">{value}</p>
             {subtitle && (
-              <p className="text-sm opacity-80 mt-1">{subtitle}</p>
+              <p className="text-xs sm:text-sm opacity-80 mt-1">{subtitle}</p>
             )}
           </div>
           

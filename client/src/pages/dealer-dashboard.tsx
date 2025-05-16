@@ -347,34 +347,34 @@ export default function DealerDashboard() {
             </div>
           </div>
           
-          {/* DaisyUI Tabs Navigation */}
-          <div className="tabs tabs-boxed bg-base-200 p-1">
+          {/* Responsive Tabs Navigation */}
+          <div className="tabs tabs-boxed bg-base-200 p-1 overflow-x-auto scrollbar-hide whitespace-nowrap flex flex-nowrap">
             <button 
-              className={`tab ${activeTab === "dashboard" ? "tab-active bg-primary text-white" : ""}`}
+              className={`tab flex-shrink-0 ${activeTab === "dashboard" ? "tab-active bg-primary text-white" : ""}`}
               onClick={() => setActiveTab("dashboard")}
             >
               Overview
             </button>
             <button 
-              className={`tab ${activeTab === "active-listings" ? "tab-active bg-primary text-white" : ""}`}
+              className={`tab flex-shrink-0 ${activeTab === "active-listings" ? "tab-active bg-primary text-white" : ""}`}
               onClick={() => setActiveTab("active-listings")}
             >
               Active Listings
             </button>
             <button 
-              className={`tab ${activeTab === "placed-bids" ? "tab-active bg-primary text-white" : ""}`}
+              className={`tab flex-shrink-0 ${activeTab === "placed-bids" ? "tab-active bg-primary text-white" : ""}`}
               onClick={() => setActiveTab("placed-bids")}
             >
               Placed Bids
             </button>
             <button 
-              className={`tab ${activeTab === "pending-completion" ? "tab-active bg-primary text-white" : ""}`}
+              className={`tab flex-shrink-0 ${activeTab === "pending-completion" ? "tab-active bg-primary text-white" : ""}`}
               onClick={() => setActiveTab("pending-completion")}
             >
               Pending Completion
             </button>
             <button 
-              className={`tab ${activeTab === "completed-deals" ? "tab-active bg-primary text-white" : ""}`}
+              className={`tab flex-shrink-0 ${activeTab === "completed-deals" ? "tab-active bg-primary text-white" : ""}`}
               onClick={() => setActiveTab("completed-deals")}
             >
               Completed Deals
