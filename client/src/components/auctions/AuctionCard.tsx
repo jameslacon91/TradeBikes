@@ -7,6 +7,7 @@ import { Clock, Users, AlertCircle } from 'lucide-react';
 import { AuctionWithDetails } from '@shared/types';
 import { useAuth } from '@/hooks/use-auth';
 import PendingActions from '@/components/dashboard/PendingActions';
+import ListingActions from '@/components/auctions/ListingActions';
 
 interface AuctionCardProps {
   auction: AuctionWithDetails;
@@ -86,16 +87,29 @@ export default function AuctionCard({
         />
         
         {/* Status badge */}
-        <div className="absolute top-2 right-2">
+        <div className="absolute top-2 right-2 flex items-center gap-1">
           <Badge className={
             status === 'active' ? 'bg-green-500' : 
             status === 'completed' ? 'bg-blue-500' : 
-            status === 'pending_collection' ? 'bg-amber-500' : 'bg-gray-500'
+            status === 'pending_collection' ? 'bg-amber-500' :
+            status === 'no_sale' ? 'bg-gray-500' : 'bg-gray-500'
           }>
             {status === 'active' ? 'Active' : 
              status === 'completed' ? 'Completed' : 
-             status === 'pending_collection' ? 'Pending Collection' : 'Expired'}
+             status === 'pending_collection' ? 'Pending Collection' : 
+             status === 'no_sale' ? 'No Sale' : 'Expired'}
           </Badge>
+          
+          {/* Only show listing actions for dealer's own listings */}
+          {dealerId === user?.id && (
+            <div className="bg-white/80 backdrop-blur-sm rounded">
+              <ListingActions
+                auctionId={id}
+                hasBids={totalBids > 0}
+                status={status}
+              />
+            </div>
+          )}
         </div>
         
         {/* Ending soon alert */}

@@ -152,6 +152,71 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Delete listing (auction + motorcycle)
+  app.delete("/api/auctions/:id", isAuthenticated, hasRole("dealer"), async (req, res, next) => {
+    try {
+      const auctionId = parseInt(req.params.id, 10);
+      const dealerId = req.user.id;
+      
+      // Attempt to delete the auction
+      const deleted = await storage.deleteAuction(auctionId, dealerId);
+      
+      if (!deleted) {
+        return res.status(400).json({ 
+          message: "Unable to delete this listing. It may have received bids or you don't have permission to delete it."
+        });
+      }
+      
+      // Notify via WebSocket
+      const wsMessage: WSMessage = {
+        type: "auction_deleted",
+        data: { 
+          auctionId,
+          dealerId
+        },
+        timestamp: Date.now()
+      };
+      broadcast(wsMessage);
+      
+      res.json({ success: true, message: "Listing deleted successfully" });
+    } catch (error) {
+      next(error);
+    }
+  });
+  
+  // Archive listing as "no sale"
+  app.post("/api/auctions/:id/archive-no-sale", isAuthenticated, hasRole("dealer"), async (req, res, next) => {
+    try {
+      const auctionId = parseInt(req.params.id, 10);
+      const dealerId = req.user.id;
+      
+      // Attempt to archive the auction as "no sale"
+      const updatedAuction = await storage.archiveAuctionAsNoSale(auctionId, dealerId);
+      
+      if (!updatedAuction) {
+        return res.status(400).json({ 
+          message: "Unable to archive this listing as 'no sale'. It may already be completed or you don't have permission."
+        });
+      }
+      
+      // Notify via WebSocket
+      const wsMessage: WSMessage = {
+        type: "auction_archived",
+        data: { 
+          auctionId,
+          dealerId,
+          status: "no_sale"
+        },
+        timestamp: Date.now()
+      };
+      broadcast(wsMessage);
+      
+      res.json(updatedAuction);
+    } catch (error) {
+      next(error);
+    }
+  });
+  
   // Get auctions where the current user has placed bids
   app.get("/api/auctions/bids", isAuthenticated, hasRole("dealer"), async (req, res, next) => {
     try {
