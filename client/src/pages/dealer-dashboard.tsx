@@ -402,14 +402,14 @@ export default function DealerDashboard() {
                     />
                   </div>
 
-                  {/* Total Bids Received */}
+                  {/* Total Bids Received - Only for active listings */}
                   <div onClick={() => setActiveTab("active-listings")}>
                     <StatCard 
-                      title="Bids Received" 
-                      value={statsLoading ? "Loading..." : stats?.totalBids || 0}
+                      title="Active Bids Received" 
+                      value={statsLoading || auctionsLoading ? "Loading..." : 
+                        activeListings.reduce((total, auction) => total + (auction.bids?.length || 0), 0)}
                       icon={<Clock className="h-6 w-6 text-white" />}
                       bgColor="bg-accent"
-                      trend={stats?.trendUp ? { up: true, value: stats.trendValue || 0 } : undefined}
                       className="cursor-pointer transition-transform hover:translate-y-[-5px]"
                     />
                   </div>
