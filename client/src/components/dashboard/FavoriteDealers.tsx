@@ -19,15 +19,29 @@ const FavoriteDealers = () => {
   const [searchTerm, setSearchTerm] = useState('');
 
   // Get all dealers that can be favorites
-  const { data: allDealers, isLoading: dealersLoading } = useQuery<User[]>({
+  const { data: allDealers = [], isLoading: dealersLoading } = useQuery<User[]>({
     queryKey: ['/api/dealers'],
-    enabled: !!user
+    enabled: !!user,
+    onError: (error: Error) => {
+      toast({
+        title: "Failed to load dealers",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
   });
 
   // Get user's favorite dealers
-  const { data: favoriteDealers, isLoading: favoritesLoading } = useQuery<User[]>({
+  const { data: favoriteDealers = [], isLoading: favoritesLoading } = useQuery<User[]>({
     queryKey: ['/api/user/favorites'],
-    enabled: !!user
+    enabled: !!user,
+    onError: (error: Error) => {
+      toast({
+        title: "Failed to load favorite dealers",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
   });
 
   const isLoading = dealersLoading || favoritesLoading;
@@ -68,8 +82,9 @@ const FavoriteDealers = () => {
   
   // Filter dealers based on search term and exclude existing favorites
   const filteredDealers = allDealers?.filter(dealer => {
-    // Exclude current user and non-dealers
-    if (dealer.id === user?.id || dealer.role !== 'dealer') return false;
+    // Don't filter by role, as we're already getting just dealers from the API
+    // Exclude current user
+    if (dealer.id === user?.id) return false;
     
     // Exclude dealers already in favorites
     if (favoriteDealers?.some(fav => fav.id === dealer.id)) return false;
