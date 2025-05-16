@@ -114,7 +114,7 @@ export default function DealerDashboard() {
   const { data: activeAuctions, isLoading: auctionsLoading } = useQuery<AuctionWithDetails[]>({
     queryKey: ['/api/auctions/dealer', user?.id],
     enabled: (activeTab === 'active-listings' || activeTab === 'dashboard' || activeTab === 'pending-completion' || 
-              activeTab === 'completed-deals' || activeTab === 'placed-bids') && !!user,
+              activeTab === 'completed-deals' || activeTab === 'placed-bids' || activeTab === 'archived-listings') && !!user,
     staleTime: 0 // Always refetch when query key changes
   });
   
@@ -177,6 +177,9 @@ export default function DealerDashboard() {
   
   // Filter auctions by status
   const activeListings = userAuctions.filter(a => a.status === 'active');
+  
+  // Get archived listings (marked as "no sale")
+  const archivedListings = userAuctions.filter(a => a.status === 'no_sale');
   
   // Create a combined set of auctions to check for completed listings (both user-created and bidded)
   const allAuctionsToCheck = [...(userAuctions || [])];
@@ -662,6 +665,45 @@ export default function DealerDashboard() {
                           key={auction.id}
                           auction={auction}
                           showDealerInfo={auction.dealerId !== user?.id}
+                        />
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </TabsContent>
+              
+              {/* Archived Listings Tab */}
+              <TabsContent value="archived-listings">
+                <div className="mb-6">
+                  <h2 className="text-xl font-semibold mb-2">Archived Listings</h2>
+                  <p className="text-muted-foreground">Listings that have been marked as "no sale".</p>
+                
+                  {auctionsLoading ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
+                      {[...Array(3)].map((_, i) => (
+                        <div key={i} className="border rounded-lg p-4">
+                          <Skeleton className="h-40 w-full mb-3" />
+                          <Skeleton className="h-5 w-2/3 mb-2" />
+                          <Skeleton className="h-4 w-1/2 mb-4" />
+                          <div className="flex justify-between">
+                            <Skeleton className="h-8 w-20" />
+                            <Skeleton className="h-8 w-20" />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : archivedListings.length === 0 ? (
+                    <div className="text-center py-12 border rounded-lg mt-4">
+                      <Package className="h-12 w-12 mx-auto text-muted-foreground/50 mb-4" />
+                      <h3 className="text-lg font-medium mb-2">You don't have any archived listings</h3>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
+                      {archivedListings.map(auction => (
+                        <AuctionCard 
+                          key={auction.id}
+                          auction={auction}
+                          showDealerInfo={false}
                         />
                       ))}
                     </div>
