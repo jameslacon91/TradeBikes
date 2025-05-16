@@ -4,7 +4,7 @@ import { setupVite, serveStatic, log } from "./vite";
 import cors from "cors";
 import { corsConfig } from "./deployment-config";
 
-// DEPLOYMENT_VERSION: May 15, 2025 - 7:30 PM - Latest version with centralized deployment configuration
+// DEPLOYMENT_VERSION: 2025-05-16T05:55:53.288Z - Updated for Replit deployment
 
 const app = express();
 
