@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import React, { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { User } from '@shared/schema';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -8,90 +8,122 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useAuth } from '@/hooks/use-auth';
 import { Star, Plus, MessageCircle, Phone, Search, X } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { apiRequest, queryClient } from '@/lib/queryClient';
+import { apiRequest } from '@/lib/queryClient';
 import { Input } from '@/components/ui/input';
+
+// Define dealer interface specifically for this component
+interface DealerInfo {
+  id: number;
+  username: string;
+  companyName: string;
+  rating: number;
+  totalRatings: number;
+}
 
 const FavoriteDealers = () => {
   const { user } = useAuth();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const [isUpdating, setIsUpdating] = useState(false);
   const [showAllDealers, setShowAllDealers] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-  const [availableDealers, setAvailableDealers] = useState<User[]>([]);
-  const [filteredDealers, setFilteredDealers] = useState<User[]>([]);
-  
-  const queryClient = queryClient;
 
   // Get all dealers that can be favorites
-  const { data: allDealers = [], isLoading: dealersLoading } = useQuery({
+  const { data: allDealers = [], isLoading: dealersLoading } = useQuery<DealerInfo[]>({
     queryKey: ['/api/dealers'],
     enabled: !!user
   });
 
   // Get user's favorite dealers
-  const { data: favoriteDealers = [], isLoading: favoritesLoading } = useQuery({
+  const { data: favoriteDealers = [], isLoading: favoritesLoading } = useQuery<DealerInfo[]>({
     queryKey: ['/api/user/favorites'],
     enabled: !!user
   });
 
   const isLoading = dealersLoading || favoritesLoading;
 
-  // Update filtered dealers whenever dependencies change
-  useEffect(() => {
-    if (Array.isArray(allDealers) && Array.isArray(favoriteDealers) && user) {
-      // Filter out current user and already favorited dealers
-      const available = allDealers.filter(dealer => 
-        dealer.id !== user.id && 
-        !favoriteDealers.some(fav => fav.id === dealer.id)
-      );
-      setAvailableDealers(available);
-
-      // Apply search filter if needed
-      if (searchTerm) {
-        const filtered = available.filter(dealer => 
-          (dealer.companyName && dealer.companyName.toLowerCase().includes(searchTerm.toLowerCase())) ||
-          dealer.username.toLowerCase().includes(searchTerm.toLowerCase())
-        );
-        setFilteredDealers(filtered);
-      } else {
-        setFilteredDealers(available);
-      }
+  // Add favorite mutation
+  const addFavoriteMutation = useMutation({
+    mutationFn: async (dealerId: number) => {
+      await apiRequest('POST', '/api/user/favorites/add', { dealerId });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/user/favorites'] });
+      toast({
+        title: 'Added to favorites',
+        description: 'Dealer has been added to your favorites',
+      });
+    },
+    onError: () => {
+      toast({
+        title: 'Action failed',
+        description: 'Could not add dealer to favorites.',
+        variant: 'destructive',
+      });
+    },
+    onSettled: () => {
+      setIsUpdating(false);
     }
-  }, [allDealers, favoriteDealers, user, searchTerm]);
+  });
 
-  const toggleFavorite = async (dealerId: number) => {
+  // Remove favorite mutation
+  const removeFavoriteMutation = useMutation({
+    mutationFn: async (dealerId: number) => {
+      await apiRequest('POST', '/api/user/favorites/remove', { dealerId });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/user/favorites'] });
+      toast({
+        title: 'Removed from favorites',
+        description: 'Dealer has been removed from your favorites',
+      });
+    },
+    onError: () => {
+      toast({
+        title: 'Action failed',
+        description: 'Could not remove dealer from favorites.',
+        variant: 'destructive',
+      });
+    },
+    onSettled: () => {
+      setIsUpdating(false);
+    }
+  });
+
+  const toggleFavorite = (dealerId: number) => {
     if (!user) return;
     
     setIsUpdating(true);
-    try {
-      const isFavorite = favoriteDealers.some(d => d.id === dealerId);
-      const endpoint = isFavorite ? '/api/user/favorites/remove' : '/api/user/favorites/add';
-      
-      await apiRequest('POST', endpoint, { dealerId });
-      
-      // Invalidate the favorites query to refresh the list
-      queryClient.invalidateQueries({queryKey: ['/api/user/favorites']});
-      
-      toast({
-        title: isFavorite ? 'Removed from favorites' : 'Added to favorites',
-        description: isFavorite 
-          ? 'Dealer has been removed from your favorites' 
-          : 'Dealer has been added to your favorites',
-      });
-    } catch (error) {
-      toast({
-        title: 'Action failed',
-        description: 'Could not update favorites.',
-        variant: 'destructive',
-      });
-    } finally {
-      setIsUpdating(false);
-      
-      // Close the add dealers view if we're adding a dealer
-      if (!showAllDealers) {
-        setShowAllDealers(false);
-      }
+    const isFavorite = favoriteDealers.some((d: DealerInfo) => d.id === dealerId);
+    
+    if (isFavorite) {
+      removeFavoriteMutation.mutate(dealerId);
+    } else {
+      addFavoriteMutation.mutate(dealerId);
     }
+  };
+  
+  // Get filtered dealers that can be added as favorites
+  const getFilteredDealers = () => {
+    if (!Array.isArray(allDealers) || !Array.isArray(favoriteDealers) || !user) {
+      return [];
+    }
+    
+    // Filter out current user and dealers already in favorites
+    const availableDealers = allDealers.filter(dealer => 
+      dealer.id !== user.id && 
+      !favoriteDealers.some(fav => fav.id === dealer.id)
+    );
+    
+    // Apply search filter if there's a search term
+    if (searchTerm) {
+      return availableDealers.filter(dealer => 
+        (dealer.companyName && dealer.companyName.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        dealer.username.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+    
+    return availableDealers;
   };
 
   return (
@@ -128,9 +160,9 @@ const FavoriteDealers = () => {
               </div>
             ))}
           </div>
-        ) : favoriteDealers?.length === 0 || showAllDealers ? (
+        ) : favoriteDealers.length === 0 || showAllDealers ? (
           <div className="py-4">
-            {favoriteDealers?.length === 0 ? (
+            {favoriteDealers.length === 0 ? (
               <p className="text-muted-foreground mb-4 text-center">
                 You don't have any favorite dealers yet.
               </p>
@@ -165,17 +197,17 @@ const FavoriteDealers = () => {
               {showAllDealers && (
                 <div className="flex justify-between items-center">
                   <h3 className="font-medium text-sm">Available Dealers:</h3>
-                  <span className="text-xs text-muted-foreground">{filteredDealers.length} found</span>
+                  <span className="text-xs text-muted-foreground">{getFilteredDealers().length} found</span>
                 </div>
               )}
               
-              {filteredDealers.length === 0 ? (
+              {getFilteredDealers().length === 0 ? (
                 <p className="text-center text-muted-foreground text-sm py-2">
                   {searchTerm ? "No dealers match your search" : "No more dealers available"}
                 </p>
               ) : (
                 <>
-                  {filteredDealers.map(dealer => (
+                  {getFilteredDealers().map((dealer: DealerInfo) => (
                     <div key={dealer.id} className="flex items-center justify-between border-b pb-3 last:border-0">
                       <div className="flex items-center space-x-3">
                         <Avatar>
@@ -213,7 +245,7 @@ const FavoriteDealers = () => {
           </div>
         ) : (
           <div className="space-y-4">
-            {favoriteDealers?.map(dealer => (
+            {favoriteDealers.map((dealer: DealerInfo) => (
               <div key={dealer.id} className="flex items-center justify-between border-b pb-3 last:border-0">
                 <div className="flex items-center space-x-3">
                   <Avatar>
