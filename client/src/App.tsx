@@ -24,6 +24,7 @@ import { AuthProvider } from "./hooks/use-auth";
 import { WebSocketProvider } from "./hooks/use-websocket";
 import { LogOut, UserCircle, Plus, TrendingUp, Menu, X } from "lucide-react";
 import InstallPrompt from "./components/mobile/InstallPrompt";
+import BottomNavigation from "./components/mobile/BottomNavigation";
 
 // Main router component
 function Router() {
@@ -266,18 +267,28 @@ function App() {
           <AuthProvider>
             <TooltipProvider>
               <Toaster />
-              <div className="min-h-screen flex flex-col bg-background text-foreground">
-                <MainNavigation />
-                <main className="flex-grow">
-                  <Router />
-                </main>
-                <InstallPrompt />
-              </div>
+              <AppContent />
             </TooltipProvider>
           </AuthProvider>
         </WebSocketProvider>
       </QueryClientProvider>
     </ThemeProvider>
+  );
+}
+
+// Separate component to access auth context after it's provided
+function AppContent() {
+  const { user } = useAuth();
+  
+  return (
+    <div className="min-h-screen flex flex-col bg-background text-foreground">
+      <MainNavigation />
+      <main className="flex-grow">
+        <Router />
+      </main>
+      <InstallPrompt />
+      {user && <BottomNavigation />}
+    </div>
   );
 }
 
