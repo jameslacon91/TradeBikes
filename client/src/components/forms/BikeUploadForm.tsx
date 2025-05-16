@@ -343,7 +343,7 @@ export default function BikeUploadForm() {
               name="make"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Make</FormLabel>
+                  <FormLabel>Make *</FormLabel>
                   <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <FormControl>
                       <SelectTrigger>
@@ -380,7 +380,7 @@ export default function BikeUploadForm() {
               name="year"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Year</FormLabel>
+                  <FormLabel>Year *</FormLabel>
                   <Select 
                     onValueChange={(value) => field.onChange(parseInt(value, 10))} 
                     value={field.value ? field.value.toString() : ""}
@@ -406,7 +406,7 @@ export default function BikeUploadForm() {
               name="mileage"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Mileage</FormLabel>
+                  <FormLabel>Mileage *</FormLabel>
                   <FormControl>
                     <Input 
                       type="number" 
@@ -729,7 +729,7 @@ export default function BikeUploadForm() {
               name="auctionDuration"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Auction Duration</FormLabel>
+                  <FormLabel>Auction Duration *</FormLabel>
                   <FormControl>
                     <RadioGroup
                       onValueChange={field.onChange}
@@ -754,7 +754,7 @@ export default function BikeUploadForm() {
             
             {/* Visibility Options */}
             <div>
-              <h3 className="text-md font-semibold text-gray-800 mb-2">Listing Visibility</h3>
+              <h3 className="text-md font-semibold text-gray-100 mb-2">Listing Visibility *</h3>
               <FormField
                 control={form.control}
                 name="visibilityType"
@@ -767,11 +767,11 @@ export default function BikeUploadForm() {
                         className="space-y-3"
                       >
                         {visibilityOptions.map((option) => (
-                          <div key={option.value} className="flex items-start space-x-2 p-2 rounded-md border border-transparent hover:border-gray-200 hover:bg-gray-50">
+                          <div key={option.value} className="flex items-start space-x-2 p-2 rounded-md border border-gray-700 hover:border-blue-500 bg-gray-800 hover:bg-gray-700">
                             <RadioGroupItem value={option.value} id={`visibility-${option.value}`} className="mt-1" />
                             <div>
-                              <Label htmlFor={`visibility-${option.value}`} className="font-medium">{option.label}</Label>
-                              <p className="text-sm text-gray-500">{option.description}</p>
+                              <Label htmlFor={`visibility-${option.value}`} className="font-medium text-white">{option.label}</Label>
+                              <p className="text-sm text-gray-300">{option.description}</p>
                             </div>
                           </div>
                         ))}
