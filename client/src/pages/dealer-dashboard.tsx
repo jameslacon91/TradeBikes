@@ -379,6 +379,12 @@ export default function DealerDashboard() {
             >
               Completed Deals
             </button>
+            <button 
+              className={`tab flex-shrink-0 ${activeTab === "archived-listings" ? "tab-active bg-primary text-white" : ""}`}
+              onClick={() => setActiveTab("archived-listings")}
+            >
+              Archived Listings
+            </button>
           </div>
           
           {/* Content Container */}
