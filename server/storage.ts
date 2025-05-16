@@ -40,6 +40,7 @@ export interface IStorage {
   getMotorcycle(id: number): Promise<Motorcycle | undefined>;
   getMotorcyclesByDealerId(dealerId: number): Promise<Motorcycle[]>;
   updateMotorcycle(id: number, motorcycle: Partial<Motorcycle>): Promise<Motorcycle | undefined>;
+  deleteMotorcycle(id: number, dealerId: number): Promise<boolean>;
   
   // Auction methods
   createAuction(auction: InsertAuction): Promise<Auction>;
@@ -48,6 +49,8 @@ export interface IStorage {
   getActiveAuctions(currentUserId?: number | null): Promise<AuctionWithDetails[]>;
   getAuctionsByDealerId(dealerId: number): Promise<AuctionWithDetails[]>;
   updateAuction(id: number, auction: Partial<Auction>): Promise<Auction | undefined>;
+  deleteAuction(id: number, dealerId: number): Promise<boolean>;
+  archiveAuctionAsNoSale(id: number, dealerId: number): Promise<Auction | undefined>;
   
   // Bid methods
   createBid(bid: InsertBid): Promise<Bid>;
@@ -1344,6 +1347,62 @@ export class MemStorage implements IStorage {
     
     const updatedAuction = { ...auction, ...auctionData };
     this.auctions.set(id, updatedAuction);
+    return updatedAuction;
+  }
+  
+  async deleteAuction(id: number, dealerId: number): Promise<boolean> {
+    const auction = this.auctions.get(id);
+    
+    // Check if auction exists and belongs to the dealer
+    if (!auction || auction.dealerId !== dealerId) {
+      return false;
+    }
+    
+    // Check if it has bids - if it does, we shouldn't delete it
+    const hasBids = Array.from(this.bids.values()).some(b => b.auctionId === auction.id);
+    if (hasBids) {
+      return false;
+    }
+    
+    // Also delete the associated motorcycle
+    const motorcycle = this.motorcycles.get(auction.motorcycleId);
+    if (motorcycle && motorcycle.dealerId === dealerId) {
+      this.motorcycles.delete(auction.motorcycleId);
+    }
+    
+    // Delete the auction
+    this.auctions.delete(id);
+    return true;
+  }
+  
+  async archiveAuctionAsNoSale(id: number, dealerId: number): Promise<Auction | undefined> {
+    const auction = this.auctions.get(id);
+    
+    // Check if auction exists and belongs to the dealer
+    if (!auction || auction.dealerId !== dealerId) {
+      return undefined;
+    }
+    
+    // Can only archive active or pending auctions
+    if (auction.status !== 'active' && auction.status !== 'pending') {
+      return undefined;
+    }
+    
+    // Update auction status to 'no_sale'
+    const updatedAuction = { 
+      ...auction, 
+      status: 'no_sale',
+      completedAt: new Date().toISOString()
+    };
+    this.auctions.set(id, updatedAuction);
+    
+    // Update motorcycle status to 'available' again
+    const motorcycle = this.motorcycles.get(auction.motorcycleId);
+    if (motorcycle) {
+      const updatedMotorcycle = { ...motorcycle, status: 'available' };
+      this.motorcycles.set(motorcycle.id, updatedMotorcycle);
+    }
+    
     return updatedAuction;
   }
 
