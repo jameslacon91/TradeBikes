@@ -1626,6 +1626,41 @@ export class MemStorage implements IStorage {
       return a.createdAt.getTime() - b.createdAt.getTime();
     });
   }
+  
+  async getAllMessagesForUser(userId: number): Promise<Message[]> {
+    const result: Message[] = [];
+    for (const message of this.messages.values()) {
+      if (message.senderId === userId || message.receiverId === userId) {
+        result.push(message);
+      }
+    }
+    // Sort by creation date (descending - newest first)
+    return result.sort((a, b) => {
+      if (!a.createdAt || !b.createdAt) return 0;
+      return b.createdAt.getTime() - a.createdAt.getTime();
+    });
+  }
+  
+  async markMessageAsRead(messageId: number, userId: number): Promise<Message | undefined> {
+    const message = this.messages.get(messageId);
+    if (!message) return undefined;
+    
+    // Only the receiver can mark a message as read
+    if (message.receiverId !== userId) return undefined;
+    
+    message.read = true;
+    return message;
+  }
+  
+  async getUnreadMessageCount(userId: number): Promise<number> {
+    let count = 0;
+    for (const message of this.messages.values()) {
+      if (message.receiverId === userId && !message.read) {
+        count++;
+      }
+    }
+    return count;
+  }
 
   // Notification methods
   async createNotification(insertNotification: InsertNotification): Promise<Notification> {

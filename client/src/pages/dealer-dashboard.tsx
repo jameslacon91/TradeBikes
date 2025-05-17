@@ -13,7 +13,7 @@ import ActivityItem from '@/components/dashboard/ActivityItem';
 import AuctionCard from '@/components/auctions/AuctionCard';
 import { 
   Package, AlertCircle, Clock, CheckCircle, BarChart4, Users,
-  Gavel, PlusCircle, Link as LinkIcon, Home, Search
+  Gavel, PlusCircle, Link as LinkIcon, Home, Search, MessageSquare
 } from 'lucide-react';
 import { Link } from 'wouter';
 import Layout from '@/components/layout/Layout';
@@ -49,6 +49,17 @@ export default function DealerDashboard() {
     enabled: false // Just to get the refetch function
   });
   
+  const { refetch: refetchMessages } = useQuery<{count: number}>({
+    queryKey: ['/api/messages/unread/count', user?.id],
+    enabled: false // Just to get the refetch function
+  });
+  
+  // Query for unread messages count
+  const { data: unreadMessagesData, isLoading: unreadMessagesLoading } = useQuery<{count: number}>({
+    queryKey: ['/api/messages/unread/count', user?.id],
+    enabled: !!user?.id
+  });
+  
   // Force a refetch of all data when the user changes
   useEffect(() => {
     // This effect runs when the user ID changes, ensuring fresh data
@@ -60,8 +71,9 @@ export default function DealerDashboard() {
       refetchDealerAuctions();
       refetchActivity();
       refetchBids();
+      refetchMessages();
     }
-  }, [user?.id, refetchStats, refetchDealerAuctions, refetchActivity, refetchBids]);
+  }, [user?.id, refetchStats, refetchDealerAuctions, refetchActivity, refetchBids, refetchMessages]);
   
   // Listen for the force-data-refresh event from WebSocket notifications
   useEffect(() => {
