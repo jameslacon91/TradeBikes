@@ -123,19 +123,11 @@ export default function DealerDashboard() {
     enabled: activeTab === 'dashboard' && !!user
   });
   
-  // Fetch unread message count
-  const { data: unreadMessagesData } = useQuery({
-    queryKey: ['/api/messages/unread/count'],
-    queryFn: async () => {
-      const res = await fetch('/api/messages/unread/count');
-      if (!res.ok) {
-        throw new Error('Failed to fetch unread messages count');
-      }
-      return res.json() as Promise<{ count: number }>;
-    },
-    enabled: !!user,
-    refetchInterval: 30000 // Refresh every 30 seconds
-  });
+  // We're already fetching unread message count above with this query:
+  // const { data: unreadMessagesData, isLoading: unreadMessagesLoading } = useQuery<{count: number}>({
+  //   queryKey: ['/api/messages/unread/count', user?.id],
+  //   enabled: !!user?.id
+  // });
   
   // Fetch dealer auctions - needed for multiple tabs
   const { data: activeAuctions, isLoading: auctionsLoading } = useQuery<AuctionWithDetails[]>({
