@@ -25,6 +25,7 @@ import { WebSocketProvider } from "./hooks/use-websocket";
 import { LogOut, UserCircle, Plus, TrendingUp, Menu, X } from "lucide-react";
 import InstallPrompt from "./components/mobile/InstallPrompt";
 import BottomNavigation from "./components/mobile/BottomNavigation";
+import ChatWidget from "./components/chat/ChatWidget";
 
 // Main router component
 function Router() {
@@ -288,6 +289,7 @@ function AppContent() {
       </main>
       <InstallPrompt />
       {user && <BottomNavigation />}
+      <ChatWidget />
     </div>
   );
 }
