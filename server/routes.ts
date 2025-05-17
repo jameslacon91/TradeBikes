@@ -425,11 +425,56 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get all messages for the current user
+  app.get("/api/messages", isAuthenticated, async (req, res, next) => {
+    try {
+      const messages = await storage.getAllMessagesForUser(req.user.id);
+      
+      // Fetch user details for the other participants
+      const messageWithUsers = await Promise.all(
+        messages.map(async (message) => {
+          const otherUserId = message.senderId === req.user.id ? message.receiverId : message.senderId;
+          const otherUser = await storage.getUser(otherUserId);
+          
+          return {
+            ...message,
+            otherUser: otherUser ? {
+              id: otherUser.id,
+              username: otherUser.username,
+              companyName: otherUser.companyName
+            } : undefined
+          };
+        })
+      );
+      
+      res.json(messageWithUsers);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  // Get messages between current user and specific user
   app.get("/api/messages/:userId", isAuthenticated, async (req, res, next) => {
     try {
       const userId = parseInt(req.params.userId, 10);
       const messages = await storage.getMessagesBetweenUsers(req.user.id, userId);
       res.json(messages);
+    } catch (error) {
+      next(error);
+    }
+  });
+  
+  // Mark a message as read
+  app.patch("/api/messages/:messageId/read", isAuthenticated, async (req, res, next) => {
+    try {
+      const messageId = parseInt(req.params.messageId, 10);
+      const message = await storage.markMessageAsRead(messageId, req.user.id);
+      
+      if (!message) {
+        return res.status(404).json({ message: "Message not found" });
+      }
+      
+      res.json(message);
     } catch (error) {
       next(error);
     }
