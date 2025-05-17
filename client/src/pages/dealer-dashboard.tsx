@@ -22,6 +22,7 @@ import { DashboardStats, AuctionWithDetails, ActivityItem as ActivityItemType } 
 // Lazy-loaded components
 const FavoriteDealers = lazy(() => import('@/components/dashboard/FavoriteDealers'));
 const BidAcceptance = lazy(() => import('@/components/dashboard/BidAcceptance'));
+const MessagesTab = lazy(() => import('@/components/dashboard/MessagesTab'));
 
 export default function DealerDashboard() {
   const { user } = useAuth();
@@ -400,6 +401,17 @@ export default function DealerDashboard() {
             >
               Archived Listings
             </button>
+            <button 
+              className={`tab flex-shrink-0 ${activeTab === "messages" ? "tab-active bg-primary text-white" : ""}`}
+              onClick={() => setActiveTab("messages")}
+            >
+              Messages
+              {unreadMessagesData && unreadMessagesData.count > 0 && (
+                <span className="ml-2 bg-red-500 text-white rounded-full px-2 py-0.5 text-xs font-bold">
+                  {unreadMessagesData.count}
+                </span>
+              )}
+            </button>
           </div>
           
           {/* Content Container */}
@@ -759,6 +771,24 @@ export default function DealerDashboard() {
                       ))}
                     </div>
                   )}
+                </div>
+              </TabsContent>
+              
+              {/* Messages Tab */}
+              <TabsContent value="messages">
+                <div className="mb-6">
+                  <h2 className="text-xl font-semibold mb-2">Messages</h2>
+                  <p className="text-muted-foreground">View and respond to messages from other dealers.</p>
+                  
+                  <div className="h-[calc(100vh-250px)] min-h-[500px]">
+                    <Suspense fallback={
+                      <div className="flex items-center justify-center h-full">
+                        <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full"></div>
+                      </div>
+                    }>
+                      <MessagesTab />
+                    </Suspense>
+                  </div>
                 </div>
               </TabsContent>
             </Tabs>
