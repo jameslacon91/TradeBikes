@@ -63,6 +63,9 @@ export interface IStorage {
   // Message methods
   createMessage(message: InsertMessage): Promise<Message>;
   getMessagesBetweenUsers(userId1: number, userId2: number): Promise<Message[]>;
+  getAllMessagesForUser(userId: number): Promise<Message[]>;
+  markMessageAsRead(messageId: number, userId: number): Promise<Message | undefined>;
+  getUnreadMessageCount(userId: number): Promise<number>;
   
   // Notification methods
   createNotification(notification: InsertNotification): Promise<Notification>;
