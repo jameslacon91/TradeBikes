@@ -479,6 +479,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       next(error);
     }
   });
+  
+  // Get unread message count
+  app.get("/api/messages/unread/count", isAuthenticated, async (req, res, next) => {
+    try {
+      const count = await storage.getUnreadMessageCount(req.user.id);
+      res.json({ count });
+    } catch (error) {
+      next(error);
+    }
+  });
 
   // Notifications
   app.get("/api/notifications", isAuthenticated, async (req, res, next) => {
