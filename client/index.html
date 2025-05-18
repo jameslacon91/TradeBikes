@@ -66,14 +66,22 @@
   <body>
     <div id="error-info"></div>
     <div id="root"></div>
-    <!-- Chat widget container that will always appear -->
-    <div id="chat-widget-container"></div>
     
+    <!-- Main application script -->
     <script type="module" src="/src/main.tsx"></script>
     
-    <!-- Direct chat widget script - will work independently of React -->
-    <script>
-      document.addEventListener('DOMContentLoaded', function() {
+    <!-- Chat widget script (separate file) -->
+    <script src="/chat-widget.js"></script>
+    
+    <!-- This is a replit script which adds a banner on the top of the page when opened in development mode outside the replit environment -->
+    <script
+      type="text/javascript"
+      src="https://replit.com/public/js/replit-dev-banner.js"
+    ></script>
+      // Delay the initialization to ensure the React app loads first
+      window.addEventListener('load', function() {
+        // Give React app a chance to initialize
+        setTimeout(function() {
         // Create a chat button with fixed positioning
         const chatButtonContainer = document.createElement('div');
         chatButtonContainer.style.position = 'fixed';
