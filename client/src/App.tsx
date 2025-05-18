@@ -294,4 +294,5 @@ function AppContent() {
   );
 }
 
+// Version with chat widget added (May 18, 2025)
 export default App;

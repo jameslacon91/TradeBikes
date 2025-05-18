@@ -1,61 +1,29 @@
-#!/usr/bin/env node
 /**
  * TradeBikes Deployment Helper
  * This script forces Replit to recognize changes in deployment
  * by creating a timestamp file and modifying critical paths
  */
 
-import fs from 'fs';
-import path from 'path';
-import { execSync } from 'child_process';
+import * as fs from 'fs';
 
-// Current timestamp to make this deployment unique
+// Update the timestamp in deployment-timestamp.txt
 const timestamp = new Date().toISOString();
+console.log(`Updating deployment timestamp to: ${timestamp}`);
+fs.writeFileSync('deployment-timestamp.txt', `Deployment requested at: ${timestamp}`);
 
-// Create a timestamp file to ensure Replit sees changes
-fs.writeFileSync('deployment-timestamp.txt', `Deployment triggered at: ${timestamp}`);
-console.log(`✅ Created timestamp file for deployment: ${timestamp}`);
+// Update a comment in the server file to force rebuild
+console.log('Adding deployment trigger to server files');
+const deployFilePath = 'server/deploy.ts';
+const deployContent = fs.readFileSync(deployFilePath, 'utf8');
+const updatedDeployContent = deployContent.replace(
+  '/**\n * Special deployment entry point for TradeBikes',
+  `/**\n * Special deployment entry point for TradeBikes\n * Last deployment: ${timestamp}`
+);
+fs.writeFileSync(deployFilePath, updatedDeployContent);
 
-// If we have a dist directory, touch the files to update timestamps
-try {
-  if (fs.existsSync('dist')) {
-    console.log('📂 Updating timestamps on dist files...');
-    execSync('find dist -type f -exec touch {} \\;');
-  }
-} catch (error) {
-  console.log('⚠️ Could not update dist file timestamps:', error.message);
-}
+// Create a special build marker file that will force rebuild
+console.log('Creating build marker file');
+fs.writeFileSync('.build-marker', `BUILD_TIMESTAMP=${timestamp}\nTRIGGER=true\n`);
 
-// Update main server file to force Replit to notice changes
-try {
-  const indexPath = 'server/index.ts';
-  if (fs.existsSync(indexPath)) {
-    let content = fs.readFileSync(indexPath, 'utf8');
-    
-    // Add or update deployment version comment
-    if (content.includes('DEPLOYMENT_VERSION:')) {
-      content = content.replace(
-        /DEPLOYMENT_VERSION:.*$/m,
-        `DEPLOYMENT_VERSION: ${timestamp} - Updated for Replit deployment`
-      );
-    } else {
-      content = `// DEPLOYMENT_VERSION: ${timestamp} - Updated for Replit deployment\n${content}`;
-    }
-    
-    fs.writeFileSync(indexPath, content);
-    console.log('✅ Updated server index.ts with deployment timestamp');
-  }
-} catch (error) {
-  console.log('⚠️ Could not update server index.ts:', error.message);
-}
-
-// Create or update Replit Secrets
-console.log('🔑 Make sure you have these secrets set in Replit:');
-console.log('  - SESSION_SECRET: A secure random string');
-console.log('  - NODE_ENV: Set to "production"');
-console.log('  - REPLIT_DEPLOYMENT: Set to "true"');
-
-console.log('\n🚀 Ready for deployment!');
-console.log('1. Click the "Deploy" button in Replit');
-console.log('2. Wait for the deployment to finish');
-console.log('3. Visit your deployment URL (e.g., https://trade-bikes-jameslacon1.replit.app)');
+console.log('✅ Deployment helper complete!');
+console.log('Please deploy again - these changes should ensure the latest version is deployed.');
