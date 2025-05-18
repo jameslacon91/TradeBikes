@@ -1,284 +1,212 @@
-// Wait for the page to be fully loaded
-window.addEventListener('load', function() {
-  // Wait a short time to ensure React has initialized
-  setTimeout(function() {
-    // Create a chat button with fixed positioning
-    const chatButtonContainer = document.createElement('div');
-    chatButtonContainer.style.position = 'fixed';
-    chatButtonContainer.style.bottom = '20px';
-    chatButtonContainer.style.right = '20px';
-    chatButtonContainer.style.zIndex = '9999';
-    document.body.appendChild(chatButtonContainer);
+// TradeBikes Chat Widget - Standalone Implementation
+document.addEventListener('DOMContentLoaded', function() {
+  // Create a chat button with fixed positioning
+  const chatButtonContainer = document.createElement('div');
+  chatButtonContainer.style.position = 'fixed';
+  chatButtonContainer.style.bottom = '20px';
+  chatButtonContainer.style.right = '20px';
+  chatButtonContainer.style.zIndex = '9999';
+  
+  // Create the button
+  const chatButton = document.createElement('button');
+  chatButton.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>';
+  chatButton.style.width = '56px';
+  chatButton.style.height = '56px';
+  chatButton.style.borderRadius = '50%';
+  chatButton.style.backgroundColor = '#2c5282'; // TradeBikes blue
+  chatButton.style.color = 'white';
+  chatButton.style.border = 'none';
+  chatButton.style.cursor = 'pointer';
+  chatButton.style.display = 'flex';
+  chatButton.style.justifyContent = 'center';
+  chatButton.style.alignItems = 'center';
+  chatButton.style.boxShadow = '0 4px 10px rgba(0, 0, 0, 0.2)';
+  chatButton.style.transition = 'all 0.3s ease';
+  
+  // Hover effect
+  chatButton.onmouseover = function() {
+    this.style.transform = 'scale(1.05)';
+    this.style.boxShadow = '0 6px 15px rgba(0, 0, 0, 0.3)';
+  };
+  
+  chatButton.onmouseout = function() {
+    this.style.transform = 'scale(1)';
+    this.style.boxShadow = '0 4px 10px rgba(0, 0, 0, 0.2)';
+  };
+  
+  // Add to DOM
+  chatButtonContainer.appendChild(chatButton);
+  document.body.appendChild(chatButtonContainer);
+  
+  // Create chat window (initially hidden)
+  const chatWindow = document.createElement('div');
+  chatWindow.style.position = 'fixed';
+  chatWindow.style.bottom = '80px';
+  chatWindow.style.right = '20px';
+  chatWindow.style.width = '320px';
+  chatWindow.style.height = '400px';
+  chatWindow.style.backgroundColor = 'white';
+  chatWindow.style.borderRadius = '12px';
+  chatWindow.style.boxShadow = '0 5px 25px rgba(0, 0, 0, 0.2)';
+  chatWindow.style.display = 'none';
+  chatWindow.style.flexDirection = 'column';
+  chatWindow.style.overflow = 'hidden';
+  chatWindow.style.zIndex = '9998';
+  chatWindow.style.fontFamily = 'Inter, system-ui, sans-serif';
+  
+  // Chat header
+  const chatHeader = document.createElement('div');
+  chatHeader.style.backgroundColor = '#2c5282';
+  chatHeader.style.color = 'white';
+  chatHeader.style.padding = '15px';
+  chatHeader.style.fontWeight = 'bold';
+  chatHeader.style.display = 'flex';
+  chatHeader.style.justifyContent = 'space-between';
+  chatHeader.style.alignItems = 'center';
+  chatHeader.innerHTML = '<span>TradeBikes Support</span>';
+  
+  // Close button
+  const closeButton = document.createElement('button');
+  closeButton.innerHTML = '✕';
+  closeButton.style.background = 'none';
+  closeButton.style.border = 'none';
+  closeButton.style.color = 'white';
+  closeButton.style.fontSize = '16px';
+  closeButton.style.cursor = 'pointer';
+  
+  chatHeader.appendChild(closeButton);
+  chatWindow.appendChild(chatHeader);
+  
+  // Chat messages container
+  const chatMessages = document.createElement('div');
+  chatMessages.style.flex = '1';
+  chatMessages.style.padding = '15px';
+  chatMessages.style.overflowY = 'auto';
+  chatMessages.style.display = 'flex';
+  chatMessages.style.flexDirection = 'column';
+  chatMessages.style.gap = '10px';
+  chatWindow.appendChild(chatMessages);
+  
+  // Input area
+  const inputArea = document.createElement('div');
+  inputArea.style.padding = '10px';
+  inputArea.style.borderTop = '1px solid #eee';
+  inputArea.style.display = 'flex';
+  
+  const chatInput = document.createElement('input');
+  chatInput.type = 'text';
+  chatInput.placeholder = 'Type your message...';
+  chatInput.style.flex = '1';
+  chatInput.style.padding = '10px';
+  chatInput.style.border = '1px solid #ddd';
+  chatInput.style.borderRadius = '20px';
+  chatInput.style.outline = 'none';
+  
+  const sendButton = document.createElement('button');
+  sendButton.innerHTML = '→';
+  sendButton.style.marginLeft = '10px';
+  sendButton.style.width = '40px';
+  sendButton.style.borderRadius = '20px';
+  sendButton.style.backgroundColor = '#2c5282';
+  sendButton.style.color = 'white';
+  sendButton.style.border = 'none';
+  sendButton.style.cursor = 'pointer';
+  
+  inputArea.appendChild(chatInput);
+  inputArea.appendChild(sendButton);
+  chatWindow.appendChild(inputArea);
+  
+  // Add window to DOM
+  document.body.appendChild(chatWindow);
+  
+  // Helper function to add a message
+  function addMessage(text, sender) {
+    const messageContainer = document.createElement('div');
+    messageContainer.style.maxWidth = '80%';
+    messageContainer.style.padding = '10px';
+    messageContainer.style.borderRadius = '10px';
+    messageContainer.style.marginBottom = '8px';
+    messageContainer.style.wordBreak = 'break-word';
     
-    // Chat button that opens the chat widget
-    const chatButton = document.createElement('button');
-    chatButton.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>';
-    chatButton.style.width = '50px';
-    chatButton.style.height = '50px';
-    chatButton.style.borderRadius = '50%';
-    chatButton.style.backgroundColor = '#2c5282';
-    chatButton.style.color = 'white';
-    chatButton.style.border = 'none';
-    chatButton.style.display = 'flex';
-    chatButton.style.alignItems = 'center';
-    chatButton.style.justifyContent = 'center';
-    chatButton.style.cursor = 'pointer';
-    chatButton.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)';
-    chatButtonContainer.appendChild(chatButton);
-    
-    // Create a chat widget container (initially hidden)
-    const chatWidget = document.createElement('div');
-    chatWidget.style.position = 'fixed';
-    chatWidget.style.bottom = '80px';
-    chatWidget.style.right = '20px';
-    chatWidget.style.width = '320px';
-    chatWidget.style.height = '400px';
-    chatWidget.style.backgroundColor = '#fff';
-    chatWidget.style.borderRadius = '8px';
-    chatWidget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.15)';
-    chatWidget.style.display = 'none';
-    chatWidget.style.flexDirection = 'column';
-    chatWidget.style.overflow = 'hidden';
-    chatWidget.style.zIndex = '9999';
-    chatWidget.style.border = '1px solid #e2e8f0';
-    document.body.appendChild(chatWidget);
-    
-    // Chat header
-    const chatHeader = document.createElement('div');
-    chatHeader.style.backgroundColor = '#2c5282';
-    chatHeader.style.color = 'white';
-    chatHeader.style.padding = '10px 15px';
-    chatHeader.style.display = 'flex';
-    chatHeader.style.justifyContent = 'space-between';
-    chatHeader.style.alignItems = 'center';
-    chatHeader.innerHTML = '<div style="display: flex; align-items: center;"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px;"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg><span>TradeBikes Support</span></div>';
-    chatWidget.appendChild(chatHeader);
-    
-    // Close button
-    const closeButton = document.createElement('button');
-    closeButton.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>';
-    closeButton.style.backgroundColor = 'transparent';
-    closeButton.style.border = 'none';
-    closeButton.style.color = 'white';
-    closeButton.style.cursor = 'pointer';
-    chatHeader.appendChild(closeButton);
-    
-    // Chat messages container
-    const chatMessages = document.createElement('div');
-    chatMessages.style.flex = '1';
-    chatMessages.style.padding = '15px';
-    chatMessages.style.overflowY = 'auto';
-    chatMessages.style.backgroundColor = '#f8fafc';
-    chatWidget.appendChild(chatMessages);
-    
-    // Bot message
-    const botMessage = document.createElement('div');
-    botMessage.style.marginBottom = '10px';
-    botMessage.style.maxWidth = '80%';
-    
-    const botMessageContent = document.createElement('div');
-    botMessageContent.textContent = "Hello! I'm your TradeBikes assistant. How can I help you with motorcycle trading today?";
-    botMessageContent.style.backgroundColor = '#e2e8f0';
-    botMessageContent.style.color = '#1a202c';
-    botMessageContent.style.padding = '8px 12px';
-    botMessageContent.style.borderRadius = '8px';
-    botMessageContent.style.display = 'inline-block';
-    
-    botMessage.appendChild(botMessageContent);
-    chatMessages.appendChild(botMessage);
-    
-    // Input area
-    const inputArea = document.createElement('div');
-    inputArea.style.borderTop = '1px solid #e2e8f0';
-    inputArea.style.padding = '10px';
-    inputArea.style.display = 'flex';
-    inputArea.style.backgroundColor = 'white';
-    chatWidget.appendChild(inputArea);
-    
-    // Message input
-    const messageInput = document.createElement('input');
-    messageInput.type = 'text';
-    messageInput.placeholder = 'Type your message...';
-    messageInput.style.flex = '1';
-    messageInput.style.border = '1px solid #e2e8f0';
-    messageInput.style.borderRadius = '4px';
-    messageInput.style.padding = '8px 12px';
-    messageInput.style.marginRight = '8px';
-    inputArea.appendChild(messageInput);
-    
-    // Send button
-    const sendButton = document.createElement('button');
-    sendButton.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>';
-    sendButton.style.backgroundColor = '#2c5282';
-    sendButton.style.color = 'white';
-    sendButton.style.border = 'none';
-    sendButton.style.borderRadius = '4px';
-    sendButton.style.padding = '8px 12px';
-    sendButton.style.cursor = 'pointer';
-    inputArea.appendChild(sendButton);
-    
-    // Quick replies area
-    const quickReplies = document.createElement('div');
-    quickReplies.style.padding = '10px';
-    quickReplies.style.borderTop = '1px solid #e2e8f0';
-    quickReplies.style.backgroundColor = 'white';
-    quickReplies.innerHTML = '<div style="font-size: 12px; color: #64748b; margin-bottom: 6px;">Common Questions:</div>';
-    chatWidget.appendChild(quickReplies);
-    
-    // Add quick reply buttons
-    const questions = [
-      'How do I list a motorcycle?',
-      'How do I place a bid?',
-      'What happens after I accept a bid?',
-      'How do I arrange collection?',
-      'How do I contact another dealer?'
-    ];
-    
-    const quickRepliesContainer = document.createElement('div');
-    quickRepliesContainer.style.display = 'flex';
-    quickRepliesContainer.style.flexWrap = 'wrap';
-    quickRepliesContainer.style.gap = '5px';
-    
-    questions.forEach(question => {
-      const quickReplyBtn = document.createElement('button');
-      quickReplyBtn.textContent = question;
-      quickReplyBtn.style.backgroundColor = '#f1f5f9';
-      quickReplyBtn.style.color = '#334155';
-      quickReplyBtn.style.border = 'none';
-      quickReplyBtn.style.borderRadius = '9999px';
-      quickReplyBtn.style.padding = '6px 10px';
-      quickReplyBtn.style.fontSize = '12px';
-      quickReplyBtn.style.cursor = 'pointer';
-      quickReplyBtn.dataset.question = question;
-      quickRepliesContainer.appendChild(quickReplyBtn);
-      
-      quickReplyBtn.addEventListener('click', function() {
-        sendUserMessage(this.dataset.question);
-      });
-    });
-    
-    quickReplies.appendChild(quickRepliesContainer);
-    
-    // Function to add a user message
-    function addUserMessage(text) {
-      const userMessage = document.createElement('div');
-      userMessage.style.marginBottom = '10px';
-      userMessage.style.textAlign = 'right';
-      
-      const userMessageContent = document.createElement('div');
-      userMessageContent.textContent = text;
-      userMessageContent.style.backgroundColor = '#2c5282';
-      userMessageContent.style.color = 'white';
-      userMessageContent.style.padding = '8px 12px';
-      userMessageContent.style.borderRadius = '8px';
-      userMessageContent.style.display = 'inline-block';
-      userMessageContent.style.maxWidth = '80%';
-      
-      userMessage.appendChild(userMessageContent);
-      chatMessages.appendChild(userMessage);
-      chatMessages.scrollTop = chatMessages.scrollHeight;
+    if (sender === 'user') {
+      messageContainer.style.alignSelf = 'flex-end';
+      messageContainer.style.backgroundColor = '#E3F2FD';
+      messageContainer.style.marginLeft = 'auto';
+    } else {
+      messageContainer.style.alignSelf = 'flex-start';
+      messageContainer.style.backgroundColor = '#f1f1f1';
     }
     
-    // Function to add a bot message
-    function addBotMessage(text) {
-      const botMessage = document.createElement('div');
-      botMessage.style.marginBottom = '10px';
-      botMessage.style.maxWidth = '80%';
-      
-      const botMessageContent = document.createElement('div');
-      botMessageContent.textContent = text;
-      botMessageContent.style.backgroundColor = '#e2e8f0';
-      botMessageContent.style.color = '#1a202c';
-      botMessageContent.style.padding = '8px 12px';
-      botMessageContent.style.borderRadius = '8px';
-      botMessageContent.style.display = 'inline-block';
-      
-      botMessage.appendChild(botMessageContent);
-      chatMessages.appendChild(botMessage);
-      chatMessages.scrollTop = chatMessages.scrollHeight;
-    }
+    messageContainer.textContent = text;
+    chatMessages.appendChild(messageContainer);
     
-    // Function to handle user messages and bot responses
-    function sendUserMessage(text) {
-      if (!text.trim()) return;
+    // Scroll to bottom
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  }
+  
+  // Toggle chat window visibility
+  chatButton.addEventListener('click', function() {
+    if (chatWindow.style.display === 'none') {
+      chatWindow.style.display = 'flex';
+      chatInput.focus();
       
-      addUserMessage(text);
-      messageInput.value = '';
+      // If first time opening, add welcome message
+      if (chatMessages.childElementCount === 0) {
+        addMessage('Hello there! Welcome to TradeBikes. How can I help you today?', 'bot');
+      }
+    }
+  });
+  
+  // Close chat window
+  closeButton.addEventListener('click', function() {
+    chatWindow.style.display = 'none';
+  });
+  
+  // Send message functionality
+  function sendMessage() {
+    const message = chatInput.value.trim();
+    if (message) {
+      addMessage(message, 'user');
+      chatInput.value = '';
       
-      // Show typing indicator
-      const typingIndicator = document.createElement('div');
-      typingIndicator.style.marginBottom = '10px';
-      typingIndicator.style.maxWidth = '80%';
-      
-      const typingContent = document.createElement('div');
-      typingContent.style.backgroundColor = '#e2e8f0';
-      typingContent.style.padding = '8px 12px';
-      typingContent.style.borderRadius = '8px';
-      typingContent.style.display = 'inline-block';
-      typingContent.innerHTML = '<div style="display: flex; gap: 4px;"><div style="width: 8px; height: 8px; background-color: #94a3b8; border-radius: 50%; animation: bounce 1s infinite;"></div><div style="width: 8px; height: 8px; background-color: #94a3b8; border-radius: 50%; animation: bounce 1s infinite 0.2s;"></div><div style="width: 8px; height: 8px; background-color: #94a3b8; border-radius: 50%; animation: bounce 1s infinite 0.4s;"></div></div>';
-      
-      typingIndicator.appendChild(typingContent);
-      chatMessages.appendChild(typingIndicator);
-      
-      // Simulate bot thinking and response
+      // Simulate response after short delay
       setTimeout(() => {
-        chatMessages.removeChild(typingIndicator);
+        let response;
         
-        // Simple response logic
-        let response = '';
-        const lowerText = text.toLowerCase();
-        
-        if (lowerText.includes('list') || lowerText.includes('sell')) {
-          response = 'To list a motorcycle, go to your dashboard and click "List a Bike". Fill in all the required details about your motorcycle and set your reserve price.';
-        } else if (lowerText.includes('bid') || lowerText.includes('offer')) {
-          response = 'To place a bid, browse active listings and click on a motorcycle you\'re interested in. Enter your bid amount and submit. Remember, the selling dealer won\'t see other bids.';
-        } else if (lowerText.includes('accept') || lowerText.includes('winning')) {
-          response = 'When you accept a bid, the buyer will be notified. You\'ll then need to confirm collection details through the "Pending Completion" tab.';
-        } else if (lowerText.includes('collection') || lowerText.includes('pickup')) {
-          response = 'After a bid is accepted, arrange collection details through the messaging system. Once the motorcycle has been collected, mark it as "Collection Confirmed" in the system.';
-        } else if (lowerText.includes('contact') || lowerText.includes('message')) {
-          response = 'You can contact other dealers through the messaging tab. Select the dealer you want to contact and write your message.';
-        } else if (lowerText.includes('hello') || lowerText.includes('hi')) {
-          response = 'Hello! How can I help you with TradeBikes today?';
-        } else if (lowerText.includes('thank')) {
-          response = 'You\'re welcome! Is there anything else I can help you with?';
-        } else {
-          response = 'I\'m not sure I understand. Could you rephrase your question? Or select from one of the common questions below.';
+        if (message.toLowerCase().includes('login') || message.toLowerCase().includes('sign in')) {
+          response = "If you're having trouble logging in, please make sure your credentials are correct. If you need further assistance, please contact your account manager.";
+        }
+        else if (message.toLowerCase().includes('list') || message.toLowerCase().includes('sell')) {
+          response = "To list a motorcycle, go to your Dealer Dashboard and click on 'Add New Bike'. Fill in the details and photos, then click 'Create Listing'.";
+        }
+        else if (message.toLowerCase().includes('bid') || message.toLowerCase().includes('offer')) {
+          response = "You can place bids on active listings by visiting the marketplace section. Click on any listing to view details and submit your bid.";
+        }
+        else if (message.toLowerCase().includes('payment') || message.toLowerCase().includes('pay')) {
+          response = "All payments are processed securely through our platform. Once a deal is accepted, you'll receive payment instructions in your notifications.";
+        }
+        else if (message.toLowerCase().includes('transport') || message.toLowerCase().includes('delivery')) {
+          response = "Transport options are available for all completed deals. You can arrange transport from your dashboard after a deal is finalized.";
+        }
+        else if (message.toLowerCase().includes('contact') || message.toLowerCase().includes('support')) {
+          response = "For direct support, please email us at support@tradebikes.online or call 0800-BIKE-TRADE during business hours.";
+        }
+        else {
+          response = "Thank you for your message. Our team is currently offline, but we'll get back to you as soon as possible. For urgent inquiries, please email support@tradebikes.online.";
         }
         
-        addBotMessage(response);
+        addMessage(response, 'bot');
       }, 1000);
     }
-    
-    // Event listeners
-    chatButton.addEventListener('click', function() {
-      chatWidget.style.display = 'flex';
-      chatButton.style.display = 'none';
-    });
-    
-    closeButton.addEventListener('click', function() {
-      chatWidget.style.display = 'none';
-      chatButton.style.display = 'flex';
-    });
-    
-    sendButton.addEventListener('click', function() {
-      sendUserMessage(messageInput.value);
-    });
-    
-    messageInput.addEventListener('keypress', function(e) {
-      if (e.key === 'Enter') {
-        sendUserMessage(this.value);
-      }
-    });
-    
-    // Add animation style
-    const style = document.createElement('style');
-    style.textContent = `
-      @keyframes bounce {
-        0%, 100% { transform: translateY(0); }
-        50% { transform: translateY(-4px); }
-      }
-    `;
-    document.head.appendChild(style);
-  }, 2000); // 2 second delay to ensure React app loads first
+  }
+  
+  // Send on button click
+  sendButton.addEventListener('click', sendMessage);
+  
+  // Send on Enter key
+  chatInput.addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+      sendMessage();
+    }
+  });
 });
