@@ -13,7 +13,7 @@ interface Message {
 // Initial greeting messages from the bot
 const initialMessages: Message[] = [
   {
-    text: 'Hello! I\'m your TradeBikes assistant. How can I help you today?',
+    text: 'Hello! I\'m your TradeBikes assistant. How can I help you with motorcycle trading today?',
     sender: 'bot',
     timestamp: new Date()
   }
@@ -130,11 +130,11 @@ const ChatWidget: React.FC = () => {
   };
 
   return (
-    <div className="fixed bottom-4 right-4 z-50">
+    <div className="fixed bottom-4 right-4 z-[9999]">
       {/* Chat bubble button */}
       {!isOpen && (
         <button
-          className="flex items-center justify-center bg-primary text-white rounded-full p-4 shadow-lg hover:bg-primary/90 transition-all"
+          className="flex items-center justify-center bg-primary text-white rounded-full p-4 shadow-xl hover:bg-primary/90 transition-all"
           onClick={() => {
             setIsOpen(true);
             setIsMinimized(false);
