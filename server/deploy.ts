@@ -6,7 +6,7 @@
 
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
-import { deployServeStatic } from "./deploy-override";
+import { serveStatic } from "./static-server";
 import cors from "cors";
 import { isProduction, corsConfig } from "./prod-config"; // Use production-specific config
 import crypto from "crypto";
@@ -133,7 +133,7 @@ setupAuth(app);
   });
 
   // Serve static files from the client build
-  deployServeStatic(app);
+  serveStatic(app);
 
   // Start the server
   const port = process.env.PORT || 5000;
