@@ -119,7 +119,16 @@ app.use((req, res, next) => {
   if (app.get("env") === "development") {
     await setupVite(app, server);
   } else {
-    serveStatic(app);
+    // In production, use our custom static server that looks for files in the /build directory
+    try {
+      const { serveStatic: serveStaticProd } = await import("./static-server");
+      serveStaticProd(app);
+      console.log("✅ Using production static server from static-server.ts");
+    } catch (err) {
+      console.error("❌ Failed to load production static server:", err);
+      // Fallback to the default static server
+      serveStatic(app);
+    }
   }
 
   // ALWAYS serve the app on port 5000

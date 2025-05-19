@@ -413,7 +413,7 @@ export default function BikeUploadForm() {
                       {...field} 
                       onChange={(e) => field.onChange(parseInt(e.target.value, 10) || 0)}
                       min={0}
-                      placeholder="e.g. 5000" 
+                      placeholder="Enter mileage" 
                     />
                   </FormControl>
                   <FormMessage />
@@ -439,7 +439,7 @@ export default function BikeUploadForm() {
                     <Input 
                       {...field} 
                       value={field.value || ''}
-                      placeholder="e.g. 675cc, 1200cc" 
+                      placeholder="Enter engine size" 
                     />
                   </FormControl>
                   <FormMessage />
@@ -509,7 +509,7 @@ export default function BikeUploadForm() {
                 <FormControl>
                   <Input 
                     {...field} 
-                    placeholder="e.g. AB12 CDE" 
+                    placeholder="Enter registration number" 
                   />
                 </FormControl>
                 <FormDescription>Enter the vehicle registration number</FormDescription>
