@@ -1,28 +1,79 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en" data-theme="tradebikes">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no"
+    />
     <title>TradeBikes - Real‑Time Wholesale Motorcycle Trading</title>
-    <meta name="description" content="TradeBikes lets dealerships and professional traders buy & sell used motorcycles in a live, real‑time marketplace—move inventory in minutes, not weeks." />
+    <meta
+      name="description"
+      content="TradeBikes lets dealerships and professional traders buy & sell used motorcycles in a live, real‑time marketplace—move inventory in minutes, not weeks."
+    />
 
     <!-- PWA tags -->
     <link rel="manifest" href="/manifest.json" />
     <meta name="theme-color" content="#2c5282" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
     <meta name="apple-mobile-web-app-title" content="TradeBikes" />
     <link rel="apple-touch-icon" href="/icons/icon-152x152.png" />
     <link rel="icon" type="image/svg+xml" href="/icons/icon-512x512.svg" />
-    
+    <!-- Error handling script -->
+    <script>
+      window.addEventListener("error", function (e) {
+        console.error("Global error caught:", e.error);
+        document.getElementById("error-info").innerHTML =
+          "<strong>Error:</strong> " +
+          e.message +
+          "<br/><pre>" +
+          ((e.error && e.error.stack) || "No stack trace") +
+          "</pre>";
+        document.getElementById("error-info").style.display = "block";
+      });
+    </script>
+    <style>
+      #error-info {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        background: #fff0f0;
+        color: #ff0000;
+        padding: 10px;
+        border-bottom: 1px solid #ff0000;
+        z-index: 9999;
+        overflow: auto;
+        max-height: 50vh;
+      }
+    </style>
     <!-- Global stylesheet -->
     <link rel="stylesheet" href="/style.css" />
 
-    <!-- Inter font -->
+    <!-- Inter font (optional but matches the CSS) -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-    
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <script type="module" crossorigin src="/assets/index-BpSmGhpl.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-DitjpiRM.css">
+  </head>
+  <body>
+    <div id="error-info"></div>
+    <div id="root"></div>
+
+    <!-- Main application script -->
+
+    <!-- Chat widget script (separate file) -->
+    <script src="/chat-widget.js"></script>
+
     <!-- Inline emergency fallback if React fails to load -->
     <script>
       // This inline script ensures something always shows to users
@@ -63,19 +114,14 @@
         }, 5000); // 5 second timeout for React to load
       });
     </script>
-  </head>
-  <body>
-    <div id="root"></div>
+    
+    <!-- External emergency fallback (backup) -->
+    <script src="/emergency-fallback.js"></script>
 
-    <!-- Chat widget script -->
-    <script src="/chat-widget.js"></script>
-
-    <!-- Static content that will show if JavaScript is disabled -->
-    <noscript>
-      <div style="padding:20px;max-width:600px;margin:0 auto;font-family:system-ui,sans-serif;text-align:center;">
-        <h1>TradeBikes</h1>
-        <p>You need to enable JavaScript to use this application.</p>
-      </div>
-    </noscript>
+    <!-- This is a replit script which adds a banner on the top of the page when opened in development mode outside the replit environment -->
+    <script
+      type="text/javascript"
+      src="https://replit.com/public/js/replit-dev-banner.js"
+    ></script>
   </body>
 </html>
