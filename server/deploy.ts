@@ -114,7 +114,14 @@ setupAuth(app);
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || err.statusCode || 500;
     const message = err.message || "Internal Server Error";
-    res.status(status).json({ message });
+    
+    console.error(`Server Error: [${status}] ${message}`);
+    console.error(err.stack || err);
+    
+    // Send a generic message in production for security
+    res.status(status).json({ 
+      message: "An error occurred while processing your request. Please try again later." 
+    });
   });
 
   // Serve static files from the client build
