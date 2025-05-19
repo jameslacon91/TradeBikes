@@ -1,6 +1,6 @@
 /**
  * Special deployment entry point for TradeBikes
- * Last deployment: 2025-05-19T11:07:30.000Z
+ * Last deployment: 2025-05-19T11:07:30.125Z
  * This file is designed for Replit deployment and handles production-specific configuration
  */
 

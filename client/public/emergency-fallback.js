@@ -1,10 +1,12 @@
 // This script will show a proper UI if the main React app fails to load
+// This is a backup to the inline fallback that's in index.html
 window.addEventListener('load', function() {
-  console.log("Emergency fallback script loaded");
+  console.log("External emergency fallback script loaded");
   
-  // Check if the app has loaded after 5 seconds
+  // Set a slightly longer timeout than the inline fallback
+  // to prevent conflicts/race conditions
   setTimeout(function() {
-    console.log("Checking if app loaded correctly");
+    console.log("External fallback checking if app loaded correctly");
     // Get the root element
     const rootElement = document.getElementById('root');
     
@@ -56,5 +58,5 @@ window.addEventListener('load', function() {
         window.location.reload();
       });
     }
-  }, 5000); // Wait 5 seconds to check if React loaded
+  }, 6000); // Wait 6 seconds to check if React loaded (1s after inline fallback)
 });
