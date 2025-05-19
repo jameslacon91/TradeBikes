@@ -1,12 +1,12 @@
 /**
  * Special deployment entry point for TradeBikes
- * Last deployment: 2025-05-19T11:07:30.125Z
+ * Last deployment: 2025-05-19T11:54:12.000Z
  * This file is designed for Replit deployment and handles production-specific configuration
  */
 
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
-import { serveStatic } from "./vite";
+import { deployServeStatic } from "./deploy-override";
 import cors from "cors";
 import { isProduction, corsConfig } from "./prod-config"; // Use production-specific config
 import crypto from "crypto";
@@ -133,7 +133,7 @@ setupAuth(app);
   });
 
   // Serve static files from the client build
-  serveStatic(app);
+  deployServeStatic(app);
 
   // Start the server
   const port = process.env.PORT || 5000;
