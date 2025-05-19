@@ -1,6 +1,6 @@
 /**
  * TradeBikes deployment override - adjusts the server configuration for production
- * Last updated: 2025-05-19T11:53:30.000Z
+ * Last updated: 2025-05-19T11:56:35.972Z
  */
 
 import express, { type Express, Request, Response, NextFunction } from "express";
