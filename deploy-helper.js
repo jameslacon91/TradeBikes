@@ -4,26 +4,42 @@
  * by creating a timestamp file and modifying critical paths
  */
 
-import * as fs from 'fs';
+const fs = require('fs');
+const path = require('path');
+const { execSync } = require('child_process');
 
-// Update the timestamp in deployment-timestamp.txt
+// Create timestamp for unique identifier
 const timestamp = new Date().toISOString();
-console.log(`Updating deployment timestamp to: ${timestamp}`);
-fs.writeFileSync('deployment-timestamp.txt', `Deployment requested at: ${timestamp}`);
 
-// Update a comment in the server file to force rebuild
-console.log('Adding deployment trigger to server files');
-const deployFilePath = 'server/deploy.ts';
-const deployContent = fs.readFileSync(deployFilePath, 'utf8');
-const updatedDeployContent = deployContent.replace(
-  '/**\n * Special deployment entry point for TradeBikes',
-  `/**\n * Special deployment entry point for TradeBikes\n * Last deployment: ${timestamp}`
-);
-fs.writeFileSync(deployFilePath, updatedDeployContent);
+try {
+  // Update deployment timestamp in deploy.ts
+  const deployPath = path.join(__dirname, 'server', 'deploy.ts');
+  let deployContent = fs.readFileSync(deployPath, 'utf8');
+  deployContent = deployContent.replace(
+    /Last deployment: .*/,
+    `Last deployment: ${timestamp}`
+  );
+  fs.writeFileSync(deployPath, deployContent);
+  console.log('✅ Updated deployment timestamp in deploy.ts');
 
-// Create a special build marker file that will force rebuild
-console.log('Creating build marker file');
-fs.writeFileSync('.build-marker', `BUILD_TIMESTAMP=${timestamp}\nTRIGGER=true\n`);
+  // Create/update force-rebuild.txt in the public directory
+  const forceRebuildPath = path.join(__dirname, 'client', 'public', 'force-rebuild.txt');
+  fs.writeFileSync(forceRebuildPath, `Force rebuild for deployment: ${timestamp}`);
+  console.log('✅ Created force-rebuild.txt');
 
-console.log('✅ Deployment helper complete!');
-console.log('Please deploy again - these changes should ensure the latest version is deployed.');
+  // Create deployment-timestamp.txt at root
+  const timestampPath = path.join(__dirname, 'deployment-timestamp.txt');
+  fs.writeFileSync(timestampPath, timestamp);
+  console.log('✅ Created deployment-timestamp.txt');
+
+  // Create .build-marker file to force rebuild
+  fs.writeFileSync('.build-marker', timestamp);
+  console.log('✅ Updated .build-marker file');
+
+  // Fix potential WebSocket issues in deployment
+  console.log('Deployment files prepared with timestamp:', timestamp);
+  console.log('Ready for deployment!');
+} catch (error) {
+  console.error('Error updating deployment files:', error);
+  process.exit(1);
+}

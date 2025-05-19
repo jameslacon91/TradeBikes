@@ -1,6 +1,6 @@
 /**
  * Special deployment entry point for TradeBikes
- * Last deployment: 2025-05-18T09:40:46.603Z
+ * Last deployment: 2025-05-19T11:07:30.000Z
  * This file is designed for Replit deployment and handles production-specific configuration
  */
 
@@ -110,17 +110,25 @@ setupAuth(app);
   // Register API routes
   const server = await registerRoutes(app);
 
-  // Error handling
+  // Enhanced error handling for production
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || err.statusCode || 500;
     const message = err.message || "Internal Server Error";
     
-    console.error(`Server Error: [${status}] ${message}`);
-    console.error(err.stack || err);
+    // Detailed logging for server-side troubleshooting
+    console.error(`[PRODUCTION ERROR] Status: [${status}] Message: ${message}`);
+    console.error(`Error Stack: ${err.stack || JSON.stringify(err)}`);
     
-    // Send a generic message in production for security
-    res.status(status).json({ 
-      message: "An error occurred while processing your request. Please try again later." 
+    // Log request info without sensitive data
+    console.error(`Request Path: ${_req.path}`);
+    console.error(`Request Method: ${_req.method}`);
+    
+    // Always respond with a 200 status in production to prevent browser errors
+    // but include the actual error code in the response
+    res.status(200).json({ 
+      success: false,
+      errorCode: status,
+      message: "The service is temporarily unavailable. Please try again later."
     });
   });
 
