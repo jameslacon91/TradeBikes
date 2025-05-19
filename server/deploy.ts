@@ -23,6 +23,19 @@ const MemoryStore = createMemoryStore(session);
 process.env.NODE_ENV = 'production';
 console.log(`✅ Deployment mode active (NODE_ENV: ${process.env.NODE_ENV})`);
 
+// Load deployment timestamp if available
+try {
+  const fs = require('fs');
+  const path = require('path');
+  const timestampPath = path.join(__dirname, '..', 'deployment-timestamp.txt');
+  if (fs.existsSync(timestampPath)) {
+    const timestamp = fs.readFileSync(timestampPath, 'utf8').trim();
+    console.log(`✅ Deployment timestamp: ${timestamp}`);
+  }
+} catch (err) {
+  console.warn('Could not load deployment timestamp', err);
+}
+
 // Create and configure the Express application
 const app = express();
 
