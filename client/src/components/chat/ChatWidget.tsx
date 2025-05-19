@@ -130,8 +130,8 @@ const ChatWidget: React.FC = () => {
   };
 
   return (
-    <div className="fixed bottom-4 right-4 z-[9999]" data-chat-widget="react">
-      {/* Chat bubble button */}
+    <div className="fixed bottom-4 right-4 z-[9999] sm:bottom-4 md:bottom-4 lg:bottom-4 xs:bottom-20" data-chat-widget="react">
+      {/* Chat bubble button - positioned higher on mobile to avoid dashboard button */}
       {!isOpen && (
         <button
           className="flex items-center justify-center bg-primary text-white rounded-full p-4 shadow-xl hover:bg-primary/90 transition-all"

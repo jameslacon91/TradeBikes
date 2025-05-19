@@ -326,9 +326,12 @@ export default function BikeUploadForm() {
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit, (errors) => {
         console.log('Form validation errors:', errors);
+        
+        // Create a more specific error message
+        const errorFields = Object.keys(errors).join(', ');
         toast({
-          title: "Form validation failed",
-          description: "Please check all required fields and try again.",
+          title: "Please complete all required fields",
+          description: `Missing or invalid information: ${errorFields}`,
           variant: "destructive",
         });
       })} className="space-y-8">

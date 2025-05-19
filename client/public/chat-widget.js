@@ -15,7 +15,14 @@ document.addEventListener('DOMContentLoaded', function() {
     const chatButtonContainer = document.createElement('div');
     chatButtonContainer.setAttribute('data-chat-widget', 'standalone');
     chatButtonContainer.style.position = 'fixed';
-    chatButtonContainer.style.bottom = '20px';
+    
+    // Position higher on mobile screens to avoid overlapping with dashboard button
+    if (window.innerWidth < 640) {
+      chatButtonContainer.style.bottom = '80px'; // Higher position on mobile
+    } else {
+      chatButtonContainer.style.bottom = '20px'; // Normal position on larger screens
+    }
+    
     chatButtonContainer.style.right = '20px';
     chatButtonContainer.style.zIndex = '9999';
     
