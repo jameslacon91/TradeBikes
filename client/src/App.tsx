@@ -289,7 +289,7 @@ function AppContent() {
       </main>
       <InstallPrompt />
       {user && <BottomNavigation />}
-      <ChatWidget />
+      {/* ChatWidget now handled as standalone JS */}
     </div>
   );
 }
