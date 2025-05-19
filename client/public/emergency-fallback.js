@@ -1,7 +1,10 @@
 // This script will show a proper UI if the main React app fails to load
 window.addEventListener('load', function() {
+  console.log("Emergency fallback script loaded");
+  
   // Check if the app has loaded after 5 seconds
   setTimeout(function() {
+    console.log("Checking if app loaded correctly");
     // Get the root element
     const rootElement = document.getElementById('root');
     
