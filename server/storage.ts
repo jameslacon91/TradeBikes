@@ -1662,6 +1662,17 @@ export class MemStorage implements IStorage {
     }
     return count;
   }
+  
+  async getAllMessages(): Promise<Message[]> {
+    // Get all messages from the storage
+    const messages = Array.from(this.messages.values());
+    
+    // Sort by creation date (newest first)
+    return messages.sort((a, b) => {
+      if (!a.createdAt || !b.createdAt) return 0;
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    });
+  }
 
   // Notification methods
   async createNotification(insertNotification: InsertNotification): Promise<Notification> {
@@ -2143,6 +2154,14 @@ export class DatabaseStorage implements IStorage {
       ));
     
     return unreadMessages.length;
+  }
+  
+  async getAllMessages(): Promise<Message[]> {
+    // Fetch all messages for the admin dashboard
+    return db
+      .select()
+      .from(messages)
+      .orderBy(desc(messages.createdAt));
   }
 
   // Notification methods
