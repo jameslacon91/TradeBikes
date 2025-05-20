@@ -154,12 +154,12 @@ export function setupAuth(app: Express) {
       
       console.log(`Creating new user: ${username}`);
       
-      // Always create users with dealer role
+      // Create users with dealer role by default (admin role is created manually in database)
       const user = await storage.createUser({
         username,
         password,
         email,
-        role: 'dealer', // Force role to be dealer
+        role: 'dealer', // Default role is dealer
         companyName,
         phone,
         address,

@@ -4,6 +4,7 @@ import { storage } from "./storage";
 import { setupAuth } from "./auth";
 import { setupWebSocket, sendToUser, broadcast } from "./websocket";
 import { WSMessage } from "@shared/types";
+import { setupAdminRoutes } from "./admin-routes";
 import { z } from "zod";
 import { 
   insertMotorcycleSchema, 
@@ -42,6 +43,9 @@ const hasRole = (role: string) => (req: Request, res: Response, next: NextFuncti
 export async function registerRoutes(app: Express): Promise<Server> {
   // Set up authentication
   setupAuth(app);
+  
+  // Set up admin routes
+  setupAdminRoutes(app);
 
   // Create HTTP server
   const httpServer = createServer(app);
