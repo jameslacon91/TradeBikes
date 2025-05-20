@@ -7,14 +7,7 @@ export default defineConfig({
   plugins: [
     react(),
     runtimeErrorOverlay(),
-    ...(process.env.NODE_ENV !== "production" &&
-    process.env.REPL_ID !== undefined
-      ? [
-          await import("@replit/vite-plugin-cartographer").then((m) =>
-            m.cartographer(),
-          ),
-        ]
-      : []),
+    // Removed cartographer plugin to avoid async issues in deploy
   ],
   resolve: {
     alias: {
@@ -25,7 +18,7 @@ export default defineConfig({
   },
   root: path.resolve(import.meta.dirname, "client"),
   build: {
-    outDir: path.resolve(import.meta.dirname, "..", "build"), // build folder in the root
+    outDir: path.resolve(import.meta.dirname, "..", "build"),
     emptyOutDir: true,
   },
 });
