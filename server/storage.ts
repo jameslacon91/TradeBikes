@@ -1716,4 +1716,478 @@ export class MemStorage implements IStorage {
   }
 }
 
-export const storage = new MemStorage();
+import { eq, and, or, desc, isNull, inArray } from "drizzle-orm";
+import { db } from "./db";
+import connectPg from "connect-pg-simple";
+
+const PostgresSessionStore = connectPg(session);
+
+export class DatabaseStorage implements IStorage {
+  readonly sessionStore: session.Store;
+
+  constructor() {
+    this.sessionStore = new PostgresSessionStore({ 
+      pool, 
+      createTableIfMissing: true,
+      tableName: 'sessions' 
+    });
+  }
+
+  // User methods
+  async getUser(id: number): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user;
+  }
+
+  async getUserByUsername(username: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.username, username));
+    return user;
+  }
+
+  async createUser(insertUser: InsertUser): Promise<User> {
+    const [user] = await db.insert(users).values(insertUser).returning();
+    return user;
+  }
+
+  async updateUser(id: number, userData: Partial<User>): Promise<User | undefined> {
+    const [updatedUser] = await db
+      .update(users)
+      .set(userData)
+      .where(eq(users.id, id))
+      .returning();
+    return updatedUser;
+  }
+
+  getAllUsers(): Map<number, User> {
+    // This is a legacy method - convert DB results to a Map for compatibility
+    const userMap = new Map<number, User>();
+    
+    // Using an immediately-invoked async function to handle the async operation
+    (async () => {
+      const allUsers = await db.select().from(users);
+      allUsers.forEach(user => userMap.set(user.id, user));
+    })();
+    
+    return userMap;
+  }
+
+  // Motorcycle methods
+  async createMotorcycle(insertMotorcycle: InsertMotorcycle): Promise<Motorcycle> {
+    const [motorcycle] = await db
+      .insert(motorcycles)
+      .values(insertMotorcycle)
+      .returning();
+    return motorcycle;
+  }
+
+  async getMotorcycle(id: number): Promise<Motorcycle | undefined> {
+    const [motorcycle] = await db
+      .select()
+      .from(motorcycles)
+      .where(eq(motorcycles.id, id));
+    return motorcycle;
+  }
+
+  async getMotorcyclesByDealerId(dealerId: number): Promise<Motorcycle[]> {
+    return db
+      .select()
+      .from(motorcycles)
+      .where(eq(motorcycles.dealerId, dealerId));
+  }
+
+  async updateMotorcycle(id: number, motorcycleData: Partial<Motorcycle>): Promise<Motorcycle | undefined> {
+    const [updatedMotorcycle] = await db
+      .update(motorcycles)
+      .set(motorcycleData)
+      .where(eq(motorcycles.id, id))
+      .returning();
+    return updatedMotorcycle;
+  }
+
+  async deleteMotorcycle(id: number, dealerId: number): Promise<boolean> {
+    const result = await db
+      .delete(motorcycles)
+      .where(and(
+        eq(motorcycles.id, id),
+        eq(motorcycles.dealerId, dealerId)
+      ))
+      .returning({ id: motorcycles.id });
+    
+    return result.length > 0;
+  }
+
+  // Auction methods
+  async createAuction(insertAuction: InsertAuction): Promise<Auction> {
+    const [auction] = await db
+      .insert(auctions)
+      .values(insertAuction)
+      .returning();
+    return auction;
+  }
+
+  async getAuction(id: number): Promise<Auction | undefined> {
+    const [auction] = await db
+      .select()
+      .from(auctions)
+      .where(eq(auctions.id, id));
+    return auction;
+  }
+
+  async getAuctionWithDetails(id: number): Promise<AuctionWithDetails | undefined> {
+    const [auction] = await db
+      .select()
+      .from(auctions)
+      .where(eq(auctions.id, id));
+    
+    if (!auction) return undefined;
+    
+    const [motorcycle] = await db
+      .select()
+      .from(motorcycles)
+      .where(eq(motorcycles.id, auction.motorcycleId));
+    
+    if (!motorcycle) return undefined;
+    
+    const auctionBids = await db
+      .select()
+      .from(bids)
+      .where(eq(bids.auctionId, id));
+    
+    const highestBid = await this.getHighestBidForAuction(id);
+    
+    return {
+      ...auction,
+      motorcycle,
+      bids: auctionBids,
+      currentBid: highestBid?.amount,
+      totalBids: auctionBids.length
+    };
+  }
+
+  async getActiveAuctions(currentUserId: number | null = null): Promise<AuctionWithDetails[]> {
+    const now = new Date();
+    const activeAuctions = await db
+      .select()
+      .from(auctions)
+      .where(and(
+        eq(auctions.status, "active"),
+        or(
+          eq(auctions.visibilityType, "all"),
+          currentUserId ? eq(auctions.dealerId, currentUserId) : undefined
+        )
+      ));
+    
+    // Early return if no auctions
+    if (activeAuctions.length === 0) return [];
+    
+    const result: AuctionWithDetails[] = [];
+    
+    // Process each auction to add details
+    for (const auction of activeAuctions) {
+      const [motorcycle] = await db
+        .select()
+        .from(motorcycles)
+        .where(eq(motorcycles.id, auction.motorcycleId));
+      
+      if (!motorcycle) continue;
+      
+      const auctionBids = await db
+        .select()
+        .from(bids)
+        .where(eq(bids.auctionId, auction.id));
+      
+      const highestBid = await this.getHighestBidForAuction(auction.id);
+      
+      // Check if this auction should be visible to the current user
+      let isVisible = true;
+      
+      if (auction.visibilityType === "favorites" && currentUserId) {
+        const [seller] = await db
+          .select()
+          .from(users)
+          .where(eq(users.id, auction.dealerId));
+        
+        if (seller && seller.favoriteDealers) {
+          isVisible = seller.favoriteDealers.includes(currentUserId);
+        } else {
+          isVisible = false;
+        }
+      }
+      
+      // Add to results if visible
+      if (isVisible) {
+        result.push({
+          ...auction,
+          motorcycle,
+          bids: auctionBids,
+          currentBid: highestBid?.amount,
+          totalBids: auctionBids.length
+        });
+      }
+    }
+    
+    return result;
+  }
+
+  async getAuctionsByDealerId(dealerId: number): Promise<AuctionWithDetails[]> {
+    const dealerAuctions = await db
+      .select()
+      .from(auctions)
+      .where(eq(auctions.dealerId, dealerId));
+    
+    // Early return if no auctions
+    if (dealerAuctions.length === 0) return [];
+    
+    const result: AuctionWithDetails[] = [];
+    
+    // Process each auction to add details
+    for (const auction of dealerAuctions) {
+      const [motorcycle] = await db
+        .select()
+        .from(motorcycles)
+        .where(eq(motorcycles.id, auction.motorcycleId));
+      
+      if (!motorcycle) continue;
+      
+      const auctionBids = await db
+        .select()
+        .from(bids)
+        .where(eq(bids.auctionId, auction.id));
+      
+      const highestBid = await this.getHighestBidForAuction(auction.id);
+      
+      result.push({
+        ...auction,
+        motorcycle,
+        bids: auctionBids,
+        currentBid: highestBid?.amount,
+        totalBids: auctionBids.length
+      });
+    }
+    
+    return result;
+  }
+
+  async updateAuction(id: number, auctionData: Partial<Auction>): Promise<Auction | undefined> {
+    const [updatedAuction] = await db
+      .update(auctions)
+      .set(auctionData)
+      .where(eq(auctions.id, id))
+      .returning();
+    return updatedAuction;
+  }
+
+  async deleteAuction(id: number, dealerId: number): Promise<boolean> {
+    const result = await db
+      .delete(auctions)
+      .where(and(
+        eq(auctions.id, id),
+        eq(auctions.dealerId, dealerId)
+      ))
+      .returning({ id: auctions.id });
+    
+    return result.length > 0;
+  }
+
+  async archiveAuctionAsNoSale(id: number, dealerId: number): Promise<Auction | undefined> {
+    const [updatedAuction] = await db
+      .update(auctions)
+      .set({ 
+        status: "cancelled",
+        completedAt: new Date().toISOString()
+      })
+      .where(and(
+        eq(auctions.id, id),
+        eq(auctions.dealerId, dealerId)
+      ))
+      .returning();
+      
+    if (updatedAuction) {
+      // Update the motorcycle status
+      await db
+        .update(motorcycles)
+        .set({ status: "available" })
+        .where(eq(motorcycles.id, updatedAuction.motorcycleId));
+    }
+    
+    return updatedAuction;
+  }
+
+  // Bid methods
+  async createBid(insertBid: InsertBid): Promise<Bid> {
+    const [bid] = await db
+      .insert(bids)
+      .values(insertBid)
+      .returning();
+    return bid;
+  }
+
+  async getBid(id: number): Promise<Bid | undefined> {
+    const [bid] = await db
+      .select()
+      .from(bids)
+      .where(eq(bids.id, id));
+    return bid;
+  }
+
+  async getBidsByAuctionId(auctionId: number): Promise<Bid[]> {
+    return db
+      .select()
+      .from(bids)
+      .where(eq(bids.auctionId, auctionId))
+      .orderBy(desc(bids.amount));
+  }
+
+  async getBidsByDealerId(dealerId: number): Promise<Bid[]> {
+    return db
+      .select()
+      .from(bids)
+      .where(eq(bids.dealerId, dealerId))
+      .orderBy(desc(bids.createdAt));
+  }
+
+  async getHighestBidForAuction(auctionId: number): Promise<Bid | undefined> {
+    const [highestBid] = await db
+      .select()
+      .from(bids)
+      .where(eq(bids.auctionId, auctionId))
+      .orderBy(desc(bids.amount))
+      .limit(1);
+    
+    return highestBid;
+  }
+
+  async getAuctionsWithBidsByDealer(dealerId: number): Promise<AuctionWithDetails[]> {
+    // Get all bids by this dealer
+    const dealerBids = await db
+      .select()
+      .from(bids)
+      .where(eq(bids.dealerId, dealerId));
+    
+    // Extract unique auction IDs
+    const auctionIds = [...new Set(dealerBids.map(bid => bid.auctionId))];
+    
+    if (auctionIds.length === 0) return [];
+    
+    const result: AuctionWithDetails[] = [];
+    
+    // Get full details for each auction
+    for (const auctionId of auctionIds) {
+      const auctionWithDetails = await this.getAuctionWithDetails(auctionId);
+      if (auctionWithDetails) {
+        result.push(auctionWithDetails);
+      }
+    }
+    
+    return result;
+  }
+
+  // Message methods
+  async createMessage(insertMessage: InsertMessage): Promise<Message> {
+    const [message] = await db
+      .insert(messages)
+      .values(insertMessage)
+      .returning();
+    return message;
+  }
+
+  async getMessagesBetweenUsers(userId1: number, userId2: number): Promise<Message[]> {
+    return db
+      .select()
+      .from(messages)
+      .where(or(
+        and(
+          eq(messages.senderId, userId1),
+          eq(messages.receiverId, userId2)
+        ),
+        and(
+          eq(messages.senderId, userId2),
+          eq(messages.receiverId, userId1)
+        )
+      ))
+      .orderBy(messages.createdAt);
+  }
+
+  async getAllMessagesForUser(userId: number): Promise<Message[]> {
+    return db
+      .select()
+      .from(messages)
+      .where(or(
+        eq(messages.senderId, userId),
+        eq(messages.receiverId, userId)
+      ))
+      .orderBy(messages.createdAt);
+  }
+
+  async markMessageAsRead(messageId: number, userId: number): Promise<Message | undefined> {
+    const [updatedMessage] = await db
+      .update(messages)
+      .set({ read: true })
+      .where(and(
+        eq(messages.id, messageId),
+        eq(messages.receiverId, userId)
+      ))
+      .returning();
+    
+    return updatedMessage;
+  }
+
+  async getUnreadMessageCount(userId: number): Promise<number> {
+    const unreadMessages = await db
+      .select()
+      .from(messages)
+      .where(and(
+        eq(messages.receiverId, userId),
+        eq(messages.read, false)
+      ));
+    
+    return unreadMessages.length;
+  }
+
+  // Notification methods
+  async createNotification(insertNotification: InsertNotification): Promise<Notification> {
+    const [notification] = await db
+      .insert(notifications)
+      .values(insertNotification)
+      .returning();
+    return notification;
+  }
+
+  async getNotificationsByUserId(userId: number): Promise<Notification[]> {
+    return db
+      .select()
+      .from(notifications)
+      .where(eq(notifications.userId, userId))
+      .orderBy(desc(notifications.createdAt));
+  }
+
+  async markNotificationAsRead(id: number): Promise<Notification | undefined> {
+    const [updatedNotification] = await db
+      .update(notifications)
+      .set({ read: true })
+      .where(eq(notifications.id, id))
+      .returning();
+    
+    return updatedNotification;
+  }
+
+  // Data management - not needed for DB implementation
+  resetIds(): void {
+    // No action needed, database handles IDs
+  }
+
+  // Helper methods
+  async comparePasswords(supplied: string, stored: string): Promise<boolean> {
+    return comparePasswords(supplied, stored);
+  }
+}
+
+// Import for session store
+import { Pool } from '@neondatabase/serverless';
+import { pool } from './db';
+
+// Uncomment to use database storage
+export const storage = new DatabaseStorage();
+
+// Comment out this line when using database storage
+// export const storage = new MemStorage();
