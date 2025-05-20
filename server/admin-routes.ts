@@ -74,26 +74,35 @@ export function setupAdminRoutes(app: Express) {
     }
   });
 
-  // Get all messages (only headers, not content for privacy)
+  // Get all messages including content (admin view)
   app.get("/api/admin/messages", isAdmin, async (req: Request, res: Response) => {
     try {
-      const users = storage.getAllUsers();
-      const messageStats = [];
+      // Get all messages from all users
+      const messages = await storage.getAllMessages();
       
-      // Collect message stats for all users
-      for (const [userId, user] of users) {
-        const unreadCount = await storage.getUnreadMessageCount(userId);
-        messageStats.push({
-          userId,
-          username: user.username,
-          unreadCount
-        });
-      }
+      // Add sender and receiver usernames to messages
+      const messagesWithUsernames = await Promise.all(messages.map(async (message) => {
+        const sender = await storage.getUser(message.senderId);
+        const receiver = await storage.getUser(message.receiverId);
+        
+        return {
+          ...message,
+          senderUsername: sender ? sender.username : 'Unknown',
+          senderCompany: sender ? sender.companyName : 'Unknown',
+          receiverUsername: receiver ? receiver.username : 'Unknown',
+          receiverCompany: receiver ? receiver.companyName : 'Unknown'
+        };
+      }));
       
-      res.json(messageStats);
+      // Sort messages by creation date (newest first)
+      messagesWithUsernames.sort((a, b) => 
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
+      
+      res.json(messagesWithUsernames);
     } catch (error) {
-      console.error("Error fetching message stats:", error);
-      res.status(500).json({ message: "Failed to fetch message stats" });
+      console.error("Error fetching messages:", error);
+      res.status(500).json({ message: "Failed to fetch messages" });
     }
   });
 }
