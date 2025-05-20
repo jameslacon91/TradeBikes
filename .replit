@@ -13,6 +13,7 @@ run = ["sh", "-c", "NODE_ENV=production node dist/server/index.js"]
 
 [env]
 REPLIT_KEEP_PACKAGE_DEV_DEPENDENCIES = "1"
+REPLIT_DISABLE_PACKAGE_LAYER = "1"
 
 [workflows]
 runButton = "Start Dev Server"
