@@ -1,320 +1,399 @@
-import { useState, useEffect } from "react";
-import { Navigate } from "wouter";
-import { useAuth } from "@/hooks/use-auth";
-import { Loader2, Users, Bike, Bell, MessageSquare, Settings } from "lucide-react";
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
+import { User } from "@shared/schema";
+import { Motorcycle } from "@shared/schema"; 
+import { Auction } from "@shared/schema";
+import { Loader2, AlertTriangle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { apiRequest } from "@/lib/queryClient";
-import { User, Motorcycle, Auction } from "@shared/schema";
+import { format } from "date-fns";
+import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/use-auth";
+import { Redirect } from "wouter";
 
 export default function AdminDashboard() {
-  const { user, isLoading } = useAuth();
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState("dealers");
+  const { toast } = useToast();
 
-  // Navigate away if not an admin
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-background">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    );
+  // Redirect non-admin users
+  if (user && user.role !== "admin") {
+    toast({
+      title: "Access Denied",
+      description: "You do not have permission to access the admin dashboard.",
+      variant: "destructive",
+    });
+    return <Redirect to="/dashboard" />;
   }
 
-  if (!user || user.role !== "admin") {
-    return <Navigate to="/" />;
+  // If still checking auth status, show loading
+  if (!user) {
+    return <LoadingState message="Checking authentication..." />;
   }
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <header className="border-b border-border bg-card shadow-sm">
-        <div className="container py-4 flex justify-between items-center">
-          <h1 className="text-2xl font-bold text-primary">TradeBikes Admin</h1>
-          <div className="flex items-center gap-4">
-            <span className="hidden md:block">Logged in as: {user.username}</span>
-            <Badge variant="outline">Admin</Badge>
-          </div>
-        </div>
-      </header>
+    <div className="container mx-auto py-8 px-4">
+      <h1 className="text-3xl font-bold mb-2">Admin Dashboard</h1>
+      <p className="text-muted-foreground mb-6">
+        Manage dealers, motorcycles, auctions, and messages.
+      </p>
 
-      <main className="container py-8">
-        <Tabs defaultValue="dealers" value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid grid-cols-4 mb-8">
-            <TabsTrigger value="dealers" className="flex gap-2 items-center">
-              <Users className="h-4 w-4" />
-              <span>Dealers</span>
-            </TabsTrigger>
-            <TabsTrigger value="motorcycles" className="flex gap-2 items-center">
-              <Bike className="h-4 w-4" />
-              <span>Motorcycles</span>
-            </TabsTrigger>
-            <TabsTrigger value="auctions" className="flex gap-2 items-center">
-              <Bell className="h-4 w-4" />
-              <span>Auctions</span>
-            </TabsTrigger>
-            <TabsTrigger value="messages" className="flex gap-2 items-center">
-              <MessageSquare className="h-4 w-4" />
-              <span>Messages</span>
-            </TabsTrigger>
-          </TabsList>
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
+        <TabsList className="grid grid-cols-4 w-full md:w-auto">
+          <TabsTrigger value="dealers">Dealers</TabsTrigger>
+          <TabsTrigger value="motorcycles">Motorcycles</TabsTrigger>
+          <TabsTrigger value="auctions">Listings</TabsTrigger>
+          <TabsTrigger value="messages">Messages</TabsTrigger>
+        </TabsList>
 
-          <TabsContent value="dealers">
-            <DealersList />
-          </TabsContent>
+        <TabsContent value="dealers" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>All Dealers</CardTitle>
+              <CardDescription>
+                List of all registered dealers in the system
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <DealersList />
+            </CardContent>
+          </Card>
+        </TabsContent>
 
-          <TabsContent value="motorcycles">
-            <MotorcyclesList />
-          </TabsContent>
+        <TabsContent value="motorcycles" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>All Motorcycles</CardTitle>
+              <CardDescription>
+                List of all motorcycles in the system
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <MotorcyclesList />
+            </CardContent>
+          </Card>
+        </TabsContent>
 
-          <TabsContent value="auctions">
-            <AuctionsList />
-          </TabsContent>
+        <TabsContent value="auctions" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>All Listings</CardTitle>
+              <CardDescription>
+                List of all listings (active, ended, and pending collection)
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <AuctionsList />
+            </CardContent>
+          </Card>
+        </TabsContent>
 
-          <TabsContent value="messages">
-            <MessagesList />
-          </TabsContent>
-        </Tabs>
-      </main>
+        <TabsContent value="messages" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>All Messages</CardTitle>
+              <CardDescription>
+                List of all messages between dealers
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <MessagesList />
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
 
 function DealersList() {
-  const { data: dealers, isLoading, error } = useQuery({
-    queryKey: ['/api/admin/dealers'],
-    queryFn: async () => {
-      const response = await apiRequest('GET', '/api/admin/dealers');
-      return response.json();
-    }
+  const { data: dealers, isLoading, error } = useQuery<User[]>({
+    queryKey: ["/api/admin/dealers"],
+    staleTime: 30000, // 30 seconds
   });
 
   if (isLoading) {
-    return <LoadingState message="Loading dealers..." />;
+    return <LoadingState />;
   }
 
   if (error) {
     return <ErrorState message="Failed to load dealers" error={error} />;
   }
 
+  if (!dealers || dealers.length === 0) {
+    return <div className="py-4">No dealers found in the system.</div>;
+  }
+
   return (
-    <div>
-      <h2 className="text-xl font-semibold mb-4">All Dealers</h2>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {dealers?.length > 0 ? (
-          dealers.map((dealer: User) => (
-            <Card key={dealer.id} className="overflow-hidden">
-              <CardHeader className="bg-muted pb-2">
-                <CardTitle>{dealer.username}</CardTitle>
-                <CardDescription>{dealer.companyName}</CardDescription>
-              </CardHeader>
-              <CardContent className="pt-4">
-                <div className="flex flex-col space-y-2 text-sm">
-                  <div className="flex items-center justify-between">
-                    <span className="font-medium">Email:</span>
-                    <span>{dealer.email}</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="font-medium">Role:</span>
-                    <Badge>{dealer.role}</Badge>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="font-medium">Phone:</span>
-                    <span>{dealer.phone || "Not provided"}</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="font-medium">Location:</span>
-                    <span>{dealer.city || "Unknown"}</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="font-medium">Joined:</span>
-                    <span>{new Date(dealer.createdAt).toLocaleDateString()}</span>
-                  </div>
-                </div>
-                
-                <div className="flex justify-end mt-4">
-                  <Button variant="outline" size="sm">View Details</Button>
-                </div>
-              </CardContent>
-            </Card>
-          ))
-        ) : (
-          <div className="col-span-full text-center py-8">
-            <p className="text-muted-foreground">No dealers found</p>
-          </div>
-        )}
-      </div>
+    <div className="overflow-x-auto">
+      <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+        <thead className="bg-gray-50 dark:bg-gray-800">
+          <tr>
+            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+              ID
+            </th>
+            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+              Username
+            </th>
+            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+              Company Name
+            </th>
+            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+              Role
+            </th>
+            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+              Email
+            </th>
+          </tr>
+        </thead>
+        <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-800">
+          {dealers.map((dealer: User) => (
+            <tr key={dealer.id}>
+              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                {dealer.id}
+              </td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm">
+                {dealer.username}
+              </td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm">
+                {dealer.companyName}
+              </td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm">
+                <Badge variant={dealer.role === "admin" ? "destructive" : "default"}>
+                  {dealer.role}
+                </Badge>
+              </td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm">
+                {dealer.email || "N/A"}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 }
 
 function MotorcyclesList() {
-  const { data: motorcycles, isLoading, error } = useQuery({
-    queryKey: ['/api/admin/motorcycles'],
-    queryFn: async () => {
-      const response = await apiRequest('GET', '/api/admin/motorcycles');
-      return response.json();
-    }
+  const { data: motorcycles, isLoading, error } = useQuery<Motorcycle[]>({
+    queryKey: ["/api/admin/motorcycles"],
+    staleTime: 30000, // 30 seconds
   });
 
   if (isLoading) {
-    return <LoadingState message="Loading motorcycles..." />;
+    return <LoadingState />;
   }
 
   if (error) {
     return <ErrorState message="Failed to load motorcycles" error={error} />;
   }
 
+  if (!motorcycles || motorcycles.length === 0) {
+    return <div className="py-4">No motorcycles found in the system.</div>;
+  }
+
   return (
-    <div>
-      <h2 className="text-xl font-semibold mb-4">All Motorcycles</h2>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {motorcycles?.length > 0 ? (
-          motorcycles.map((motorcycle: Motorcycle) => (
-            <Card key={motorcycle.id} className="overflow-hidden">
-              <CardHeader className="bg-muted pb-2">
-                <CardTitle>{motorcycle.year} {motorcycle.make} {motorcycle.model}</CardTitle>
-                <CardDescription>
-                  <Badge variant={motorcycle.status === 'available' ? 'default' : 
-                                 motorcycle.status === 'pending' ? 'secondary' : 'outline'}>
-                    {motorcycle.status}
-                  </Badge>
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="pt-4">
-                {motorcycle.images && motorcycle.images.length > 0 && (
-                  <div className="aspect-video overflow-hidden rounded-md mb-4">
-                    <img 
-                      src={motorcycle.images[0]} 
-                      alt={`${motorcycle.make} ${motorcycle.model}`} 
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                )}
-                
-                <div className="flex flex-col space-y-2 text-sm">
-                  <div className="flex items-center justify-between">
-                    <span className="font-medium">Mileage:</span>
-                    <span>{motorcycle.mileage.toLocaleString()} miles</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="font-medium">Engine:</span>
-                    <span>{motorcycle.engineSize || "Not specified"}</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="font-medium">Color:</span>
-                    <span>{motorcycle.color}</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="font-medium">Condition:</span>
-                    <span>{motorcycle.condition}</span>
-                  </div>
-                </div>
-                
-                <div className="flex justify-end mt-4">
-                  <Button variant="outline" size="sm">View Details</Button>
-                </div>
-              </CardContent>
-            </Card>
-          ))
-        ) : (
-          <div className="col-span-full text-center py-8">
-            <p className="text-muted-foreground">No motorcycles found</p>
-          </div>
-        )}
-      </div>
+    <div className="overflow-x-auto">
+      <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+        <thead className="bg-gray-50 dark:bg-gray-800">
+          <tr>
+            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+              ID
+            </th>
+            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+              Make
+            </th>
+            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+              Model
+            </th>
+            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+              Year
+            </th>
+            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+              Dealer ID
+            </th>
+            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+              Status
+            </th>
+          </tr>
+        </thead>
+        <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-800">
+          {motorcycles.map((motorcycle: Motorcycle) => (
+            <tr key={motorcycle.id}>
+              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                {motorcycle.id}
+              </td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm">
+                {motorcycle.make}
+              </td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm">
+                {motorcycle.model}
+              </td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm">
+                {motorcycle.year}
+              </td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm">
+                {motorcycle.dealerId}
+              </td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm">
+                <Badge variant={motorcycle.status === "available" ? "success" : motorcycle.status === "sold" ? "secondary" : "outline"}>
+                  {motorcycle.status || "N/A"}
+                </Badge>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 }
 
 function AuctionsList() {
-  const { data: auctions, isLoading, error } = useQuery({
-    queryKey: ['/api/admin/auctions'],
-    queryFn: async () => {
-      const response = await apiRequest('GET', '/api/admin/auctions');
-      return response.json();
-    }
+  const { data: auctions, isLoading, error } = useQuery<Auction[]>({
+    queryKey: ["/api/admin/auctions"],
+    staleTime: 30000, // 30 seconds
   });
 
   if (isLoading) {
-    return <LoadingState message="Loading auctions..." />;
+    return <LoadingState />;
   }
 
   if (error) {
-    return <ErrorState message="Failed to load auctions" error={error} />;
+    return <ErrorState message="Failed to load listings" error={error} />;
   }
 
+  if (!auctions || auctions.length === 0) {
+    return <div className="py-4">No listings found in the system.</div>;
+  }
+
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case "active":
+        return <Badge variant="success">Active</Badge>;
+      case "ended":
+        return <Badge variant="secondary">Ended</Badge>;
+      case "pending_collection":
+        return <Badge variant="warning">Pending Collection</Badge>;
+      case "completed":
+        return <Badge variant="default">Completed</Badge>;
+      case "no_sale":
+        return <Badge variant="outline">No Sale</Badge>;
+      default:
+        return <Badge variant="outline">{status}</Badge>;
+    }
+  };
+
   return (
-    <div>
-      <h2 className="text-xl font-semibold mb-4">All Auctions/Underwrites</h2>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {auctions?.length > 0 ? (
-          auctions.map((auction: Auction) => (
-            <Card key={auction.id} className="overflow-hidden">
-              <CardHeader className="bg-muted pb-2">
-                <div className="flex justify-between items-start">
-                  <CardTitle>Auction #{auction.id}</CardTitle>
-                  <Badge variant={auction.status === 'active' ? 'default' : 
-                                 auction.status === 'pending' ? 'secondary' : 
-                                 auction.status === 'completed' ? 'success' : 'outline'}>
-                    {auction.status}
-                  </Badge>
-                </div>
-                <CardDescription>
-                  Motorcycle ID: {auction.motorcycleId}
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="pt-4">
-                <div className="flex flex-col space-y-2 text-sm">
-                  <div className="flex items-center justify-between">
-                    <span className="font-medium">Seller:</span>
-                    <span>Dealer #{auction.dealerId}</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="font-medium">Started:</span>
-                    <span>{new Date(auction.startTime).toLocaleDateString()}</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="font-medium">Ends:</span>
-                    <span>{new Date(auction.endTime).toLocaleDateString()}</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="font-medium">Visibility:</span>
-                    <span>{auction.visibilityType}</span>
-                  </div>
-                  {auction.bidAccepted && (
-                    <div className="flex items-center justify-between">
-                      <span className="font-medium">Winner:</span>
-                      <span>Dealer #{auction.winningBidderId}</span>
-                    </div>
-                  )}
-                </div>
-                
-                <div className="flex justify-end mt-4">
-                  <Button variant="outline" size="sm">View Details</Button>
-                </div>
-              </CardContent>
-            </Card>
-          ))
-        ) : (
-          <div className="col-span-full text-center py-8">
-            <p className="text-muted-foreground">No auctions found</p>
-          </div>
-        )}
-      </div>
+    <div className="overflow-x-auto">
+      <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+        <thead className="bg-gray-50 dark:bg-gray-800">
+          <tr>
+            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+              ID
+            </th>
+            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+              Motorcycle ID
+            </th>
+            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+              Seller ID
+            </th>
+            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+              Start Time
+            </th>
+            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+              End Time
+            </th>
+            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+              Status
+            </th>
+          </tr>
+        </thead>
+        <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-800">
+          {auctions.map((auction: Auction) => (
+            <tr key={auction.id}>
+              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                {auction.id}
+              </td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm">
+                {auction.motorcycleId}
+              </td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm">
+                {auction.dealerId}
+              </td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm">
+                {format(new Date(auction.startTime), "dd MMM yyyy HH:mm")}
+              </td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm">
+                {format(new Date(auction.endTime), "dd MMM yyyy HH:mm")}
+              </td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm">
+                {getStatusBadge(auction.status)}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 }
 
 function MessagesList() {
+  const { data: messages, isLoading, error } = useQuery({
+    queryKey: ["/api/admin/messages"],
+    staleTime: 30000, // 30 seconds
+  });
+
+  if (isLoading) {
+    return <LoadingState />;
+  }
+
+  if (error) {
+    return <ErrorState message="Failed to load messages" error={error} />;
+  }
+
+  if (!messages || messages.length === 0) {
+    return <div className="py-4">No messages found in the system.</div>;
+  }
+
   return (
-    <div className="text-center py-12">
-      <h2 className="text-xl font-semibold mb-2">Messages Dashboard</h2>
-      <p className="text-muted-foreground">Messages monitoring and management coming soon.</p>
+    <div className="space-y-4">
+      {messages.map((message: any) => (
+        <Card key={message.id} className="mb-4">
+          <CardHeader className="pb-2">
+            <div className="flex justify-between">
+              <CardTitle className="text-sm font-medium">
+                From: User #{message.senderId} 
+                <span className="mx-2">→</span> 
+                To: User #{message.receiverId}
+              </CardTitle>
+              <Badge variant={message.read ? "outline" : "secondary"}>
+                {message.read ? "Read" : "Unread"}
+              </Badge>
+            </div>
+            <CardDescription className="text-xs">
+              {format(new Date(message.createdAt), "dd MMM yyyy HH:mm")}
+              {message.auctionId && <span> • Regarding Listing #{message.auctionId}</span>}
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm">{message.content}</p>
+          </CardContent>
+        </Card>
+      ))}
     </div>
   );
 }
@@ -330,9 +409,13 @@ function LoadingState({ message = "Loading..." }) {
 
 function ErrorState({ message, error }: { message: string; error: Error }) {
   return (
-    <div className="text-center py-12">
-      <h3 className="text-xl font-semibold text-destructive mb-2">{message}</h3>
-      <p className="text-muted-foreground">{error.message}</p>
+    <div className="flex flex-col items-center justify-center py-12 text-center">
+      <AlertTriangle className="h-8 w-8 text-destructive mb-4" />
+      <h3 className="text-lg font-semibold mb-2">{message}</h3>
+      <p className="text-muted-foreground mb-4">{error.message}</p>
+      <Button variant="outline" onClick={() => window.location.reload()}>
+        Try Again
+      </Button>
     </div>
   );
 }

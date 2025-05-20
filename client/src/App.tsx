@@ -11,6 +11,7 @@ import RegisterPage from "@/pages/register-page";
 import VerifyEmailPage from "@/pages/verify-email";
 import SubscriptionPage from "@/pages/subscription-page";
 import DealerDashboard from "@/pages/dealer-dashboard";
+import AdminDashboard from "@/pages/admin-dashboard";
 // Dealer dashboard handles both selling and buying functionality
 import AuctionsPage from "@/pages/auctions-page";
 import AuctionDetail from "@/pages/auction-detail";
@@ -45,6 +46,9 @@ function Router() {
       {/* Protected routes */}
       {/* All users are dealers who can both sell and buy */}
       <ProtectedRoute path="/dashboard" component={DealerDashboard} />
+      
+      {/* Admin dashboard route */}
+      <ProtectedRoute path="/admin" component={AdminDashboard} />
       
       <ProtectedRoute path="/subscription" component={SubscriptionPage} />
       <ProtectedRoute path="/auctions" component={MapSearchPage} />
@@ -120,6 +124,23 @@ function MainNavigation() {
                       Dashboard
                     </Link>
                   </li>
+                  
+                  {/* Admin dashboard link - only show for admin users */}
+                  {user.role === 'admin' && (
+                    <li>
+                      <Link 
+                        href="/admin" 
+                        className="text-white bg-red-600 hover:bg-red-700 rounded-md px-3 py-2 flex items-center"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 mr-1" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M12 4.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3Z"/>
+                          <path d="M19.5 10.5h-15a1.5 1.5 0 0 0 0 3h15a1.5 1.5 0 0 0 0-3Z"/>
+                          <path d="M16.5 18h-9a1.5 1.5 0 0 0 0 3h9a1.5 1.5 0 0 0 0-3Z"/>
+                        </svg>
+                        Admin
+                      </Link>
+                    </li>
+                  )}
                   
                   <li>
                     <Link 
@@ -212,6 +233,24 @@ function MainNavigation() {
                         Dashboard
                       </Link>
                     </li>
+                    
+                    {/* Admin dashboard link - only show for admin users */}
+                    {user.role === 'admin' && (
+                      <li>
+                        <Link 
+                          onClick={closeMobileMenu} 
+                          href="/admin" 
+                          className="block py-2 text-red-600 hover:text-red-700 flex items-center"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 mr-2" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M12 4.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3Z"/>
+                            <path d="M19.5 10.5h-15a1.5 1.5 0 0 0 0 3h15a1.5 1.5 0 0 0 0-3Z"/>
+                            <path d="M16.5 18h-9a1.5 1.5 0 0 0 0 3h9a1.5 1.5 0 0 0 0-3Z"/>
+                          </svg>
+                          Admin Panel
+                        </Link>
+                      </li>
+                    )}
                     
                     <li>
                       <Link onClick={closeMobileMenu} href="/search-map" className="block py-2 text-gray-600 dark:text-gray-300 hover:text-primary flex items-center">
