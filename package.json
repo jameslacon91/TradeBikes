@@ -5,7 +5,7 @@
   "license": "MIT",
   "scripts": {
     "dev": "NODE_ENV=development tsx server/index.ts",
-    "build": "vite build && echo '✅ Vite build complete'",
+    "build": "npm install && vite build && echo '✅ Vite build complete'",
     "start": "NODE_ENV=production tsx server/static-server.ts"
   },
   "dependencies": {
