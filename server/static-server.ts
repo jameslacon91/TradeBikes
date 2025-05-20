@@ -1,23 +1,33 @@
-import express, { type Express } from "express";
+import express from "express";
 import fs from "fs";
 import path from "path";
+import { fileURLToPath } from "url";
 
-/**
- * Serves static files from the build directory in production
- * This matches the exact implementation you requested
- */
-export function serveStatic(app: Express) {
-  const distPath = path.resolve(import.meta.dirname, "..", "build");
+// Fix for ES modules: get __dirname
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-  if (!fs.existsSync(distPath)) {
-    throw new Error(
-      `Could not find the build directory: ${distPath}, make sure to build the client using 'npm run build'`,
-    );
-  }
+// Setup Express
+const app = express();
+const PORT = process.env.PORT || 5000;
 
-  app.use(express.static(distPath));
+// Tell it where your built frontend lives
+const distPath = path.resolve(__dirname, "..", "dist", "public");
 
-  app.get("*", (_req, res) => {
-    res.sendFile(path.resolve(distPath, "index.html"));
-  });
+// Make sure the folder exists
+if (!fs.existsSync(distPath)) {
+  throw new Error(`Missing build folder at: ${distPath}`);
 }
+
+// Serve files (JS, CSS, etc.)
+app.use(express.static(distPath));
+
+// Serve index.html for everything else
+app.get("*", (_, res) => {
+  res.sendFile(path.join(distPath, "index.html"));
+});
+
+// Start the server
+app.listen(PORT, () => {
+  console.log(`✅ Server running on port ${PORT}`);
+});
