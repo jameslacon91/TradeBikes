@@ -2,20 +2,40 @@
  * Force deployment update by creating a timestamp file
  * This helps Replit recognize that changes have been made
  */
+import fs from 'fs';
+import { execSync } from 'child_process';
 
-const fs = require('fs');
-const path = require('path');
-
-// Create timestamp file with current date and time
+// Create timestamp file
 const timestamp = new Date().toISOString();
-fs.writeFileSync(path.join(__dirname, 'deployment-timestamp.txt'), timestamp);
+fs.writeFileSync('deployment-timestamp.txt', timestamp);
+console.log(`Created deployment timestamp: ${timestamp}`);
 
-// Update the force-rebuild file in the build directory
-if (!fs.existsSync(path.join(__dirname, 'build'))) {
-  fs.mkdirSync(path.join(__dirname, 'build'), { recursive: true });
+// Install the necessary packages globally to ensure they're available during build
+try {
+  console.log('Installing required build dependencies...');
+  execSync('npm install -g autoprefixer postcss tailwindcss@latest @tailwindcss/typography');
+  console.log('Global packages installed');
+  
+  // Also install them locally to be sure
+  execSync('npm install --save-dev autoprefixer postcss tailwindcss@latest @tailwindcss/typography');
+  console.log('Local packages installed');
+  
+  // Create the CJS format PostCSS config for deployment
+  const postcssConfigCjs = `module.exports = {
+  plugins: {
+    tailwindcss: {},
+    autoprefixer: {},
+  },
+};`;
+  fs.writeFileSync('postcss.config.cjs', postcssConfigCjs);
+  console.log('Created CJS format PostCSS config');
+  
+  // Create deployment marker file
+  fs.writeFileSync('.build-marker', timestamp);
+  console.log('✅ Deployment preparation complete');
+  
+  console.log('\nYour application is now ready for deployment.');
+  console.log('Click the Deploy button in Replit to deploy your TradeBikes application.');
+} catch (error) {
+  console.error('Error preparing deployment:', error);
 }
-
-fs.writeFileSync(path.join(__dirname, 'build', 'force-rebuild.txt'), timestamp);
-
-console.log(`Deployment force update created at ${timestamp}`);
-console.log('Your changes will be reflected in the next deployment.');

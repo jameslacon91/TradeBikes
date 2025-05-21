@@ -101,7 +101,7 @@
     "drizzle-kit": "^0.30.6",
     "esbuild": "^0.25.0",
     "postcss": "^8.5.3",
-    "tailwindcss": "^3.4.17",
+    "tailwindcss": "^4.1.7",
     "tsx": "^4.19.4",
     "typescript": "5.6.3",
     "vite": "^6.3.5"
