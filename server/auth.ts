@@ -142,8 +142,18 @@ export function setupAuth(app: Express) {
   app.post("/api/register", async (req, res, next) => {
     try {
       console.log("Registration attempt:", req.body.username);
+      console.log("Full registration data:", JSON.stringify(req.body));
       
       const { username, password, email, companyName, phone, address, city, postcode } = req.body;
+      
+      // Validate required fields
+      if (!username || !password || !email || !companyName) {
+        console.log("Registration validation failed - missing required fields");
+        return res.status(400).json({ 
+          message: "Missing required fields", 
+          details: "Username, password, email, and company name are required" 
+        });
+      }
       
       // Check for existing user
       const existingUser = await storage.getUserByUsername(username);
@@ -154,53 +164,64 @@ export function setupAuth(app: Express) {
       
       console.log(`Creating new user: ${username}`);
       
-      // Create users with dealer role by default (admin role is created manually in database)
-      const user = await storage.createUser({
-        username,
-        password,
-        email,
-        role: 'dealer', // Default role is dealer
-        companyName,
-        phone,
-        address,
-        city,
-        postcode,
-        // Set default values for new users
-        favoriteDealers: []
-        // Note: rating and totalRatings are managed internally by the storage system
-      });
-      
-      console.log(`User created successfully: ${username} (ID: ${user.id})`);
-      
-      // Remove password from response
-      const { password: _, ...userWithoutPassword } = user;
-      
-      // Add timestamp for cache busting
-      const userData = {
-        ...userWithoutPassword,
-        _ts: new Date().getTime() // Add timestamp to force client cache invalidation
-      };
-      
-      // Log the user in automatically
-      req.login(user, (err) => {
-        if (err) {
-          console.error(`Error during auto-login for new user: ${username}`, err);
-          return next(err);
-        }
-        console.log(`New user logged in: ${username}`);
-        debugSession(req);
-        
-        // Set a cookie header to help with cross-domain issues
-        res.cookie('loggedIn', 'true', {
-          ...cookieConfig.browser,
-          sameSite: cookieConfig.browser.sameSite as 'none' | 'lax' | 'strict'
+      try {
+        // Create users with dealer role by default (admin role is created manually in database)
+        const user = await storage.createUser({
+          username,
+          password,
+          email,
+          role: 'dealer', // Default role is dealer
+          companyName,
+          phone: phone || '',
+          address: address || '',
+          city: city || '',
+          postcode: postcode || '',
+          // Set default values for new users
+          favoriteDealers: []
+          // Note: rating and totalRatings are managed internally by the storage system
         });
         
-        res.status(201).json(userData);
-      });
+        console.log(`User created successfully: ${username} (ID: ${user.id})`);
+        
+        // Remove password from response
+        const { password: _, ...userWithoutPassword } = user;
+        
+        // Add timestamp for cache busting
+        const userData = {
+          ...userWithoutPassword,
+          _ts: new Date().getTime() // Add timestamp to force client cache invalidation
+        };
+        
+        // Log the user in automatically
+        req.login(user, (err) => {
+          if (err) {
+            console.error(`Error during auto-login for new user: ${username}`, err);
+            return next(err);
+          }
+          console.log(`New user logged in: ${username}`);
+          debugSession(req);
+          
+          // Set a cookie header to help with cross-domain issues
+          res.cookie('loggedIn', 'true', {
+            ...cookieConfig.browser,
+            sameSite: cookieConfig.browser.sameSite as 'none' | 'lax' | 'strict'
+          });
+          
+          res.status(201).json(userData);
+        });
+      } catch (userCreateError) {
+        console.error("Error creating user:", userCreateError);
+        return res.status(500).json({ 
+          message: "Failed to create user account", 
+          details: userCreateError.message || "Unknown error occurred"
+        });
+      }
     } catch (error) {
       console.error("Registration error:", error);
-      next(error);
+      res.status(500).json({ 
+        message: "Registration failed", 
+        details: error.message || "An unexpected error occurred"
+      });
     }
   });
 

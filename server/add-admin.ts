@@ -47,8 +47,30 @@ async function setupAdmin() {
       createdAt: new Date()
     };
     
-    // Add admin directly to memory storage
-    (storage as any).users.set(admin.id, admin);
+    // Add admin through the storage interface instead of direct access
+    try {
+      // First check if admin exists
+      const existingAdmin = await storage.getUserByUsername("admin");
+      if (existingAdmin) {
+        console.log("Admin already exists, skipping creation");
+      } else {
+        // Create the admin through the proper interface
+        await storage.createUser({
+          username: "admin",
+          password: adminPassword,
+          email: "admin@tradebikes.com",
+          role: "admin",
+          companyName: "TradeBikes Administration",
+          phone: "123456789",
+          address: "Admin HQ",
+          city: "London",
+          postcode: "EC1A 1BB",
+          favoriteDealers: []
+        });
+      }
+    } catch (innerError) {
+      console.log("Error adding admin directly:", innerError);
+    }
     console.log("Admin account ready - Username: admin, Password: password");
     
   } catch (error) {
