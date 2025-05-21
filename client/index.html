@@ -21,8 +21,9 @@
       content="black-translucent"
     />
     <meta name="apple-mobile-web-app-title" content="TradeBikes" />
+    <!-- Favicon -->
     <link rel="apple-touch-icon" href="/icons/icon-152x152.png" />
-    <link rel="icon" type="image/png" href="favicon"
+    <link rel="icon" type="image/png" href="/favicon.ico" />
     <link rel="icon" type="image/svg+xml" href="/icons/icon-512x512.svg" />
     <!-- Error handling script -->
     <script>
@@ -78,17 +79,19 @@
     <script>
       // This inline script ensures something always shows to users
       // even if external scripts fail to load
-      window.addEventListener('load', function() {
+      window.addEventListener("load", function () {
         console.log("Inline emergency fallback script loaded");
-        
-        setTimeout(function() {
+
+        setTimeout(function () {
           // Get the root element where React should render
-          const rootElement = document.getElementById('root');
-          
+          const rootElement = document.getElementById("root");
+
           // If the root is empty after 5 seconds, show an emergency UI
           if (rootElement && rootElement.childElementCount === 0) {
-            console.error('React app failed to load, showing inline emergency UI');
-            
+            console.error(
+              "React app failed to load, showing inline emergency UI",
+            );
+
             rootElement.innerHTML = `
               <div style="padding:20px;max-width:600px;margin:0 auto;font-family:system-ui,sans-serif;text-align:center;color:white;background:#1a202c;border-radius:8px;box-shadow:0 4px 6px rgba(0,0,0,0.1);margin-top:50px;">
                 <h1 style="font-size:24px;margin-bottom:20px;">TradeBikes</h1>
@@ -100,21 +103,26 @@
                 <div id="chat-container" style="margin-top:30px;text-align:left;"></div>
               </div>
             `;
-            
+
             // Attempt to initialize the standalone chat widget
-            if (typeof initializeChatWidget === 'function') {
+            if (typeof initializeChatWidget === "function") {
               try {
                 initializeChatWidget();
-                console.log("Standalone chat widget initialized from inline fallback");
+                console.log(
+                  "Standalone chat widget initialized from inline fallback",
+                );
               } catch (err) {
-                console.error("Failed to initialize chat widget from inline fallback:", err);
+                console.error(
+                  "Failed to initialize chat widget from inline fallback:",
+                  err,
+                );
               }
             }
           }
         }, 5000); // 5 second timeout for React to load
       });
     </script>
-    
+
     <!-- External emergency fallback (backup) -->
     <script src="/emergency-fallback.js"></script>
 
