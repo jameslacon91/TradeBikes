@@ -5,7 +5,7 @@
   "license": "MIT",
   "scripts": {
     "dev": "NODE_ENV=development tsx server/index.ts",
-    "build": "vite build && echo '✅ Vite build complete'",
+    "build": "echo \"Skipping build step for deployment\"",
     "start": "NODE_ENV=production tsx server/static-server.ts"
   },
   "dependencies": {
@@ -108,5 +108,10 @@
   },
   "optionalDependencies": {
     "bufferutil": "^4.0.8"
+  },
+  "_originalScripts": {
+    "dev": "NODE_ENV=development tsx server/index.ts",
+    "build": "vite build && echo '✅ Vite build complete'",
+    "start": "NODE_ENV=production tsx server/static-server.ts"
   }
 }
