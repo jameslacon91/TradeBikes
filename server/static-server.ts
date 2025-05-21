@@ -1,4 +1,4 @@
-import express from "express";
+import express, { Express } from "express";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -7,27 +7,34 @@ import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Setup Express
-const app = express();
-const PORT = process.env.PORT || 5000;
-
-// Tell it where your built frontend lives
-const distPath = path.resolve(__dirname, "..", "dist", "public");
-
-// Make sure the folder exists
-if (!fs.existsSync(distPath)) {
-  throw new Error(`Missing build folder at: ${distPath}`);
+// This function is exported and used by the main server
+export function serveStatic(app: Express) {
+  // Check for build folder first
+  let staticPath = path.resolve(__dirname, "..", "build");
+  
+  // If build doesn't exist, try dist/public
+  if (!fs.existsSync(staticPath)) {
+    staticPath = path.resolve(__dirname, "..", "dist", "public");
+    
+    // If dist/public doesn't exist either, use a relative path to build
+    if (!fs.existsSync(staticPath)) {
+      staticPath = path.resolve("build");
+      
+      // If none of these paths exist, warn but don't fail
+      if (!fs.existsSync(staticPath)) {
+        console.warn(`⚠️ Warning: Could not find static files at any expected location`);
+        return;
+      }
+    }
+  }
+  
+  console.log(`🌟 Serving static files from ${staticPath}`);
+  
+  // Serve static files
+  app.use(express.static(staticPath));
+  
+  // Serve index.html for client-side routing
+  app.get("*", (_, res) => {
+    res.sendFile(path.join(staticPath, "index.html"));
+  });
 }
-
-// Serve files (JS, CSS, etc.)
-app.use(express.static(distPath));
-
-// Serve index.html for everything else
-app.get("*", (_, res) => {
-  res.sendFile(path.join(distPath, "index.html"));
-});
-
-// Start the server
-app.listen(PORT, () => {
-  console.log(`✅ Server running on port ${PORT}`);
-});
