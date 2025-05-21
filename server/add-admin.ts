@@ -23,43 +23,32 @@ const credentials = {
 // This will be automatically executed when importing this file
 async function setupAdmin() {
   try {
-    // Add admin user if it doesn't exist
-    let adminUser = await storage.getUserByUsername(credentials.username);
+    // We're using memory storage, so this is a simpler approach
+    console.log("Creating new admin account directly...");
     
-    if (!adminUser) {
-      console.log("Creating new admin account...");
-      adminUser = await storage.createUser({
-        username: credentials.username,
-        password: await hashPassword(credentials.password),
-        email: "admin@tradebikes.com",
-        role: "admin",
-        companyName: "TradeBikes Administration",
-        phone: "123456789",
-        address: "Admin HQ",
-        city: "London",
-        postcode: "EC1A 1BB",
-        favoriteDealers: []
-      });
-      console.log(`Admin account created with ID: ${adminUser.id}`);
-    } else {
-      console.log("Admin account already exists");
-    }
+    // Direct in-memory approach
+    const adminPassword = await hashPassword(credentials.password);
     
-    // Ensure admin password is correct (update if necessary)
-    const pwdValid = await storage.comparePasswords(
-      credentials.password,
-      adminUser.password
-    );
+    // Simple creation approach - direct addition to storage
+    const admin = {
+      id: 999, // Special admin ID
+      username: "admin",
+      password: adminPassword,
+      email: "admin@tradebikes.com",
+      role: "admin",
+      companyName: "TradeBikes Administration",
+      phone: "123456789",
+      address: "Admin HQ",
+      city: "London",
+      postcode: "EC1A 1BB",
+      rating: 5,
+      totalRatings: 0,
+      favoriteDealers: [],
+      createdAt: new Date()
+    };
     
-    if (!pwdValid) {
-      console.log("Updating admin password...");
-      adminUser = await storage.updateUser(
-        adminUser.id, 
-        { password: await hashPassword(credentials.password) }
-      );
-      console.log("Admin password updated");
-    }
-    
+    // Add admin directly to memory storage
+    (storage as any).users.set(admin.id, admin);
     console.log("Admin account ready - Username: admin, Password: password");
     
   } catch (error) {
