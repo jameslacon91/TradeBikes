@@ -3,43 +3,36 @@
  * This script forces Replit to recognize changes in deployment
  * by creating a timestamp file and modifying critical paths
  */
+import fs from 'fs';
+import { execSync } from 'child_process';
 
-const fs = require('fs');
-const path = require('path');
-const { execSync } = require('child_process');
-
-// Create timestamp for unique identifier
+// Create timestamp file for deployment
 const timestamp = new Date().toISOString();
+fs.writeFileSync('deployment-timestamp.txt', timestamp);
+console.log(`Created deployment timestamp: ${timestamp}`);
 
+// Make sure the PostCSS config exists in CJS format for deployment
+const postcssConfig = `module.exports = {
+  plugins: {
+    tailwindcss: {},
+    autoprefixer: {},
+  },
+};`;
+
+fs.writeFileSync('postcss.config.cjs', postcssConfig);
+console.log('Created PostCSS config for deployment');
+
+// Add a simple deployment marker
 try {
-  // Update deployment timestamp in deploy.ts
-  const deployPath = path.join(__dirname, 'server', 'deploy.ts');
-  let deployContent = fs.readFileSync(deployPath, 'utf8');
-  deployContent = deployContent.replace(
-    /Last deployment: .*/,
-    `Last deployment: ${timestamp}`
-  );
-  fs.writeFileSync(deployPath, deployContent);
-  console.log('✅ Updated deployment timestamp in deploy.ts');
-
-  // Create/update force-rebuild.txt in the public directory
-  const forceRebuildPath = path.join(__dirname, 'client', 'public', 'force-rebuild.txt');
-  fs.writeFileSync(forceRebuildPath, `Force rebuild for deployment: ${timestamp}`);
-  console.log('✅ Created force-rebuild.txt');
-
-  // Create deployment-timestamp.txt at root
-  const timestampPath = path.join(__dirname, 'deployment-timestamp.txt');
-  fs.writeFileSync(timestampPath, timestamp);
-  console.log('✅ Created deployment-timestamp.txt');
-
-  // Create .build-marker file to force rebuild
+  console.log('Installing deployment dependencies...');
+  execSync('npm install -D autoprefixer postcss tailwindcss @tailwindcss/typography');
+  
+  // Create deployment marker file
   fs.writeFileSync('.build-marker', timestamp);
-  console.log('✅ Updated .build-marker file');
-
-  // Fix potential WebSocket issues in deployment
-  console.log('Deployment files prepared with timestamp:', timestamp);
-  console.log('Ready for deployment!');
+  console.log('✅ Deployment preparation complete');
+  
+  console.log('\nYour application is now ready for deployment.');
+  console.log('Click the Deploy button in Replit to deploy your TradeBikes application.');
 } catch (error) {
-  console.error('Error updating deployment files:', error);
-  process.exit(1);
+  console.error('Error preparing deployment:', error);
 }
