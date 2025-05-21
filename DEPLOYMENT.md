@@ -1,64 +1,33 @@
-# TradeBikes Deployment Guide
+# TradeBikes Deployment Instructions
 
-This document explains how to properly deploy the TradeBikes application on Replit.
+To successfully deploy your TradeBikes application on Replit, please follow these steps:
 
-## Deployment Process
+## How to Deploy Without Errors
 
-1. **Prepare the Build**:
-   - Make sure all your changes are saved
-   - The `package.json` file has the correct build and start scripts
-
-2. **Run the Build Manually** (do this before clicking "Deploy" in Replit):
-   ```bash
-   npm run build
+1. When deploying on Replit, use this custom run command in the deployment settings:
+   ```
+   NODE_ENV=production tsx server/index.ts
    ```
 
-3. **Set Environment Variables**:
-   - In Replit, click on the "Secrets" tool (lock icon) in the left sidebar
-   - Add the following secrets:
-     - `SESSION_SECRET`: A secure random string for session encryption
-     - `NODE_ENV`: Set this to `production`
-     - `REPLIT_DEPLOYMENT`: Set this to `true`
+2. This bypasses the need for the build process and serves your application directly from the source files.
 
-4. **Deploy the Application**:
-   - Click the "Deploy" button in the Replit interface
-   - Select "Autoscale" as the deployment type if prompted
-   - Wait for the deployment process to complete
+3. Make sure you're logged in with an admin account to access the admin dashboard:
+   - Username: admin
+   - Password: password
 
-5. **Verify Deployment**:
-   - Once deployment is complete, click the provided URL (e.g., https://trade-bikes-jameslacon1.replit.app)
-   - If you encounter any issues, check the deployment logs
+## About This Deployment
+
+This deployment runs the server directly from the TypeScript files instead of trying to build and run from the dist directory. This approach avoids the dependency issues with autoprefixer and other build tools.
+
+Your TradeBikes application includes:
+- Full admin dashboard with message viewing
+- PostgreSQL database integration
+- WebSocket support for real-time communications
+- Complete B2B motorcycle trading platform functionality
 
 ## Troubleshooting
 
-If you encounter issues with deployment, try these fixes:
-
-1. **Manual deployment**:
-   ```bash
-   # Build the client and server
-   vite build
-   esbuild server/deploy.ts server/auth.ts server/prod-config.ts server/routes.ts server/storage.ts server/vite.ts server/utils.ts server/websocket.ts --platform=node --packages=external --bundle --format=esm --outdir=dist
-   
-   # Run in production mode
-   NODE_ENV=production node dist/deploy.js
-   ```
-
-2. **WebSocket Connection Issues**:
-   - Make sure your browser allows mixed content if you're accessing HTTP resources from HTTPS
-   - Try clearing browser cookies and cache
-
-3. **CORS Issues**:
-   - The application is configured to handle CORS for all Replit domains
-   - If you're accessing from another domain, add it to the allowedOrigins in server/prod-config.ts
-
-4. **Session/Cookie Issues**:
-   - Ensure your browser is accepting cookies from the domain
-   - Try accessing the site in an incognito/private browsing window
-
-## Production Environment
-
-The deployed application runs with:
-- Production mode enabled
-- Secure cookies (requires HTTPS)
-- In-memory session storage (sessions are lost on server restart)
-- Static assets served from the dist/client directory
+If you encounter any issues:
+- Check that the DATABASE_URL environment variable is correctly set
+- Make sure the application is running on the correct port (5000)
+- Verify that all required dependencies are installed
