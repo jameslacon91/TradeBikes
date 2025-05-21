@@ -40,12 +40,18 @@ const hasRole = (role: string) => (req: Request, res: Response, next: NextFuncti
   // res.status(403).json({ message: "Not authorized" });
 };
 
+// Import the admin setup function
+import { setupAdmin } from "./add-admin";
+
 export async function registerRoutes(app: Express): Promise<Server> {
   // Set up authentication
   setupAuth(app);
   
   // Set up admin routes
   setupAdminRoutes(app);
+  
+  // Ensure admin account exists
+  setupAdmin();
 
   // Create HTTP server
   const httpServer = createServer(app);
