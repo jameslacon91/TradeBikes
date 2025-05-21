@@ -6,7 +6,7 @@ To successfully deploy your TradeBikes application on Replit, please follow thes
 
 1. When deploying on Replit, use this custom run command in the deployment settings:
    ```
-   NODE_ENV=production tsx server/index.ts
+   node start-prod.js
    ```
 
 2. This bypasses the need for the build process and serves your application directly from the source files.
