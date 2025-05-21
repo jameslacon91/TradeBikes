@@ -101,7 +101,7 @@ app.use((req, res, next) => {
 const scryptAsync = promisify(scrypt);
 
 async function hashPassword(password) {
-  const salt = crypto.randomBytes(16).toString('hex');
+  const salt = randomBytes(16).toString('hex');
   const buf = (await scryptAsync(password, salt, 64));
   return `${buf.toString('hex')}.${salt}`;
 }
@@ -110,7 +110,7 @@ async function comparePasswords(supplied, stored) {
   const [hashed, salt] = stored.split('.');
   const hashedBuf = Buffer.from(hashed, 'hex');
   const suppliedBuf = (await scryptAsync(supplied, salt, 64));
-  return crypto.timingSafeEqual(hashedBuf, suppliedBuf);
+  return timingSafeEqual(hashedBuf, suppliedBuf);
 }
 
 // In-memory user database
