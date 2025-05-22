@@ -1,10 +1,10 @@
 import { 
-  User, InsertUser, 
-  Motorcycle, InsertMotorcycle,
-  Auction, InsertAuction,
-  Bid, InsertBid,
-  Message, InsertMessage,
-  Notification, InsertNotification
+  User, InsertUser, users,
+  Motorcycle, InsertMotorcycle, motorcycles,
+  Auction, InsertAuction, auctions,
+  Bid, InsertBid, bids,
+  Message, InsertMessage, messages,
+  Notification, InsertNotification, notifications
 } from '@shared/schema';
 import MemoryStore from 'memorystore';
 import session from 'express-session';
