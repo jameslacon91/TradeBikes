@@ -1,33 +1,51 @@
-# TradeBikes Deployment Instructions
+# TradeBikes Deployment Guide
 
-To successfully deploy your TradeBikes application on Replit, please follow these steps:
+This document outlines how to deploy the TradeBikes platform.
 
-## How to Deploy Without Errors
+## Quick Deployment
 
-1. When deploying on Replit, use this custom run command in the deployment settings:
-   ```
-   node start-prod.js
-   ```
+For the quickest and most reliable deployment, use the standalone server:
 
-2. This bypasses the need for the build process and serves your application directly from the source files.
+```
+node start-server.cjs
+```
 
-3. Make sure you're logged in with an admin account to access the admin dashboard:
-   - Username: admin
-   - Password: password
+This server provides all essential functionality including:
+- User authentication (login/registration)
+- Motorcycle listings
+- Dealer information
+- WebSocket for real-time communication
 
-## About This Deployment
+## Test Accounts
 
-This deployment runs the server directly from the TypeScript files instead of trying to build and run from the dist directory. This approach avoids the dependency issues with autoprefixer and other build tools.
+You can use these pre-configured accounts to test the system:
 
-Your TradeBikes application includes:
-- Full admin dashboard with message viewing
-- PostgreSQL database integration
-- WebSocket support for real-time communications
-- Complete B2B motorcycle trading platform functionality
+- Admin account:
+  - Username: `admin`
+  - Password: `password`
 
-## Troubleshooting
+- Test dealer account:
+  - Username: `johndealer` 
+  - Password: `password123`
 
-If you encounter any issues:
-- Check that the DATABASE_URL environment variable is correctly set
-- Make sure the application is running on the correct port (5000)
-- Verify that all required dependencies are installed
+## Deployment Troubleshooting
+
+If you encounter any issues with the PostCSS configuration or build system, the standalone server bypasses these problems by using a simplified approach that doesn't rely on complex build tools.
+
+## Alternative Deployment Methods
+
+The following methods are also available but may require additional configuration:
+
+```
+NODE_ENV=production tsx server/index.ts
+```
+
+Or:
+
+```
+node production-server.js
+```
+
+## Replit Deployment
+
+For Replit deployment, the standalone server is recommended for its reliability and simplified approach.

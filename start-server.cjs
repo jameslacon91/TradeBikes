@@ -223,6 +223,11 @@ app.post('/api/logout', (req, res) => {
   }
 });
 
+// Health check endpoint
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
 // API endpoints for motorcycles
 app.get('/api/motorcycles', (req, res) => {
   res.json([
