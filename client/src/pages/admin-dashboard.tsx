@@ -4,7 +4,6 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -18,16 +17,23 @@ import { Button } from "@/components/ui/button";
 import { User } from "@shared/schema";
 import { Motorcycle } from "@shared/schema"; 
 import { Auction } from "@shared/schema";
-import { Loader2, AlertTriangle } from "lucide-react";
+import { Loader2, AlertTriangle, ArrowLeft, Users, Building2, Calendar, TrendingUp } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/use-auth";
 import { Redirect } from "wouter";
 
+interface DealerStats {
+  activeListings: number;
+  pendingCollection: number;
+  completedDeals: number;
+  totalBids: number;
+}
+
 export default function AdminDashboard() {
   const { user } = useAuth();
-  const [activeTab, setActiveTab] = useState("dealers");
+  const [selectedDealer, setSelectedDealer] = useState<User | null>(null);
   const { toast } = useToast();
 
   // Redirect non-admin users
@@ -47,375 +53,335 @@ export default function AdminDashboard() {
 
   return (
     <div className="container mx-auto py-8 px-4">
-      <h1 className="text-3xl font-bold mb-2">Admin Dashboard</h1>
-      <p className="text-muted-foreground mb-6">
-        Manage dealers, motorcycles, auctions, and messages.
-      </p>
+      <div className="flex items-center gap-4 mb-6">
+        {selectedDealer && (
+          <Button 
+            variant="outline" 
+            size="sm"
+            onClick={() => setSelectedDealer(null)}
+            className="flex items-center gap-2"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back to All Dealers
+          </Button>
+        )}
+        <h1 className="text-3xl font-bold">
+          {selectedDealer ? `${selectedDealer.companyName || selectedDealer.username} Details` : "Admin Dashboard"}
+        </h1>
+      </div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-        <TabsList className="grid grid-cols-4 w-full md:w-auto">
-          <TabsTrigger value="dealers">Dealers</TabsTrigger>
-          <TabsTrigger value="motorcycles">Motorcycles</TabsTrigger>
-          <TabsTrigger value="auctions">Listings</TabsTrigger>
-          <TabsTrigger value="messages">Messages</TabsTrigger>
+      {!selectedDealer ? (
+        <DealersOverview onSelectDealer={setSelectedDealer} />
+      ) : (
+        <DealerDetails dealer={selectedDealer} />
+      )}
+    </div>
+  );
+}
+
+function DealersOverview({ onSelectDealer }: { onSelectDealer: (dealer: User) => void }) {
+  const { data: dealers, isLoading: dealersLoading, error: dealersError } = useQuery<User[]>({
+    queryKey: ["/api/admin/dealers"],
+  });
+
+  const { data: motorcycles, isLoading: motorcyclesLoading } = useQuery<Motorcycle[]>({
+    queryKey: ["/api/admin/motorcycles"],
+  });
+
+  const { data: auctions, isLoading: auctionsLoading } = useQuery<Auction[]>({
+    queryKey: ["/api/admin/auctions"],
+  });
+
+  if (dealersLoading) {
+    return <LoadingState message="Loading dealers..." />;
+  }
+
+  if (dealersError) {
+    return <ErrorState message="Failed to load dealers" />;
+  }
+
+  const getDealerStats = (dealer: User): DealerStats => {
+    const dealerMotorcycles = motorcycles?.filter(m => m.dealerId === dealer.id) || [];
+    const dealerAuctions = auctions?.filter(a => 
+      dealerMotorcycles.some(m => m.id === a.motorcycleId)
+    ) || [];
+
+    return {
+      activeListings: dealerAuctions.filter(a => a.status === 'active').length,
+      pendingCollection: dealerAuctions.filter(a => a.status === 'pending_collection').length,
+      completedDeals: dealerAuctions.filter(a => a.status === 'completed').length,
+      totalBids: dealerAuctions.length, // Using auction count as proxy for bids
+    };
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total Dealers</CardTitle>
+            <Users className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{dealers?.filter(d => d.role === 'dealer').length || 0}</div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Active Listings</CardTitle>
+            <Building2 className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              {auctions?.filter(a => a.status === 'active').length || 0}
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Pending Collection</CardTitle>
+            <Calendar className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              {auctions?.filter(a => a.status === 'pending_collection').length || 0}
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Completed Deals</CardTitle>
+            <TrendingUp className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              {auctions?.filter(a => a.status === 'completed').length || 0}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>All Registered Dealers</CardTitle>
+          <CardDescription>
+            Click on a dealer to view their detailed activity and listings
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {dealersLoading || motorcyclesLoading || auctionsLoading ? (
+            <div className="flex items-center justify-center py-8">
+              <Loader2 className="h-8 w-8 animate-spin" />
+            </div>
+          ) : (
+            <div className="grid gap-4">
+              {dealers?.filter(dealer => dealer.role === 'dealer').map((dealer) => {
+                const stats = getDealerStats(dealer);
+                return (
+                  <Card 
+                    key={dealer.id} 
+                    className="cursor-pointer hover:shadow-md transition-shadow"
+                    onClick={() => onSelectDealer(dealer)}
+                  >
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <h3 className="font-semibold text-lg">
+                            {dealer.companyName || dealer.username}
+                          </h3>
+                          <p className="text-sm text-muted-foreground">
+                            Username: {dealer.username} | Email: {dealer.email}
+                          </p>
+                        </div>
+                        <div className="flex gap-4 text-sm">
+                          <div className="text-center">
+                            <div className="font-bold text-blue-600">{stats.activeListings}</div>
+                            <div className="text-muted-foreground">Active</div>
+                          </div>
+                          <div className="text-center">
+                            <div className="font-bold text-orange-600">{stats.pendingCollection}</div>
+                            <div className="text-muted-foreground">Pending</div>
+                          </div>
+                          <div className="text-center">
+                            <div className="font-bold text-green-600">{stats.completedDeals}</div>
+                            <div className="text-muted-foreground">Completed</div>
+                          </div>
+                          <div className="text-center">
+                            <div className="font-bold text-purple-600">{stats.totalBids}</div>
+                            <div className="text-muted-foreground">Total Listings</div>
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+              {dealers?.filter(dealer => dealer.role === 'dealer').length === 0 && (
+                <div className="text-center py-8 text-muted-foreground">
+                  No dealers registered yet
+                </div>
+              )}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
+function DealerDetails({ dealer }: { dealer: User }) {
+  const { data: motorcycles, isLoading: motorcyclesLoading } = useQuery<Motorcycle[]>({
+    queryKey: ["/api/admin/motorcycles"],
+  });
+
+  const { data: auctions, isLoading: auctionsLoading } = useQuery<Auction[]>({
+    queryKey: ["/api/admin/auctions"],
+  });
+
+  const dealerMotorcycles = motorcycles?.filter(m => m.dealerId === dealer.id) || [];
+  const dealerAuctions = auctions?.filter(a => 
+    dealerMotorcycles.some(m => m.id === a.motorcycleId)
+  ) || [];
+
+  const activeAuctions = dealerAuctions.filter(a => a.status === 'active');
+  const pendingAuctions = dealerAuctions.filter(a => a.status === 'pending_collection');
+  const completedAuctions = dealerAuctions.filter(a => a.status === 'completed');
+
+  if (motorcyclesLoading || auctionsLoading) {
+    return <LoadingState message="Loading dealer details..." />;
+  }
+
+  return (
+    <div className="space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle>Dealer Information</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="text-sm font-medium text-muted-foreground">Company Name</label>
+              <p className="text-lg">{dealer.companyName || 'Not specified'}</p>
+            </div>
+            <div>
+              <label className="text-sm font-medium text-muted-foreground">Username</label>
+              <p className="text-lg">{dealer.username}</p>
+            </div>
+            <div>
+              <label className="text-sm font-medium text-muted-foreground">Email</label>
+              <p className="text-lg">{dealer.email}</p>
+            </div>
+            <div>
+              <label className="text-sm font-medium text-muted-foreground">Role</label>
+              <Badge variant="secondary">{dealer.role}</Badge>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Tabs defaultValue="active" className="w-full">
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="active">
+            Active Listings ({activeAuctions.length})
+          </TabsTrigger>
+          <TabsTrigger value="pending">
+            Pending Collection ({pendingAuctions.length})
+          </TabsTrigger>
+          <TabsTrigger value="completed">
+            Completed Deals ({completedAuctions.length})
+          </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="dealers" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>All Dealers</CardTitle>
-              <CardDescription>
-                List of all registered dealers in the system
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <DealersList />
-            </CardContent>
-          </Card>
+        <TabsContent value="active" className="space-y-4">
+          <AuctionsList auctions={activeAuctions} motorcycles={dealerMotorcycles} />
         </TabsContent>
 
-        <TabsContent value="motorcycles" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>All Motorcycles</CardTitle>
-              <CardDescription>
-                List of all motorcycles in the system
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <MotorcyclesList />
-            </CardContent>
-          </Card>
+        <TabsContent value="pending" className="space-y-4">
+          <AuctionsList auctions={pendingAuctions} motorcycles={dealerMotorcycles} />
         </TabsContent>
 
-        <TabsContent value="auctions" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>All Listings</CardTitle>
-              <CardDescription>
-                List of all listings (active, ended, and pending collection)
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <AuctionsList />
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="messages" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>All Messages</CardTitle>
-              <CardDescription>
-                List of all messages between dealers
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <MessagesList />
-            </CardContent>
-          </Card>
+        <TabsContent value="completed" className="space-y-4">
+          <AuctionsList auctions={completedAuctions} motorcycles={dealerMotorcycles} />
         </TabsContent>
       </Tabs>
     </div>
   );
 }
 
-function DealersList() {
-  const { data: dealers, isLoading, error } = useQuery<User[]>({
-    queryKey: ["/api/admin/dealers"],
-    staleTime: 30000, // 30 seconds
-  });
-
-  if (isLoading) {
-    return <LoadingState />;
-  }
-
-  if (error) {
-    return <ErrorState message="Failed to load dealers" error={error} />;
-  }
-
-  if (!dealers || dealers.length === 0) {
-    return <div className="py-4">No dealers found in the system.</div>;
+function AuctionsList({ auctions, motorcycles }: { auctions: Auction[], motorcycles: Motorcycle[] }) {
+  if (auctions.length === 0) {
+    return (
+      <div className="text-center py-8 text-muted-foreground">
+        No listings in this category
+      </div>
+    );
   }
 
   return (
-    <div className="overflow-x-auto">
-      <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-        <thead className="bg-gray-50 dark:bg-gray-800">
-          <tr>
-            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-              ID
-            </th>
-            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-              Username
-            </th>
-            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-              Company Name
-            </th>
-            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-              Role
-            </th>
-            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-              Email
-            </th>
-          </tr>
-        </thead>
-        <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-800">
-          {dealers.map((dealer: User) => (
-            <tr key={dealer.id}>
-              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                {dealer.id}
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm">
-                {dealer.username}
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm">
-                {dealer.companyName}
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm">
-                <Badge variant={dealer.role === "admin" ? "destructive" : "default"}>
-                  {dealer.role}
-                </Badge>
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm">
-                {dealer.email || "N/A"}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+    <div className="grid gap-4">
+      {auctions.map((auction) => {
+        const motorcycle = motorcycles.find(m => m.id === auction.motorcycleId);
+        if (!motorcycle) return null;
+
+        return (
+          <Card key={auction.id}>
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="font-semibold">
+                    {motorcycle.year} {motorcycle.make} {motorcycle.model}
+                  </h3>
+                  <p className="text-sm text-muted-foreground">
+                    Mileage: {motorcycle.mileage?.toLocaleString()} | 
+                    Engine: {motorcycle.engineSize || 'Not specified'}
+                  </p>
+                  {auction.endTime && (
+                    <p className="text-sm text-muted-foreground">
+                      Ends: {format(new Date(auction.endTime), "PPP 'at' p")}
+                    </p>
+                  )}
+                </div>
+                <div className="text-right">
+                  <Badge 
+                    variant={
+                      auction.status === 'active' ? 'default' :
+                      auction.status === 'pending_collection' ? 'secondary' :
+                      'outline'
+                    }
+                  >
+                    {auction.status.replace('_', ' ')}
+                  </Badge>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Auction #{auction.id}
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        );
+      })}
     </div>
   );
 }
 
-function MotorcyclesList() {
-  const { data: motorcycles, isLoading, error } = useQuery<Motorcycle[]>({
-    queryKey: ["/api/admin/motorcycles"],
-    staleTime: 30000, // 30 seconds
-  });
-
-  if (isLoading) {
-    return <LoadingState />;
-  }
-
-  if (error) {
-    return <ErrorState message="Failed to load motorcycles" error={error} />;
-  }
-
-  if (!motorcycles || motorcycles.length === 0) {
-    return <div className="py-4">No motorcycles found in the system.</div>;
-  }
-
+// Helper components for loading and error states
+function LoadingState({ message }: { message: string }) {
   return (
-    <div className="overflow-x-auto">
-      <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-        <thead className="bg-gray-50 dark:bg-gray-800">
-          <tr>
-            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-              ID
-            </th>
-            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-              Make
-            </th>
-            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-              Model
-            </th>
-            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-              Year
-            </th>
-            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-              Dealer ID
-            </th>
-            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-              Status
-            </th>
-          </tr>
-        </thead>
-        <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-800">
-          {motorcycles.map((motorcycle: Motorcycle) => (
-            <tr key={motorcycle.id}>
-              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                {motorcycle.id}
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm">
-                {motorcycle.make}
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm">
-                {motorcycle.model}
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm">
-                {motorcycle.year}
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm">
-                {motorcycle.dealerId}
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm">
-                <Badge variant={motorcycle.status === "available" ? "success" : motorcycle.status === "sold" ? "secondary" : "outline"}>
-                  {motorcycle.status || "N/A"}
-                </Badge>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+    <div className="flex items-center justify-center py-8">
+      <Loader2 className="h-8 w-8 animate-spin mr-2" />
+      <span>{message}</span>
     </div>
   );
 }
 
-function AuctionsList() {
-  const { data: auctions, isLoading, error } = useQuery<Auction[]>({
-    queryKey: ["/api/admin/auctions"],
-    staleTime: 30000, // 30 seconds
-  });
-
-  if (isLoading) {
-    return <LoadingState />;
-  }
-
-  if (error) {
-    return <ErrorState message="Failed to load listings" error={error} />;
-  }
-
-  if (!auctions || auctions.length === 0) {
-    return <div className="py-4">No listings found in the system.</div>;
-  }
-
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case "active":
-        return <Badge variant="success">Active</Badge>;
-      case "ended":
-        return <Badge variant="secondary">Ended</Badge>;
-      case "pending_collection":
-        return <Badge variant="warning">Pending Collection</Badge>;
-      case "completed":
-        return <Badge variant="default">Completed</Badge>;
-      case "no_sale":
-        return <Badge variant="outline">No Sale</Badge>;
-      default:
-        return <Badge variant="outline">{status}</Badge>;
-    }
-  };
-
+function ErrorState({ message }: { message: string }) {
   return (
-    <div className="overflow-x-auto">
-      <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-        <thead className="bg-gray-50 dark:bg-gray-800">
-          <tr>
-            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-              ID
-            </th>
-            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-              Motorcycle ID
-            </th>
-            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-              Seller ID
-            </th>
-            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-              Start Time
-            </th>
-            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-              End Time
-            </th>
-            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-              Status
-            </th>
-          </tr>
-        </thead>
-        <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-800">
-          {auctions.map((auction: Auction) => (
-            <tr key={auction.id}>
-              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                {auction.id}
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm">
-                {auction.motorcycleId}
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm">
-                {auction.dealerId}
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm">
-                {format(new Date(auction.startTime), "dd MMM yyyy HH:mm")}
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm">
-                {format(new Date(auction.endTime), "dd MMM yyyy HH:mm")}
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm">
-                {getStatusBadge(auction.status)}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
-}
-
-function MessagesList() {
-  const { data: messages, isLoading, error } = useQuery({
-    queryKey: ["/api/admin/messages"],
-    staleTime: 30000, // 30 seconds
-  });
-
-  if (isLoading) {
-    return <LoadingState />;
-  }
-
-  if (error) {
-    return <ErrorState message="Failed to load messages" error={error} />;
-  }
-
-  if (!messages || messages.length === 0) {
-    return <div className="py-4">No messages found in the system.</div>;
-  }
-
-  return (
-    <div className="space-y-4">
-      {messages.map((message: any) => (
-        <Card key={message.id} className="mb-4">
-          <CardHeader className="pb-2">
-            <div className="flex justify-between">
-              <CardTitle className="text-sm font-medium">
-                From: User #{message.senderId} 
-                <span className="mx-2">→</span> 
-                To: User #{message.receiverId}
-              </CardTitle>
-              <Badge variant={message.read ? "outline" : "secondary"}>
-                {message.read ? "Read" : "Unread"}
-              </Badge>
-            </div>
-            <CardDescription className="text-xs">
-              {format(new Date(message.createdAt), "dd MMM yyyy HH:mm")}
-              {message.auctionId && <span> • Regarding Listing #{message.auctionId}</span>}
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm">{message.content}</p>
-          </CardContent>
-        </Card>
-      ))}
-    </div>
-  );
-}
-
-function LoadingState({ message = "Loading..." }) {
-  return (
-    <div className="flex flex-col items-center justify-center py-12">
-      <Loader2 className="h-8 w-8 animate-spin text-primary mb-4" />
-      <p className="text-muted-foreground">{message}</p>
-    </div>
-  );
-}
-
-function ErrorState({ message, error }: { message: string; error: Error }) {
-  return (
-    <div className="flex flex-col items-center justify-center py-12 text-center">
-      <AlertTriangle className="h-8 w-8 text-destructive mb-4" />
-      <h3 className="text-lg font-semibold mb-2">{message}</h3>
-      <p className="text-muted-foreground mb-4">{error.message}</p>
-      <Button variant="outline" onClick={() => window.location.reload()}>
-        Try Again
-      </Button>
+    <div className="flex items-center justify-center py-8 text-red-500">
+      <AlertTriangle className="h-8 w-8 mr-2" />
+      <span>{message}</span>
     </div>
   );
 }
