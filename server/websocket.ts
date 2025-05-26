@@ -7,25 +7,41 @@ import { WSMessage } from '@shared/types';
 const clients = new Map<number, WebSocket>();
 
 export function setupWebSocket(server: Server) {
-  // Configure WebSocket server with more tolerant settings for cross-domain support
-  const wss = new WebSocketServer({ 
-    server, 
-    path: '/ws',
-    clientTracking: true,
-    // Use simpler configuration for better cross-domain support
-    perMessageDeflate: {
-      zlibDeflateOptions: {
-        chunkSize: 1024,
-        level: 3
-      },
-      zlibInflateOptions: {
-        chunkSize: 10 * 1024
-      },
-      serverNoContextTakeover: true,
-      clientNoContextTakeover: true,
-      threshold: 1024
+  // Configure WebSocket server with error handling for port conflicts
+  let wss;
+  try {
+    wss = new WebSocketServer({ 
+      server, 
+      path: '/ws',
+      clientTracking: true,
+      // Use simpler configuration for better cross-domain support
+      perMessageDeflate: {
+        zlibDeflateOptions: {
+          chunkSize: 1024,
+          level: 3
+        },
+        zlibInflateOptions: {
+          chunkSize: 10 * 1024
+        },
+        serverNoContextTakeover: true,
+        clientNoContextTakeover: true,
+        threshold: 1024
+      }
+    });
+  } catch (error: any) {
+    console.error('WebSocket server error:', error);
+    if (error.code === 'EADDRINUSE') {
+      console.log('WebSocket port conflict detected, creating simplified server...');
+      // Create a basic WebSocket server without advanced options
+      wss = new WebSocketServer({ 
+        server, 
+        path: '/ws',
+        clientTracking: true
+      });
+    } else {
+      throw error;
     }
-  });
+  }
   
   // Add isAlive property to WebSocket
   function heartbeat(this: WebSocket) {

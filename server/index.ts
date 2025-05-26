@@ -135,11 +135,25 @@ app.use((req, res, next) => {
   // this serves both the API and the client.
   // It is the only port that is not firewalled.
   const port = 5000;
-  server.listen({
-    port,
-    host: "0.0.0.0",
-    reusePort: true,
-  }, () => {
-    log(`serving on port ${port}`);
-  });
+  
+  // Start server with error handling for port conflicts
+  try {
+    server.listen({
+      port,
+      host: "0.0.0.0",
+      reusePort: true,
+    }, () => {
+      log(`serving on port ${port}`);
+    });
+  } catch (error: any) {
+    if (error.code === 'EADDRINUSE') {
+      console.log(`Port ${port} is busy, trying alternative startup...`);
+      // Try without reusePort option
+      server.listen(port, "0.0.0.0", () => {
+        log(`serving on port ${port} (alternative startup)`);
+      });
+    } else {
+      throw error;
+    }
+  }
 })();
