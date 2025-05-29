@@ -3,6 +3,10 @@ import react from "@vitejs/plugin-react";
 import path from "path";
 
 export default defineConfig({
+    ssr: {
+    external: ["@babel/preset-typescript"],
+        noExternal: ["@babel/preset-typescript"]
+  },
   plugins: [react()],
   resolve: {
     alias: {
@@ -15,5 +19,11 @@ export default defineConfig({
   build: {
     outDir: path.resolve(import.meta.dirname, "dist", "public"),
     emptyOutDir: true,
+    rollupOptions: {
+      external: ["@babel/preset-typescript", "lightningcss"]
+    }
   },
+  optimizeDeps: {
+  exclude: ['@babel/preset-typescript', 'lightningcss']
+  }
 });
