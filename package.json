@@ -5,8 +5,8 @@
   "license": "MIT",
 
   "scripts": {
-    "dev":   "vite",
-    "build": "vite build && tsc -p server/tsconfig.json",
+    "dev":   "npx vite", 
+    "build": "npx vite build && npx tsc -p server/tsconfig.json",
     "start": "node dist/server/index.js"
   },
 
